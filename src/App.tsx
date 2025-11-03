@@ -11,6 +11,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import BookingCalendar from './components/BookingCalendar';
 
 const styles = {
   gradient: {
@@ -134,6 +135,12 @@ export default function CarlsNewtonLanding() {
                 Packages
               </a>
               <a
+                href="#booking"
+                style={{ color: '#06B6D4', textDecoration: 'none' }}
+              >
+                Booking
+              </a>
+              <a
                 href="#testimonials"
                 style={{ color: '#06B6D4', textDecoration: 'none' }}
               >
@@ -141,7 +148,12 @@ export default function CarlsNewtonLanding() {
               </a>
             </div>
 
-            <button style={styles.button}>Book a Show</button>
+            <button
+              style={styles.button}
+              onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Book a Show
+            </button>
           </div>
         </div>
       </nav>
@@ -241,7 +253,10 @@ export default function CarlsNewtonLanding() {
               alignItems: 'center',
             }}
           >
-            <button style={styles.button}>
+            <button
+              style={styles.button}
+              onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <Calendar size={20} />
               <span>Book Your Show</span>
             </button>
@@ -562,6 +577,39 @@ export default function CarlsNewtonLanding() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Booking Calendar Section */}
+      <section
+        style={{
+          padding: '80px 16px',
+          background: 'rgba(0, 0, 0, 0.2)',
+        }}
+        id="booking"
+      >
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <h2
+            style={{
+              fontSize: '48px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            Book Your Show
+          </h2>
+          <p
+            style={{
+              textAlign: 'center',
+              color: '#C4B5FD',
+              marginBottom: '48px',
+              fontSize: '18px',
+            }}
+          >
+            Select a date and time that works best for your school
+          </p>
+          <BookingCalendar />
         </div>
       </section>
 
