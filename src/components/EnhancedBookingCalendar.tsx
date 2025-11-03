@@ -38,8 +38,8 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   // Google Maps refs
   const mapRef = useRef<HTMLDivElement>(null);
-  const addressInputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const autocompleteContainerRef = useRef<HTMLDivElement>(null);
+  const autocompleteRef = useRef<google.maps.places.PlaceAutocompleteElement | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
 
@@ -50,7 +50,7 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   // Initialize Google Maps and Places Autocomplete
   useEffect(() => {
-    if (!showBookingModal || !addressInputRef.current || !mapRef.current) return;
+    if (!showBookingModal || !autocompleteContainerRef.current || !mapRef.current) return;
 
     const initMaps = async () => {
       try {
@@ -63,7 +63,8 @@ const EnhancedBookingCalendar: React.FC = () => {
         // Import the required libraries using the new functional API
         const { Map } = await importLibrary('maps') as google.maps.MapsLibrary;
         const { Marker } = await importLibrary('marker') as google.maps.MarkerLibrary;
-        const { Autocomplete } = await importLibrary('places') as google.maps.PlacesLibrary;
+        // Load places library (registers PlaceAutocompleteElement web component)
+        await importLibrary('places');
 
         // Default location (Dubai, UAE)
         let defaultCenter = { lat: 25.2048, lng: 55.2708 };
@@ -115,32 +116,43 @@ const EnhancedBookingCalendar: React.FC = () => {
           }
         }
 
-        // Initialize Places Autocomplete
-        if (addressInputRef.current && !autocompleteRef.current) {
-          autocompleteRef.current = new Autocomplete(
-            addressInputRef.current,
-            {
-              componentRestrictions: { country: ['ae', 'sa', 'kw', 'qa', 'om', 'bh', 'eg'] },
-              fields: ['formatted_address', 'geometry', 'address_components'],
-            }
-          );
+        // Initialize Places Autocomplete using the new PlaceAutocompleteElement API
+        if (autocompleteContainerRef.current && !autocompleteRef.current) {
+          // Create the new PlaceAutocompleteElement (web component)
+          const autocompleteElement = document.createElement('gmp-place-autocomplete') as google.maps.places.PlaceAutocompleteElement;
 
-          autocompleteRef.current.addListener('place_changed', () => {
-            const place = autocompleteRef.current?.getPlace();
-            if (place?.geometry?.location) {
-              const lat = place.geometry.location.lat();
-              const lng = place.geometry.location.lng();
-              const address = place.formatted_address || '';
+          // Configure the autocomplete element
+          autocompleteElement.setAttribute('placeholder', 'Search for your address *');
+          autocompleteElement.setAttribute('country', 'ae,sa,kw,qa,om,bh,eg');
+
+          // Style the autocomplete element to match the form
+          autocompleteElement.style.width = '100%';
+
+          // Clear the container and append the autocomplete element
+          autocompleteContainerRef.current.innerHTML = '';
+          autocompleteContainerRef.current.appendChild(autocompleteElement);
+
+          // Store ref
+          autocompleteRef.current = autocompleteElement;
+
+          // Listen for place selection using the new event
+          autocompleteElement.addEventListener('gmp-placeselect', async (event: any) => {
+            const place = event.place;
+
+            if (place && place.location) {
+              const lat = place.location.lat();
+              const lng = place.location.lng();
+              const address = place.formattedAddress || '';
 
               // Extract city from address components
               let city = '';
-              if (place.address_components) {
-                const cityComponent = place.address_components.find(
-                  (component: google.maps.GeocoderAddressComponent) =>
+              if (place.addressComponents) {
+                const cityComponent = place.addressComponents.find(
+                  (component: any) =>
                     component.types.includes('locality') ||
                     component.types.includes('administrative_area_level_1')
                 );
-                city = cityComponent?.long_name || '';
+                city = cityComponent?.longText || '';
               }
 
               setFormData((prev) => ({
@@ -928,14 +940,14 @@ const EnhancedBookingCalendar: React.FC = () => {
                   <MapPin size={16} />
                   <span>Location (Search for your address)</span>
                 </div>
-                <input
-                  ref={addressInputRef}
-                  type="text"
-                  placeholder="Search for your address *"
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  style={styles.input}
+                <div
+                  ref={autocompleteContainerRef}
+                  style={{
+                    ...styles.input,
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 />
                 <div ref={mapRef} style={styles.mapContainer} />
                 <textarea
