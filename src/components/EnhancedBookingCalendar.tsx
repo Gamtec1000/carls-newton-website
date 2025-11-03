@@ -21,6 +21,8 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Form data with location fields
   const [formData, setFormData] = useState({
@@ -48,27 +50,80 @@ const EnhancedBookingCalendar: React.FC = () => {
     fetchBookings();
   }, [currentDate]);
 
+  // Load Google Maps script
+  const loadGoogleMaps = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (window.google && window.google.maps && window.google.maps.Map) {
+        resolve();
+        return;
+      }
+
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+
+      if (!apiKey) {
+        reject(new Error('Google Maps API key is missing'));
+        return;
+      }
+
+      // Check if script is already being loaded
+      const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
+      if (existingScript) {
+        // Script exists, wait for it to load
+        existingScript.addEventListener('load', () => {
+          setTimeout(() => {
+            if (window.google && window.google.maps && window.google.maps.Map) {
+              resolve();
+            } else {
+              reject(new Error('Google Maps failed to initialize'));
+            }
+          }, 100);
+        });
+        return;
+      }
+
+      // Create script
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        // Wait a bit more to ensure google.maps is fully available
+        setTimeout(() => {
+          if (window.google && window.google.maps && window.google.maps.Map) {
+            resolve();
+          } else {
+            reject(new Error('Google Maps failed to initialize'));
+          }
+        }, 100);
+      };
+
+      script.onerror = () => {
+        reject(new Error('Failed to load Google Maps script. Check your API key and network connection.'));
+      };
+
+      document.head.appendChild(script);
+    });
+  };
+
   // Initialize Google Maps and Places Autocomplete
   useEffect(() => {
-    if (!showBookingModal || !addressInputRef.current || !mapRef.current) return;
+    if (!showBookingModal) return;
 
     const initMaps = async () => {
+      // Check if refs are available
+      if (!addressInputRef.current || !mapRef.current) {
+        console.warn('Map or input ref not available yet');
+        return;
+      }
+
+      setMapLoading(true);
+      setMapError(null);
+
       try {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-
-        // Load Google Maps script if not already loaded
-        if (!window.google || !window.google.maps) {
-          const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
-          script.async = true;
-          script.defer = true;
-
-          await new Promise<void>((resolve, reject) => {
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Failed to load Google Maps script'));
-            document.head.appendChild(script);
-          });
-        }
+        // Wait for Google Maps to load
+        await loadGoogleMaps();
 
         // Initialize map centered on Dubai, UAE
         if (mapRef.current && !mapInstanceRef.current) {
@@ -137,12 +192,21 @@ const EnhancedBookingCalendar: React.FC = () => {
             }
           });
         }
+
+        setMapLoading(false);
       } catch (error) {
         console.error('Error loading Google Maps:', error);
+        setMapError(error instanceof Error ? error.message : 'Failed to load map');
+        setMapLoading(false);
       }
     };
 
-    initMaps();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      initMaps();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [showBookingModal]);
 
   const fetchBookings = async () => {
@@ -913,7 +977,50 @@ const EnhancedBookingCalendar: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   style={styles.input}
                 />
-                <div ref={mapRef} style={{ ...styles.mapContainer, marginBottom: '24px' }} />
+                <div style={{ ...styles.mapContainer, marginBottom: '24px', position: 'relative' }}>
+                  {mapLoading && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '12px',
+                      zIndex: 10,
+                    }}>
+                      <div style={{ textAlign: 'center', color: '#A78BFA' }}>
+                        <div style={{ marginBottom: '8px' }}>Loading map...</div>
+                        <div style={{ fontSize: '12px', opacity: 0.7 }}>Please wait</div>
+                      </div>
+                    </div>
+                  )}
+                  {mapError && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      zIndex: 10,
+                    }}>
+                      <div style={{ textAlign: 'center', color: '#FCA5A5' }}>
+                        <AlertCircle size={32} style={{ marginBottom: '8px' }} />
+                        <div style={{ fontSize: '14px' }}>{mapError}</div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={mapRef} style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
+                </div>
                 <input
                   type="text"
                   placeholder="Apt/Flat/Building Number or Landmarks (Optional)"
