@@ -100,26 +100,16 @@ export default function CarlsNewtonLanding() {
               height: '64px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <img
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
+                  height: '56px',
+                  width: 'auto',
                   objectFit: 'contain'
                 }}
               />
-              <span
-                style={{
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  ...styles.textGradient,
-                }}
-              >
-                Carls Newton
-              </span>
             </div>
 
             <div
