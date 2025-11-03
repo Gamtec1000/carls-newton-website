@@ -1,63 +1,37 @@
-import { Handler, HandlerEvent } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || '',
-  process.env.VITE_SUPABASE_ANON_KEY || ''
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
 const resend = new Resend(process.env.RESEND_API_KEY || '');
 
-interface BookingRequest {
-  customer_name: string;
-  organization_name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city?: string;
-  latitude?: number;
-  longitude?: number;
-  package_type: 'preschool' | 'classic' | 'halfday';
-  date: string;
-  time_slot: string;
-  message?: string;
-}
-
-const PACKAGE_PRICES: Record<string, number> = {
+const PACKAGE_PRICES = {
   preschool: 1200,
   classic: 1800,
   halfday: 2500,
 };
 
-export const handler: Handler = async (event: HandlerEvent) => {
+export default async function handler(req, res) {
   // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
   // Handle OPTIONS request for CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   // Only allow POST
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const bookingData: BookingRequest = JSON.parse(event.body || '{}');
+    const bookingData = req.body;
 
     // Validate required fields
     if (
@@ -65,20 +39,16 @@ export const handler: Handler = async (event: HandlerEvent) => {
       !bookingData.organization_name ||
       !bookingData.email ||
       !bookingData.phone ||
-      !bookingData.address ||
+      !bookingData.full_address ||
       !bookingData.package_type ||
       !bookingData.date ||
       !bookingData.time_slot
     ) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing required fields' }),
-      };
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Get price for package
-    const price = PACKAGE_PRICES[bookingData.package_type];
+    const price = PACKAGE_PRICES[bookingData.package_type] || bookingData.price;
 
     // Create booking in Supabase
     const { data: booking, error: dbError } = await supabase
@@ -89,7 +59,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
           organization_name: bookingData.organization_name,
           email: bookingData.email,
           phone: bookingData.phone,
-          address: bookingData.address,
+          full_address: bookingData.full_address,
+          address_details: bookingData.address_details || null,
           city: bookingData.city || null,
           latitude: bookingData.latitude || null,
           longitude: bookingData.longitude || null,
@@ -107,16 +78,15 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to create booking', details: dbError.message }),
-      };
+      return res.status(500).json({
+        error: 'Failed to create booking',
+        details: dbError.message
+      });
     }
 
     // Send email notifications via Resend
     try {
-      const packageNames: Record<string, string> = {
+      const packageNames = {
         preschool: 'Preschool Special (30-45 mins)',
         classic: 'Classic Show (45-60 mins)',
         halfday: 'Half-Day Experience (4 hours)',
@@ -143,7 +113,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <p><strong>Organization/School:</strong> ${bookingData.organization_name}</p>
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
-          <p><strong>Address:</strong> ${bookingData.address}</p>
+          <p><strong>Address:</strong> ${bookingData.full_address}</p>
+          ${bookingData.address_details ? `<p><strong>Address Details:</strong> ${bookingData.address_details}</p>` : ''}
           ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
           ${bookingData.latitude && bookingData.longitude ? `<p><strong>Location:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Map</a></p>` : ''}
           <hr />
@@ -180,7 +151,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
               <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
               <p><strong>Date:</strong> ${formattedDate}</p>
               <p><strong>Time:</strong> ${bookingData.time_slot}</p>
-              <p><strong>Location:</strong> ${bookingData.address}</p>
+              <p><strong>Location:</strong> ${bookingData.full_address}</p>
               <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
             </div>
 
@@ -215,24 +186,17 @@ export const handler: Handler = async (event: HandlerEvent) => {
       // Don't fail the booking if email fails
     }
 
-    return {
-      statusCode: 201,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        booking: booking,
-        message: 'Booking created successfully',
-      }),
-    };
+    return res.status(201).json({
+      success: true,
+      bookingId: booking.id,
+      booking: booking,
+      message: 'Booking created successfully',
+    });
   } catch (error) {
     console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      }),
-    };
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-};
+}
