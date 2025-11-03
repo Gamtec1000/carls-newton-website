@@ -60,7 +60,7 @@ const EnhancedBookingCalendar: React.FC = () => {
           libraries: ['places'],
         });
 
-        await loader.load();
+        await (loader as any).load();
 
         // Initialize map centered on UAE
         if (mapRef.current && !mapInstanceRef.current) {
@@ -630,7 +630,7 @@ const EnhancedBookingCalendar: React.FC = () => {
     } as React.CSSProperties,
     mapContainer: {
       width: '100%',
-      height: '400px',
+      height: '300px',
       borderRadius: '12px',
       marginTop: '16px',
       border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -856,7 +856,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Organization or School Name *"
+                  placeholder="Enter organization or school name"
                   required
                   value={formData.organizationName}
                   onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
