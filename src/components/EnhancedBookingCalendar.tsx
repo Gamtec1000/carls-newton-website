@@ -7,7 +7,6 @@ import {
   getBookingsForDate,
   validateBookingForm,
 } from '../utils/bookingValidation';
-import { Loader } from '@googlemaps/js-api-loader';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
@@ -55,15 +54,23 @@ const EnhancedBookingCalendar: React.FC = () => {
 
     const initMaps = async () => {
       try {
-        const loader = new Loader({
-          apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-          version: 'weekly',
-          libraries: ['places'],
-        });
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
-        await (loader as any).load();
+        // Load Google Maps script if not already loaded
+        if (!window.google || !window.google.maps) {
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+          script.async = true;
+          script.defer = true;
 
-        // Initialize map centered on UAE
+          await new Promise<void>((resolve, reject) => {
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load Google Maps script'));
+            document.head.appendChild(script);
+          });
+        }
+
+        // Initialize map centered on Dubai, UAE
         if (mapRef.current && !mapInstanceRef.current) {
           mapInstanceRef.current = new google.maps.Map(mapRef.current, {
             center: { lat: 25.2048, lng: 55.2708 }, // Dubai
@@ -72,6 +79,7 @@ const EnhancedBookingCalendar: React.FC = () => {
             zoomControl: true,
             mapTypeControl: false,
             streetViewControl: false,
+            fullscreenControl: false,
           });
         }
 
