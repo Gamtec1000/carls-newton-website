@@ -5,6 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.bookings (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   customer_name TEXT NOT NULL,
+  organization_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT NOT NULL,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS public.bookings (
 COMMENT ON TABLE public.bookings IS 'Stores all booking requests for Carls Newton science shows';
 COMMENT ON COLUMN public.bookings.id IS 'Unique identifier for each booking';
 COMMENT ON COLUMN public.bookings.customer_name IS 'Full name of the customer';
+COMMENT ON COLUMN public.bookings.organization_name IS 'Name of the organization or school';
 COMMENT ON COLUMN public.bookings.email IS 'Customer email address';
 COMMENT ON COLUMN public.bookings.phone IS 'Customer phone number';
 COMMENT ON COLUMN public.bookings.address IS 'Full address where the show will take place';

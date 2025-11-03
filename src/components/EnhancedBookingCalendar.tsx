@@ -26,6 +26,7 @@ const EnhancedBookingCalendar: React.FC = () => {
   // Form data with location fields
   const [formData, setFormData] = useState({
     name: '',
+    organizationName: '',
     email: '',
     phone: '',
     address: '',
@@ -271,6 +272,7 @@ const EnhancedBookingCalendar: React.FC = () => {
     try {
       const bookingData = {
         customer_name: formData.name,
+        organization_name: formData.organizationName,
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
@@ -298,7 +300,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       setSuccess(true);
-      setFormData({ name: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
+      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -628,7 +630,7 @@ const EnhancedBookingCalendar: React.FC = () => {
     } as React.CSSProperties,
     mapContainer: {
       width: '100%',
-      height: '250px',
+      height: '400px',
       borderRadius: '12px',
       marginTop: '16px',
       border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -850,6 +852,14 @@ const EnhancedBookingCalendar: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  style={styles.input}
+                />
+                <input
+                  type="text"
+                  placeholder="Organization or School Name *"
+                  required
+                  value={formData.organizationName}
+                  onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
                   style={styles.input}
                 />
                 <input

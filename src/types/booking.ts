@@ -8,6 +8,7 @@ export interface BookingFormData {
   timeSlot: string;
   packageType: 'preschool' | 'classic' | 'halfday';
   name: string;
+  organizationName: string;
   email: string;
   phone: string;
   address: string;
@@ -30,6 +31,7 @@ export interface CalendarDay {
 export interface Booking {
   id: string;
   customer_name: string;
+  organization_name: string;
   email: string;
   phone: string;
   address: string;
