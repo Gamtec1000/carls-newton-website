@@ -155,6 +155,36 @@ export default function CarlsNewtonLanding() {
         </div>
       </nav>
 
+      {/* Video Animation Section */}
+      <section
+        style={{
+          paddingTop: '80px',
+          paddingBottom: '40px',
+          padding: '80px 16px 40px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ maxWidth: '1280px', width: '100%' }}>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              width: '100%',
+              height: 'auto',
+              borderRadius: '24px',
+              boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.3)',
+            }}
+          >
+            <source src="/carls newton.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section
         style={{
