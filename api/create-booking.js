@@ -31,26 +31,44 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('=== CREATE BOOKING API CALLED ===');
+    console.log('Received booking data:', JSON.stringify(req.body, null, 2));
+
     const bookingData = req.body;
 
     // Validate required fields
     const address = bookingData.full_address || bookingData.address;
 
-    if (
-      !bookingData.customer_name ||
-      !bookingData.organization_name ||
-      !bookingData.email ||
-      !bookingData.phone ||
-      !address ||
-      !bookingData.package_type ||
-      !bookingData.date ||
-      !bookingData.time_slot
-    ) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const required = {
+      customer_name: bookingData.customer_name,
+      organization_name: bookingData.organization_name,
+      email: bookingData.email,
+      phone: bookingData.phone,
+      address: address,
+      package_type: bookingData.package_type,
+      date: bookingData.date,
+      time_slot: bookingData.time_slot,
+    };
+
+    const missing = Object.keys(required).filter(key => !required[key]);
+
+    if (missing.length > 0) {
+      console.error('Missing required fields:', missing);
+      return res.status(400).json({
+        error: 'Missing required fields',
+        missing: missing
+      });
     }
 
     // Get price for package
     const price = PACKAGE_PRICES[bookingData.package_type] || bookingData.price;
+
+    if (!price) {
+      console.error('Invalid package type or missing price:', bookingData.package_type);
+      return res.status(400).json({ error: 'Invalid package type or missing price' });
+    }
+
+    console.log('Creating booking in Supabase...');
 
     // Create booking in Supabase
     const { data: booking, error: dbError } = await supabase
@@ -80,12 +98,16 @@ export default async function handler(req, res) {
       .single();
 
     if (dbError) {
-      console.error('Database error:', dbError);
+      console.error('Supabase database error:', dbError);
+      console.error('Error details:', JSON.stringify(dbError, null, 2));
       return res.status(500).json({
-        error: 'Failed to create booking',
-        details: dbError.message
+        error: 'Failed to create booking in database',
+        details: dbError.message,
+        code: dbError.code
       });
     }
+
+    console.log('Booking created successfully:', booking.id);
 
     // Send email notifications via Resend
     try {
@@ -185,9 +207,12 @@ export default async function handler(req, res) {
         `,
       });
     } catch (emailError) {
-      console.error('Email error:', emailError);
+      console.error('Email sending error (non-fatal):', emailError);
+      console.error('Email error details:', emailError.message);
       // Don't fail the booking if email fails
     }
+
+    console.log('Booking process completed successfully');
 
     return res.status(201).json({
       success: true,
@@ -196,10 +221,15 @@ export default async function handler(req, res) {
       message: 'Booking created successfully',
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('=== FATAL ERROR IN CREATE-BOOKING ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
+
     return res.status(500).json({
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }

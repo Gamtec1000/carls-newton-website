@@ -43,7 +43,7 @@ const EnhancedBookingCalendar: React.FC = () => {
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const markerRef = useRef<any>(null); // AdvancedMarkerElement type
 
   // Fetch bookings on component mount and when month changes
   useEffect(() => {
@@ -125,6 +125,9 @@ const EnhancedBookingCalendar: React.FC = () => {
         // Wait for Google Maps to load
         await loadGoogleMaps();
 
+        // Load the marker library for AdvancedMarkerElement
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as any;
+
         // Initialize map - try to get user's current location first
         if (mapRef.current && !mapInstanceRef.current) {
           let center = { lat: 25.2048, lng: 55.2708 }; // Dubai fallback
@@ -163,6 +166,7 @@ const EnhancedBookingCalendar: React.FC = () => {
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
+            mapId: 'BOOKING_MAP', // Required for AdvancedMarkerElement
           });
         }
 
@@ -176,7 +180,7 @@ const EnhancedBookingCalendar: React.FC = () => {
             }
           );
 
-          autocompleteRef.current.addListener('place_changed', () => {
+          autocompleteRef.current.addListener('place_changed', async () => {
             const place = autocompleteRef.current?.getPlace();
 
             if (!place?.geometry?.location) {
@@ -238,15 +242,25 @@ const EnhancedBookingCalendar: React.FC = () => {
               mapInstanceRef.current.setCenter({ lat, lng });
               mapInstanceRef.current.setZoom(15);
 
+              // Remove old marker if exists
               if (markerRef.current) {
-                markerRef.current.setMap(null);
+                markerRef.current.map = null;
               }
 
-              markerRef.current = new google.maps.Marker({
-                position: { lat, lng },
-                map: mapInstanceRef.current,
-                title: addressToSave,
-              });
+              // Load marker library and create new AdvancedMarkerElement (not deprecated Marker)
+              try {
+                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as any;
+
+                markerRef.current = new AdvancedMarkerElement({
+                  map: mapInstanceRef.current,
+                  position: { lat, lng },
+                  title: addressToSave,
+                });
+
+                console.log('✓ Marker placed at:', addressToSave);
+              } catch (markerError) {
+                console.error('Error creating marker:', markerError);
+              }
             }
           });
         }
