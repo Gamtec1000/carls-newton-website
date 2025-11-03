@@ -11,6 +11,9 @@ export interface BookingFormData {
   email: string;
   phone: string;
   address: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
   message?: string;
 }
 
@@ -30,6 +33,9 @@ export interface Booking {
   email: string;
   phone: string;
   address: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
   package_type: 'preschool' | 'classic' | 'halfday';
   date: string; // ISO date string
   time_slot: string;

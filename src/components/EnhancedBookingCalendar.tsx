@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Clock, X, AlertCircle, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, X, AlertCircle, CheckCircle, MapPin } from 'lucide-react';
 import type { CalendarDay, Booking } from '../types/booking';
 import {
   generateTimeSlots,
@@ -7,6 +7,10 @@ import {
   getBookingsForDate,
   validateBookingForm,
 } from '../utils/bookingValidation';
+import { Loader } from '@googlemaps/js-api-loader';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import '../styles/phone-input.css';
 
 const EnhancedBookingCalendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -19,19 +23,117 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Form data
+  // Form data with location fields
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     address: '',
+    city: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
     message: '',
   });
+
+  // Google Maps refs
+  const mapRef = useRef<HTMLDivElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
 
   // Fetch bookings on component mount and when month changes
   useEffect(() => {
     fetchBookings();
   }, [currentDate]);
+
+  // Initialize Google Maps and Places Autocomplete
+  useEffect(() => {
+    if (!showBookingModal || !addressInputRef.current || !mapRef.current) return;
+
+    const initMaps = async () => {
+      try {
+        const loader = new Loader({
+          apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+          version: 'weekly',
+          libraries: ['places'],
+        });
+
+        await loader.load();
+
+        // Initialize map centered on UAE
+        if (mapRef.current && !mapInstanceRef.current) {
+          mapInstanceRef.current = new google.maps.Map(mapRef.current, {
+            center: { lat: 25.2048, lng: 55.2708 }, // Dubai
+            zoom: 12,
+            disableDefaultUI: false,
+            zoomControl: true,
+            mapTypeControl: false,
+            streetViewControl: false,
+          });
+        }
+
+        // Initialize Places Autocomplete
+        if (addressInputRef.current && !autocompleteRef.current) {
+          autocompleteRef.current = new google.maps.places.Autocomplete(
+            addressInputRef.current,
+            {
+              componentRestrictions: { country: ['ae', 'sa', 'kw', 'qa', 'om', 'bh', 'eg'] },
+              fields: ['formatted_address', 'geometry', 'address_components'],
+            }
+          );
+
+          autocompleteRef.current.addListener('place_changed', () => {
+            const place = autocompleteRef.current?.getPlace();
+            if (place?.geometry?.location) {
+              const lat = place.geometry.location.lat();
+              const lng = place.geometry.location.lng();
+              const address = place.formatted_address || '';
+
+              // Extract city from address components
+              let city = '';
+              if (place.address_components) {
+                const cityComponent = place.address_components.find(
+                  (component) =>
+                    component.types.includes('locality') ||
+                    component.types.includes('administrative_area_level_1')
+                );
+                city = cityComponent?.long_name || '';
+              }
+
+              setFormData((prev) => ({
+                ...prev,
+                address,
+                city,
+                latitude: lat,
+                longitude: lng,
+              }));
+
+              // Update map and marker
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.setCenter({ lat, lng });
+                mapInstanceRef.current.setZoom(15);
+
+                if (markerRef.current) {
+                  markerRef.current.setMap(null);
+                }
+
+                markerRef.current = new google.maps.Marker({
+                  position: { lat, lng },
+                  map: mapInstanceRef.current,
+                  title: address,
+                });
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error loading Google Maps:', error);
+      }
+    };
+
+    initMaps();
+  }, [showBookingModal]);
 
   const fetchBookings = async () => {
     try {
@@ -172,6 +274,9 @@ const EnhancedBookingCalendar: React.FC = () => {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        city: formData.city,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         package_type: selectedPackage,
         date: selectedDate.toISOString().split('T')[0],
         time_slot: selectedTimeSlot,
@@ -193,7 +298,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       setSuccess(true);
-      setFormData({ name: '', email: '', phone: '', address: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -217,7 +322,9 @@ const EnhancedBookingCalendar: React.FC = () => {
     ? generateTimeSlots(
         bookings,
         selectedDate.toISOString().split('T')[0],
-        selectedPackage
+        selectedPackage,
+        formData.email || undefined,
+        formData.address || undefined
       )
     : [];
 
@@ -516,6 +623,26 @@ const EnhancedBookingCalendar: React.FC = () => {
       color: 'rgba(255, 255, 255, 0.5)',
       fontSize: '14px',
     },
+    phoneInputContainer: {
+      marginBottom: '16px',
+    } as React.CSSProperties,
+    mapContainer: {
+      width: '100%',
+      height: '250px',
+      borderRadius: '12px',
+      marginTop: '16px',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      overflow: 'hidden',
+    } as React.CSSProperties,
+    locationLabel: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      fontSize: '14px',
+      color: '#C4B5FD',
+      marginBottom: '8px',
+      marginTop: '16px',
+    } as React.CSSProperties,
   };
 
   return (
@@ -599,9 +726,6 @@ const EnhancedBookingCalendar: React.FC = () => {
               }}
             >
               <div>{day.date.getDate()}</div>
-              {day.bookingCount && day.bookingCount > 0 && (
-                <div style={styles.bookingDot}>●</div>
-              )}
             </div>
           ))}
         </div>
@@ -736,21 +860,33 @@ const EnhancedBookingCalendar: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   style={styles.input}
                 />
+                <div style={styles.phoneInputContainer}>
+                  <PhoneInput
+                    international
+                    defaultCountry="AE"
+                    countries={['AE', 'SA', 'KW', 'QA', 'OM', 'BH', 'EG']}
+                    value={formData.phone}
+                    onChange={(value) => setFormData({ ...formData, phone: value || '' })}
+                    placeholder="Phone Number *"
+                    required
+                  />
+                </div>
+                <div style={styles.locationLabel}>
+                  <MapPin size={16} />
+                  <span>Location (Search for your address)</span>
+                </div>
                 <input
-                  type="tel"
-                  placeholder="Phone Number *"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  style={styles.input}
-                />
-                <textarea
-                  placeholder="Full Address *"
+                  ref={addressInputRef}
+                  type="text"
+                  placeholder="Search for your address *"
                   required
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  style={styles.textarea}
+                  style={styles.input}
                 />
+                {formData.latitude && formData.longitude && (
+                  <div ref={mapRef} style={styles.mapContainer} />
+                )}
                 <textarea
                   placeholder="Special requests or questions (optional)"
                   value={formData.message}

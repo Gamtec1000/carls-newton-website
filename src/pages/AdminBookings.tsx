@@ -442,7 +442,37 @@ const AdminBookings: React.FC = () => {
                 <div style={styles.iconWrapper}>
                   <MapPin size={16} />
                 </div>
-                <span style={{ flex: 1, wordBreak: 'break-word' }}>{booking.address}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ wordBreak: 'break-word' }}>{booking.address}</div>
+                  {booking.city && (
+                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginTop: '4px' }}>
+                      {booking.city}
+                    </div>
+                  )}
+                  {booking.latitude && booking.longitude && (
+                    <a
+                      href={`https://www.google.com/maps?q=${booking.latitude},${booking.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        marginTop: '6px',
+                        fontSize: '12px',
+                        color: '#06B6D4',
+                        textDecoration: 'none',
+                        transition: 'color 0.3s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#A855F7';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#06B6D4';
+                      }}
+                    >
+                      View on Map →
+                    </a>
+                  )}
+                </div>
               </div>
 
               {booking.message && (
