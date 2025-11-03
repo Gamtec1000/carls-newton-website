@@ -39,8 +39,8 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   // Google Maps refs
   const mapRef = useRef<HTMLDivElement>(null);
-  const autocompleteContainerRef = useRef<HTMLDivElement>(null);
-  const autocompleteRef = useRef<google.maps.places.PlaceAutocompleteElement | null>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
 
@@ -51,7 +51,7 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   // Initialize Google Maps and Places Autocomplete
   useEffect(() => {
-    if (!showBookingModal || !autocompleteContainerRef.current || !mapRef.current) return;
+    if (!showBookingModal || !addressInputRef.current || !mapRef.current) return;
 
     const initMaps = async () => {
       try {
@@ -117,115 +117,93 @@ const EnhancedBookingCalendar: React.FC = () => {
           }
         }
 
-        // Always initialize/re-initialize Places Autocomplete when modal opens
-        if (autocompleteContainerRef.current) {
-          // Clear the container first
-          autocompleteContainerRef.current.innerHTML = '';
+        // Initialize traditional Places Autocomplete with input element
+        if (addressInputRef.current) {
+          const { Autocomplete } = await importLibrary('places') as google.maps.PlacesLibrary;
 
-          // Create the new PlaceAutocompleteElement (web component)
-          const autocompleteElement = document.createElement('gmp-place-autocomplete') as google.maps.places.PlaceAutocompleteElement;
-
-          // Configure the autocomplete element
-          autocompleteElement.setAttribute('placeholder', 'Search for your address *');
-          autocompleteElement.setAttribute('country', 'ae,sa,kw,qa,om,bh,eg');
-
-          // Style the autocomplete element to match the form using CSS custom properties
-          autocompleteElement.style.width = '100%';
-          autocompleteElement.style.setProperty('--gmp-font-family', 'inherit');
-          autocompleteElement.style.setProperty('--gmp-font-size', '16px');
-          autocompleteElement.style.setProperty('--gmp-background-color', 'rgba(255, 255, 255, 0.05)');
-          autocompleteElement.style.setProperty('--gmp-text-color', 'white');
-          autocompleteElement.style.setProperty('--gmp-placeholder-color', 'rgba(255, 255, 255, 0.4)');
-          autocompleteElement.style.setProperty('--gmp-border-color', 'rgba(255, 255, 255, 0.2)');
-          autocompleteElement.style.setProperty('--gmp-border-radius', '12px');
-          autocompleteElement.style.setProperty('--gmp-padding', '12px 16px');
-          autocompleteElement.style.setProperty('--gmp-focus-border-color', '#06B6D4');
-          autocompleteElement.style.setProperty('--gmp-focus-box-shadow', '0 0 0 2px rgba(6, 182, 212, 0.2)');
-
-          // Append the autocomplete element
-          autocompleteContainerRef.current.appendChild(autocompleteElement);
+          // Create autocomplete instance bound to input
+          const autocomplete = new Autocomplete(addressInputRef.current, {
+            componentRestrictions: { country: ['ae', 'sa', 'kw', 'qa', 'om', 'bh', 'eg'] },
+            fields: ['formatted_address', 'geometry', 'address_components', 'name'],
+          });
 
           // Store ref
-          autocompleteRef.current = autocompleteElement;
+          autocompleteRef.current = autocomplete;
 
-          // Listen for place selection using the new event
-          autocompleteElement.addEventListener('gmp-placeselect', async (event: any) => {
-            console.log('Place selected event fired:', event);
+          console.log('Autocomplete initialized successfully');
 
-            const place = event.place;
+          // Add place_changed event listener
+          autocomplete.addListener('place_changed', () => {
+            console.log('Place changed event fired!');
 
-            if (!place) {
-              console.error('No place in event');
+            const place = autocomplete.getPlace();
+
+            console.log('Place selected:', place);
+
+            if (!place.geometry) {
+              console.error('No geometry for place');
               return;
             }
 
-            try {
-              // Fetch full place details including geometry
-              await place.fetchFields({
-                fields: ['displayName', 'formattedAddress', 'location', 'addressComponents']
+            const lat = place.geometry.location!.lat();
+            const lng = place.geometry.location!.lng();
+            const address = place.formatted_address || '';
+
+            console.log('Coordinates:', { lat, lng, address });
+
+            // Extract city from address components
+            let city = '';
+            if (place.address_components) {
+              const cityComponent = place.address_components.find(
+                (component) =>
+                  component.types.includes('locality') ||
+                  component.types.includes('administrative_area_level_1')
+              );
+              city = cityComponent?.long_name || '';
+            }
+
+            console.log('Extracted city:', city);
+
+            // Update form data
+            setFormData((prev) => ({
+              ...prev,
+              address,
+              city,
+              latitude: lat,
+              longitude: lng,
+            }));
+
+            console.log('Form data updated with address');
+
+            // Update map center and zoom
+            if (mapInstanceRef.current) {
+              console.log('Updating map to:', { lat, lng });
+
+              mapInstanceRef.current.setCenter({ lat, lng });
+              mapInstanceRef.current.setZoom(15);
+
+              // Remove old marker
+              if (markerRef.current) {
+                markerRef.current.setMap(null);
+              }
+
+              // Add new marker
+              markerRef.current = new Marker({
+                position: { lat, lng },
+                map: mapInstanceRef.current,
+                title: address,
               });
 
-              console.log('Place details fetched:', place);
+              console.log('Map updated successfully with marker at:', { lat, lng });
+            } else {
+              console.error('Map instance not available');
+            }
 
-              if (place.location) {
-                const lat = place.location.lat();
-                const lng = place.location.lng();
-                const address = place.formattedAddress || '';
-
-                console.log('Place coordinates:', { lat, lng, address });
-
-                // Extract city from address components
-                let city = '';
-                if (place.addressComponents) {
-                  const cityComponent = place.addressComponents.find(
-                    (component: any) =>
-                      component.types.includes('locality') ||
-                      component.types.includes('administrative_area_level_1')
-                  );
-                  city = cityComponent?.longText || '';
-                }
-
-                // Update form data
-                setFormData((prev) => ({
-                  ...prev,
-                  address,
-                  city,
-                  latitude: lat,
-                  longitude: lng,
-                }));
-
-                console.log('Updating map to:', { lat, lng });
-
-                // Update map and marker
-                if (mapInstanceRef.current) {
-                  mapInstanceRef.current.setCenter({ lat, lng });
-                  mapInstanceRef.current.setZoom(15);
-
-                  // Remove old marker
-                  if (markerRef.current) {
-                    markerRef.current.setMap(null);
-                  }
-
-                  // Add new marker
-                  markerRef.current = new Marker({
-                    position: { lat, lng },
-                    map: mapInstanceRef.current,
-                    title: address,
-                  });
-
-                  console.log('Map updated successfully');
-                } else {
-                  console.error('Map instance not available');
-                }
-              } else {
-                console.error('Place has no location');
-              }
-            } catch (error) {
-              console.error('Error fetching place details:', error);
+            // Update input value visibly
+            if (addressInputRef.current) {
+              addressInputRef.current.value = address;
             }
           });
-
-          console.log('Autocomplete initialized successfully');
         }
       } catch (error) {
         console.error('Error loading Google Maps:', error);
@@ -248,9 +226,6 @@ const EnhancedBookingCalendar: React.FC = () => {
       mapInstanceRef.current = null;
 
       // Clear autocomplete
-      if (autocompleteContainerRef.current) {
-        autocompleteContainerRef.current.innerHTML = '';
-      }
       autocompleteRef.current = null;
     };
   }, [showBookingModal]);
@@ -1007,24 +982,37 @@ const EnhancedBookingCalendar: React.FC = () => {
                   <MapPin size={16} />
                   <span>Location (Search for your address)</span>
                 </div>
-                <div
-                  ref={autocompleteContainerRef}
-                  style={{
-                    ...styles.input,
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    ref={addressInputRef}
+                    type="text"
+                    placeholder="Search for your address *"
+                    required
+                    style={styles.input}
+                  />
+                  {formData.address && (
+                    <div style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#22C55E',
+                      fontSize: '20px',
+                      pointerEvents: 'none',
+                    }}>
+                      ✓
+                    </div>
+                  )}
+                </div>
                 {formData.address && (
                   <div style={{
                     padding: '8px 12px',
                     marginBottom: '16px',
                     marginTop: '8px',
                     borderRadius: '8px',
-                    background: 'rgba(6, 182, 212, 0.1)',
-                    border: '1px solid rgba(6, 182, 212, 0.3)',
-                    color: '#06B6D4',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    color: '#22C55E',
                     fontSize: '14px',
                   }}>
                     ✓ Selected: {formData.address}
