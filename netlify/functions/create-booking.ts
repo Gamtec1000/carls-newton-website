@@ -14,6 +14,9 @@ interface BookingRequest {
   email: string;
   phone: string;
   address: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
   package_type: 'preschool' | 'classic' | 'halfday';
   date: string;
   time_slot: string;
@@ -84,6 +87,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
           email: bookingData.email,
           phone: bookingData.phone,
           address: bookingData.address,
+          city: bookingData.city || null,
+          latitude: bookingData.latitude || null,
+          longitude: bookingData.longitude || null,
           package_type: bookingData.package_type,
           date: bookingData.date,
           time_slot: bookingData.time_slot,
@@ -126,6 +132,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
           <p><strong>Address:</strong> ${bookingData.address}</p>
+          ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
+          ${bookingData.latitude && bookingData.longitude ? `<p><strong>Location:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Map</a></p>` : ''}
           <hr />
           <h3>Booking Details</h3>
           <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>

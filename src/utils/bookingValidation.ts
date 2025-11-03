@@ -47,7 +47,9 @@ export function isTimeSlotAvailable(
   bookings: Booking[],
   date: string,
   timeSlot: string,
-  packageType: 'preschool' | 'classic' | 'halfday'
+  packageType: 'preschool' | 'classic' | 'halfday',
+  customerEmail?: string,
+  customerAddress?: string
 ): { available: boolean; reason?: string } {
   const dateBookings = getBookingsForDate(bookings, date);
 
@@ -67,12 +69,19 @@ export function isTimeSlotAvailable(
   }
 
   // Rule 4: Check 2-hour buffer between shows
+  // SMART LOGIC: Skip buffer if same customer email AND same address
   const requestedTime = parseTimeSlot(timeSlot);
   for (const booking of dateBookings) {
     const bookedTime = parseTimeSlot(booking.time_slot);
     const timeDiff = Math.abs(requestedTime - bookedTime);
 
-    if (timeDiff < BOOKING_RULES.bufferHours) {
+    // Check if this booking is by the same customer at the same location
+    const sameCustomer = customerEmail && booking.email.toLowerCase() === customerEmail.toLowerCase();
+    const sameLocation = customerAddress && booking.address.toLowerCase() === customerAddress.toLowerCase();
+    const skipBuffer = sameCustomer && sameLocation;
+
+    // Apply 2-hour buffer UNLESS it's the same customer at the same location
+    if (!skipBuffer && timeDiff < BOOKING_RULES.bufferHours) {
       return {
         available: false,
         reason: `Requires ${BOOKING_RULES.bufferHours}-hour buffer between shows`,
@@ -119,7 +128,9 @@ export function parseTimeSlot(timeSlot: string): number {
 export function generateTimeSlots(
   bookings: Booking[],
   date: string,
-  packageType: 'preschool' | 'classic' | 'halfday'
+  packageType: 'preschool' | 'classic' | 'halfday',
+  customerEmail?: string,
+  customerAddress?: string
 ): string[] {
   const slots: string[] = [];
 
@@ -136,7 +147,7 @@ export function generateTimeSlots(
   // Generate time slots from 8 AM to 4 PM
   for (let hour = BOOKING_RULES.operatingHours.start; hour <= BOOKING_RULES.operatingHours.end; hour++) {
     const timeSlot = formatTimeSlot(hour);
-    const { available } = isTimeSlotAvailable(bookings, date, timeSlot, packageType);
+    const { available } = isTimeSlotAvailable(bookings, date, timeSlot, packageType, customerEmail, customerAddress);
 
     if (available) {
       slots.push(timeSlot);

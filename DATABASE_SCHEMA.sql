@@ -8,6 +8,9 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT NOT NULL,
+  city TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
   package_type TEXT NOT NULL CHECK (package_type IN ('preschool', 'classic', 'halfday')),
   date DATE NOT NULL,
   time_slot TEXT NOT NULL,
@@ -25,6 +28,9 @@ COMMENT ON COLUMN public.bookings.customer_name IS 'Full name of the customer';
 COMMENT ON COLUMN public.bookings.email IS 'Customer email address';
 COMMENT ON COLUMN public.bookings.phone IS 'Customer phone number';
 COMMENT ON COLUMN public.bookings.address IS 'Full address where the show will take place';
+COMMENT ON COLUMN public.bookings.city IS 'City extracted from the address';
+COMMENT ON COLUMN public.bookings.latitude IS 'Latitude coordinate of the booking location';
+COMMENT ON COLUMN public.bookings.longitude IS 'Longitude coordinate of the booking location';
 COMMENT ON COLUMN public.bookings.package_type IS 'Type of show package: preschool, classic, or halfday';
 COMMENT ON COLUMN public.bookings.date IS 'Date of the scheduled show';
 COMMENT ON COLUMN public.bookings.time_slot IS 'Time slot for the show (e.g., "09:00 AM")';
@@ -39,6 +45,8 @@ CREATE INDEX IF NOT EXISTS idx_bookings_date ON public.bookings(date);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON public.bookings(status);
 CREATE INDEX IF NOT EXISTS idx_bookings_created_at ON public.bookings(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_bookings_email ON public.bookings(email);
+CREATE INDEX IF NOT EXISTS idx_bookings_email_address ON public.bookings(email, address);
+CREATE INDEX IF NOT EXISTS idx_bookings_location ON public.bookings(latitude, longitude);
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
