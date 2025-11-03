@@ -198,11 +198,6 @@ const EnhancedBookingCalendar: React.FC = () => {
             } else {
               console.error('Map instance not available');
             }
-
-            // Update input value visibly
-            if (addressInputRef.current) {
-              addressInputRef.current.value = address;
-            }
           });
         }
       } catch (error) {
@@ -988,6 +983,8 @@ const EnhancedBookingCalendar: React.FC = () => {
                     type="text"
                     placeholder="Search for your address *"
                     required
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     style={styles.input}
                   />
                   {formData.address && (
