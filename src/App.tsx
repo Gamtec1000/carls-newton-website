@@ -101,9 +101,16 @@ export default function CarlsNewtonLanding() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={styles.logo}>
-                <Beaker size={32} color="white" />
-              </div>
+              <img
+                src="/carls-newton-logo.png"
+                alt="Carls Newton Logo"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  objectFit: 'contain'
+                }}
+              />
               <span
                 style={{
                   fontSize: '24px',
@@ -764,9 +771,16 @@ export default function CarlsNewtonLanding() {
                 marginBottom: '16px',
               }}
             >
-              <div style={styles.logo}>
-                <Beaker size={24} />
-              </div>
+              <img
+                src="/carls-newton-logo.png"
+                alt="Carls Newton Logo"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '8px',
+                  objectFit: 'contain'
+                }}
+              />
               <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
                 Carls Newton
               </span>
