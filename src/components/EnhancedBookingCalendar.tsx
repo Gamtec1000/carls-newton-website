@@ -94,8 +94,8 @@ const EnhancedBookingCalendar: React.FC = () => {
           }
         }
 
-        // Initialize map centered on user's location or default
-        if (mapRef.current && !mapInstanceRef.current) {
+        // Always initialize/re-initialize map when modal opens
+        if (mapRef.current) {
           mapInstanceRef.current = new Map(mapRef.current, {
             center: defaultCenter,
             zoom: defaultZoom,
@@ -108,7 +108,7 @@ const EnhancedBookingCalendar: React.FC = () => {
 
           // Add a marker at user's current location if geolocation was successful
           if (defaultZoom === 13) {
-            new Marker({
+            markerRef.current = new Marker({
               position: defaultCenter,
               map: mapInstanceRef.current,
               title: 'Your Location',
@@ -116,8 +116,11 @@ const EnhancedBookingCalendar: React.FC = () => {
           }
         }
 
-        // Initialize Places Autocomplete using the new PlaceAutocompleteElement API
-        if (autocompleteContainerRef.current && !autocompleteRef.current) {
+        // Always initialize/re-initialize Places Autocomplete when modal opens
+        if (autocompleteContainerRef.current) {
+          // Clear the container first
+          autocompleteContainerRef.current.innerHTML = '';
+
           // Create the new PlaceAutocompleteElement (web component)
           const autocompleteElement = document.createElement('gmp-place-autocomplete') as google.maps.places.PlaceAutocompleteElement;
 
@@ -128,8 +131,7 @@ const EnhancedBookingCalendar: React.FC = () => {
           // Style the autocomplete element to match the form
           autocompleteElement.style.width = '100%';
 
-          // Clear the container and append the autocomplete element
-          autocompleteContainerRef.current.innerHTML = '';
+          // Append the autocomplete element
           autocompleteContainerRef.current.appendChild(autocompleteElement);
 
           // Store ref
@@ -137,49 +139,82 @@ const EnhancedBookingCalendar: React.FC = () => {
 
           // Listen for place selection using the new event
           autocompleteElement.addEventListener('gmp-placeselect', async (event: any) => {
+            console.log('Place selected event fired:', event);
+
             const place = event.place;
 
-            if (place && place.location) {
-              const lat = place.location.lat();
-              const lng = place.location.lng();
-              const address = place.formattedAddress || '';
+            if (!place) {
+              console.error('No place in event');
+              return;
+            }
 
-              // Extract city from address components
-              let city = '';
-              if (place.addressComponents) {
-                const cityComponent = place.addressComponents.find(
-                  (component: any) =>
-                    component.types.includes('locality') ||
-                    component.types.includes('administrative_area_level_1')
-                );
-                city = cityComponent?.longText || '';
-              }
+            try {
+              // Fetch full place details including geometry
+              await place.fetchFields({
+                fields: ['displayName', 'formattedAddress', 'location', 'addressComponents']
+              });
 
-              setFormData((prev) => ({
-                ...prev,
-                address,
-                city,
-                latitude: lat,
-                longitude: lng,
-              }));
+              console.log('Place details fetched:', place);
 
-              // Update map and marker
-              if (mapInstanceRef.current) {
-                mapInstanceRef.current.setCenter({ lat, lng });
-                mapInstanceRef.current.setZoom(15);
+              if (place.location) {
+                const lat = place.location.lat();
+                const lng = place.location.lng();
+                const address = place.formattedAddress || '';
 
-                if (markerRef.current) {
-                  markerRef.current.setMap(null);
+                console.log('Place coordinates:', { lat, lng, address });
+
+                // Extract city from address components
+                let city = '';
+                if (place.addressComponents) {
+                  const cityComponent = place.addressComponents.find(
+                    (component: any) =>
+                      component.types.includes('locality') ||
+                      component.types.includes('administrative_area_level_1')
+                  );
+                  city = cityComponent?.longText || '';
                 }
 
-                markerRef.current = new Marker({
-                  position: { lat, lng },
-                  map: mapInstanceRef.current,
-                  title: address,
-                });
+                // Update form data
+                setFormData((prev) => ({
+                  ...prev,
+                  address,
+                  city,
+                  latitude: lat,
+                  longitude: lng,
+                }));
+
+                console.log('Updating map to:', { lat, lng });
+
+                // Update map and marker
+                if (mapInstanceRef.current) {
+                  mapInstanceRef.current.setCenter({ lat, lng });
+                  mapInstanceRef.current.setZoom(15);
+
+                  // Remove old marker
+                  if (markerRef.current) {
+                    markerRef.current.setMap(null);
+                  }
+
+                  // Add new marker
+                  markerRef.current = new Marker({
+                    position: { lat, lng },
+                    map: mapInstanceRef.current,
+                    title: address,
+                  });
+
+                  console.log('Map updated successfully');
+                } else {
+                  console.error('Map instance not available');
+                }
+              } else {
+                console.error('Place has no location');
               }
+            } catch (error) {
+              console.error('Error fetching place details:', error);
             }
           });
+
+          console.log('Autocomplete initialized successfully');
         }
       } catch (error) {
         console.error('Error loading Google Maps:', error);
@@ -187,6 +222,26 @@ const EnhancedBookingCalendar: React.FC = () => {
     };
 
     initMaps();
+
+    // Cleanup function - reset refs when modal closes
+    return () => {
+      console.log('Cleaning up map and autocomplete');
+
+      // Clear marker
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+        markerRef.current = null;
+      }
+
+      // Clear map instance
+      mapInstanceRef.current = null;
+
+      // Clear autocomplete
+      if (autocompleteContainerRef.current) {
+        autocompleteContainerRef.current.innerHTML = '';
+      }
+      autocompleteRef.current = null;
+    };
   }, [showBookingModal]);
 
   const fetchBookings = async () => {
