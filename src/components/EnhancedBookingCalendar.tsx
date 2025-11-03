@@ -30,10 +30,11 @@ const EnhancedBookingCalendar: React.FC = () => {
     email: '',
     phone: '',
     address: '',
+    addressDetails: '',
     city: '',
     latitude: null as number | null,
     longitude: null as number | null,
-    message: '',
+    specialRequests: '',
   });
 
   // Google Maps refs
@@ -270,19 +271,27 @@ const EnhancedBookingCalendar: React.FC = () => {
     setLoading(true);
 
     try {
+      const PACKAGE_PRICES = {
+        preschool: 1200,
+        classic: 1800,
+        halfday: 2500,
+      };
+
       const bookingData = {
         customer_name: formData.name,
         organization_name: formData.organizationName,
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        address_details: formData.addressDetails,
         city: formData.city,
         latitude: formData.latitude,
         longitude: formData.longitude,
         package_type: selectedPackage,
         date: selectedDate.toISOString().split('T')[0],
         time_slot: selectedTimeSlot,
-        message: formData.message,
+        price: PACKAGE_PRICES[selectedPackage],
+        special_requests: formData.specialRequests,
       };
 
       const response = await fetch('/api/create-booking', {
@@ -300,7 +309,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       setSuccess(true);
-      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
+      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -883,9 +892,9 @@ const EnhancedBookingCalendar: React.FC = () => {
                     style={{ position: 'relative' }}
                   />
                 </div>
-                <div style={styles.locationLabel}>
+                <div style={{ ...styles.locationLabel, marginTop: '24px' }}>
                   <MapPin size={16} />
-                  <span>Location (Search for your address)</span>
+                  <span>Location</span>
                 </div>
                 <input
                   ref={addressInputRef}
@@ -896,11 +905,23 @@ const EnhancedBookingCalendar: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   style={styles.input}
                 />
-                <div ref={mapRef} style={styles.mapContainer} />
+                <div ref={mapRef} style={{ ...styles.mapContainer, marginBottom: '24px' }} />
+                <input
+                  type="text"
+                  placeholder="Apt/Flat/Building Number or Landmarks (Optional)"
+                  value={formData.addressDetails}
+                  onChange={(e) => setFormData({ ...formData, addressDetails: e.target.value })}
+                  style={{...styles.input, marginTop: 0}}
+                />
+              </div>
+
+              {/* Special Requests */}
+              <div style={{ ...styles.section, marginTop: '32px' }}>
+                <div style={styles.sectionTitle}>Special Requests or Topics to Cover (Optional)</div>
                 <textarea
-                  placeholder="Special requests or questions (optional)"
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Any specific topics, experiments, or special requirements..."
+                  value={formData.specialRequests}
+                  onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
                   style={styles.textarea}
                 />
               </div>

@@ -34,12 +34,14 @@ export default async function handler(req, res) {
     const bookingData = req.body;
 
     // Validate required fields
+    const address = bookingData.full_address || bookingData.address;
+
     if (
       !bookingData.customer_name ||
       !bookingData.organization_name ||
       !bookingData.email ||
       !bookingData.phone ||
-      !bookingData.full_address ||
+      !address ||
       !bookingData.package_type ||
       !bookingData.date ||
       !bookingData.time_slot
@@ -59,7 +61,7 @@ export default async function handler(req, res) {
           organization_name: bookingData.organization_name,
           email: bookingData.email,
           phone: bookingData.phone,
-          full_address: bookingData.full_address,
+          address: address,
           address_details: bookingData.address_details || null,
           city: bookingData.city || null,
           latitude: bookingData.latitude || null,
@@ -70,7 +72,8 @@ export default async function handler(req, res) {
           status: 'pending',
           payment_status: 'pending',
           price: price,
-          message: bookingData.message || null,
+          message: bookingData.message || bookingData.special_requests || null,
+          special_requests: bookingData.special_requests || bookingData.message || null,
         },
       ])
       .select()
@@ -113,7 +116,7 @@ export default async function handler(req, res) {
           <p><strong>Organization/School:</strong> ${bookingData.organization_name}</p>
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
-          <p><strong>Address:</strong> ${bookingData.full_address}</p>
+          <p><strong>Address:</strong> ${address}</p>
           ${bookingData.address_details ? `<p><strong>Address Details:</strong> ${bookingData.address_details}</p>` : ''}
           ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
           ${bookingData.latitude && bookingData.longitude ? `<p><strong>Location:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Map</a></p>` : ''}
@@ -123,7 +126,7 @@ export default async function handler(req, res) {
           <p><strong>Date:</strong> ${formattedDate}</p>
           <p><strong>Time:</strong> ${bookingData.time_slot}</p>
           <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
-          ${bookingData.message ? `<p><strong>Message:</strong> ${bookingData.message}</p>` : ''}
+          ${(bookingData.special_requests || bookingData.message) ? `<p><strong>Special Requests:</strong> ${bookingData.special_requests || bookingData.message}</p>` : ''}
           <hr />
           <p><strong>Status:</strong> Pending Confirmation</p>
           <p><strong>Payment Status:</strong> Pending</p>
@@ -151,7 +154,7 @@ export default async function handler(req, res) {
               <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
               <p><strong>Date:</strong> ${formattedDate}</p>
               <p><strong>Time:</strong> ${bookingData.time_slot}</p>
-              <p><strong>Location:</strong> ${bookingData.full_address}</p>
+              <p><strong>Location:</strong> ${address}</p>
               <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
             </div>
 
