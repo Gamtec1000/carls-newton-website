@@ -114,7 +114,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       };
     }
 
-    // Send email notification via Resend
+    // Send email notifications via Resend
     try {
       const packageNames: Record<string, string> = {
         preschool: 'Preschool Special (30-45 mins)',
@@ -122,6 +122,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
         halfday: 'Half-Day Experience (4 hours)',
       };
 
+      const formattedDate = new Date(bookingData.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      // Send admin notification email
       await resend.emails.send({
         from: 'Carls Newton Bookings <bookings@resend.dev>',
         to: 'carls.newton10@gmail.com',
@@ -141,12 +149,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <hr />
           <h3>Booking Details</h3>
           <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
-          <p><strong>Date:</strong> ${new Date(bookingData.date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}</p>
+          <p><strong>Date:</strong> ${formattedDate}</p>
           <p><strong>Time:</strong> ${bookingData.time_slot}</p>
           <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
           ${bookingData.message ? `<p><strong>Message:</strong> ${bookingData.message}</p>` : ''}
@@ -156,6 +159,55 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <p style="margin-top: 20px; color: #666;">
             Please confirm this booking and update the payment status in the admin panel.
           </p>
+        `,
+      });
+
+      // Send customer confirmation email
+      await resend.emails.send({
+        from: 'Carls Newton Bookings <bookings@resend.dev>',
+        to: bookingData.email,
+        subject: 'Booking Request Received - Carls Newton Science Shows',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Booking Request Received</h2>
+            <p>Dear ${bookingData.customer_name},</p>
+            <p>Thank you for your interest in Carls Newton Science Shows! We have received your booking request and will review it shortly.</p>
+
+            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #1f2937;">Booking Details</h3>
+              <p><strong>Booking ID:</strong> ${booking.id}</p>
+              <p><strong>Organization/School:</strong> ${bookingData.organization_name}</p>
+              <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
+              <p><strong>Date:</strong> ${formattedDate}</p>
+              <p><strong>Time:</strong> ${bookingData.time_slot}</p>
+              <p><strong>Location:</strong> ${bookingData.address}</p>
+              <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
+            </div>
+
+            <h3 style="color: #1f2937;">What's Next?</h3>
+            <ol>
+              <li>We will review your booking request within 24 hours</li>
+              <li>You'll receive a confirmation email once your booking is approved</li>
+              <li>Payment instructions will be provided in the confirmation email</li>
+            </ol>
+
+            <p style="margin-top: 30px;">If you have any questions, please contact us at:</p>
+            <p>
+              <strong>Email:</strong> carls.newton10@gmail.com<br/>
+              <strong>Phone:</strong> ${bookingData.phone}
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
+
+            <p style="color: #6b7280; font-size: 14px;">
+              This is an automated confirmation email. Please do not reply to this email.
+            </p>
+
+            <p style="color: #2563eb; font-weight: bold; margin-top: 20px;">
+              Carls Newton Science Shows<br/>
+              <span style="font-weight: normal; font-size: 14px;">Making Science Fun for Young Minds!</span>
+            </p>
+          </div>
         `,
       });
     } catch (emailError) {
