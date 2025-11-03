@@ -394,6 +394,9 @@ const AdminBookings: React.FC = () => {
                   <h3 style={{ color: 'white', fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
                     {booking.customer_name}
                   </h3>
+                  <p style={{ color: '#A78BFA', fontSize: '14px', marginBottom: '4px' }}>
+                    {booking.organization_name}
+                  </p>
                   <p style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>
                     {new Date(booking.created_at).toLocaleDateString()}
                   </p>

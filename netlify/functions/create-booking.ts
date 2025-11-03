@@ -11,6 +11,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || '');
 
 interface BookingRequest {
   customer_name: string;
+  organization_name: string;
   email: string;
   phone: string;
   address: string;
@@ -61,6 +62,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     // Validate required fields
     if (
       !bookingData.customer_name ||
+      !bookingData.organization_name ||
       !bookingData.email ||
       !bookingData.phone ||
       !bookingData.address ||
@@ -84,6 +86,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       .insert([
         {
           customer_name: bookingData.customer_name,
+          organization_name: bookingData.organization_name,
           email: bookingData.email,
           phone: bookingData.phone,
           address: bookingData.address,
@@ -129,6 +132,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <hr />
           <h3>Customer Information</h3>
           <p><strong>Name:</strong> ${bookingData.customer_name}</p>
+          <p><strong>Organization/School:</strong> ${bookingData.organization_name}</p>
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
           <p><strong>Address:</strong> ${bookingData.address}</p>
