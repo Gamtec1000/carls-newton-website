@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
 import {
   Rocket,
   Beaker,
   Sparkles,
   Calendar,
-  Book,
-  ShoppingBag,
   Star,
   ArrowRight,
-  Menu,
-  X,
 } from 'lucide-react';
-import BookingCalendar from './components/BookingCalendar';
+import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
 
 const styles = {
   gradient: {
@@ -21,7 +16,7 @@ const styles = {
     color: 'white',
   },
   nav: {
-    position: 'fixed',
+    position: 'fixed' as const,
     width: '100%',
     background: 'rgba(88, 28, 135, 0.9)',
     backdropFilter: 'blur(10px)',
@@ -83,8 +78,6 @@ const styles = {
 };
 
 export default function CarlsNewtonLanding() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
     <div style={styles.gradient}>
       {/* Navigation */}
@@ -114,9 +107,8 @@ export default function CarlsNewtonLanding() {
 
             <div
               style={{
-                display: 'none',
+                display: 'flex',
                 gap: '32px',
-                '@media(min-width: 768px)': { display: 'flex' },
               }}
             >
               <a
@@ -636,7 +628,7 @@ export default function CarlsNewtonLanding() {
           >
             Select a date and time that works best for your school
           </p>
-          <BookingCalendar />
+          <EnhancedBookingCalendar />
         </div>
       </section>
 
