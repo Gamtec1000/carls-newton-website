@@ -65,17 +65,54 @@ const EnhancedBookingCalendar: React.FC = () => {
         const { Marker } = await importLibrary('marker') as google.maps.MarkerLibrary;
         const { Autocomplete } = await importLibrary('places') as google.maps.PlacesLibrary;
 
-        // Initialize map centered on UAE
+        // Default location (Dubai, UAE)
+        let defaultCenter = { lat: 25.2048, lng: 55.2708 };
+        let defaultZoom = 11;
+
+        // Try to get user's current location
+        if (navigator.geolocation) {
+          try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+              });
+            });
+
+            // Use user's current location
+            defaultCenter = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            defaultZoom = 13; // Closer zoom for user's location
+
+            console.log('Using user location:', defaultCenter);
+          } catch (geoError) {
+            console.log('Geolocation denied or unavailable, using default Dubai location:', geoError);
+          }
+        }
+
+        // Initialize map centered on user's location or default
         if (mapRef.current && !mapInstanceRef.current) {
           mapInstanceRef.current = new Map(mapRef.current, {
-            center: { lat: 25.2048, lng: 55.2708 }, // Dubai
-            zoom: 11,
+            center: defaultCenter,
+            zoom: defaultZoom,
             disableDefaultUI: false,
             zoomControl: true,
             mapTypeControl: false,
             streetViewControl: false,
             mapId: 'DEMO_MAP_ID', // Required for advanced markers
           });
+
+          // Add a marker at user's current location if geolocation was successful
+          if (defaultZoom === 13) {
+            new Marker({
+              position: defaultCenter,
+              map: mapInstanceRef.current,
+              title: 'Your Location',
+            });
+          }
         }
 
         // Initialize Places Autocomplete
