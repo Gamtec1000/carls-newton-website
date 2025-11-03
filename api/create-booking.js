@@ -68,42 +68,60 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid package type or missing price' });
     }
 
+    // Check environment variables
+    console.log('Checking environment variables...');
+    console.log('Supabase URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    console.log('Supabase URL length:', process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0);
+    console.log('Supabase Key length:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0);
+
+    // Prepare insert data
+    const insertData = {
+      customer_name: bookingData.customer_name,
+      organization_name: bookingData.organization_name,
+      email: bookingData.email,
+      phone: bookingData.phone,
+      address: address,
+      address_details: bookingData.address_details || null,
+      city: bookingData.city || null,
+      latitude: bookingData.latitude || null,
+      longitude: bookingData.longitude || null,
+      package_type: bookingData.package_type,
+      date: bookingData.date,
+      time_slot: bookingData.time_slot,
+      status: 'pending',
+      payment_status: 'pending',
+      price: price,
+      message: bookingData.message || bookingData.special_requests || null,
+      special_requests: bookingData.special_requests || bookingData.message || null,
+    };
+
     console.log('Creating booking in Supabase...');
+    console.log('Attempting to insert data:', JSON.stringify(insertData, null, 2));
 
     // Create booking in Supabase
     const { data: booking, error: dbError } = await supabase
       .from('bookings')
-      .insert([
-        {
-          customer_name: bookingData.customer_name,
-          organization_name: bookingData.organization_name,
-          email: bookingData.email,
-          phone: bookingData.phone,
-          address: address,
-          address_details: bookingData.address_details || null,
-          city: bookingData.city || null,
-          latitude: bookingData.latitude || null,
-          longitude: bookingData.longitude || null,
-          package_type: bookingData.package_type,
-          date: bookingData.date,
-          time_slot: bookingData.time_slot,
-          status: 'pending',
-          payment_status: 'pending',
-          price: price,
-          message: bookingData.message || bookingData.special_requests || null,
-          special_requests: bookingData.special_requests || bookingData.message || null,
-        },
-      ])
+      .insert([insertData])
       .select()
       .single();
 
     if (dbError) {
-      console.error('Supabase database error:', dbError);
-      console.error('Error details:', JSON.stringify(dbError, null, 2));
+      console.error('=== SUPABASE INSERT FAILED ===');
+      console.error('Error object:', dbError);
+      console.error('Error code:', dbError.code);
+      console.error('Error message:', dbError.message);
+      console.error('Error details:', dbError.details);
+      console.error('Error hint:', dbError.hint);
+      console.error('Full error JSON:', JSON.stringify(dbError, null, 2));
+
       return res.status(500).json({
         error: 'Failed to create booking in database',
-        details: dbError.message,
-        code: dbError.code
+        supabaseError: dbError.message,
+        code: dbError.code,
+        details: dbError.details,
+        hint: dbError.hint,
+        insertData: insertData // Include what we tried to insert for debugging
       });
     }
 
