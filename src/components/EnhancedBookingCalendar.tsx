@@ -30,6 +30,7 @@ const EnhancedBookingCalendar: React.FC = () => {
     email: '',
     phone: '',
     address: '',
+    addressDetails: '',
     city: '',
     latitude: null as number | null,
     longitude: null as number | null,
@@ -128,8 +129,18 @@ const EnhancedBookingCalendar: React.FC = () => {
           autocompleteElement.setAttribute('placeholder', 'Search for your address *');
           autocompleteElement.setAttribute('country', 'ae,sa,kw,qa,om,bh,eg');
 
-          // Style the autocomplete element to match the form
+          // Style the autocomplete element to match the form using CSS custom properties
           autocompleteElement.style.width = '100%';
+          autocompleteElement.style.setProperty('--gmp-font-family', 'inherit');
+          autocompleteElement.style.setProperty('--gmp-font-size', '16px');
+          autocompleteElement.style.setProperty('--gmp-background-color', 'rgba(255, 255, 255, 0.05)');
+          autocompleteElement.style.setProperty('--gmp-text-color', 'white');
+          autocompleteElement.style.setProperty('--gmp-placeholder-color', 'rgba(255, 255, 255, 0.4)');
+          autocompleteElement.style.setProperty('--gmp-border-color', 'rgba(255, 255, 255, 0.2)');
+          autocompleteElement.style.setProperty('--gmp-border-radius', '12px');
+          autocompleteElement.style.setProperty('--gmp-padding', '12px 16px');
+          autocompleteElement.style.setProperty('--gmp-focus-border-color', '#06B6D4');
+          autocompleteElement.style.setProperty('--gmp-focus-box-shadow', '0 0 0 2px rgba(6, 182, 212, 0.2)');
 
           // Append the autocomplete element
           autocompleteContainerRef.current.appendChild(autocompleteElement);
@@ -384,6 +395,7 @@ const EnhancedBookingCalendar: React.FC = () => {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        address_details: formData.addressDetails,
         city: formData.city,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -408,7 +420,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       setSuccess(true);
-      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
+      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, message: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -1003,6 +1015,27 @@ const EnhancedBookingCalendar: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                   }}
+                />
+                {formData.address && (
+                  <div style={{
+                    padding: '8px 12px',
+                    marginBottom: '16px',
+                    marginTop: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(6, 182, 212, 0.1)',
+                    border: '1px solid rgba(6, 182, 212, 0.3)',
+                    color: '#06B6D4',
+                    fontSize: '14px',
+                  }}>
+                    ✓ Selected: {formData.address}
+                  </div>
+                )}
+                <input
+                  type="text"
+                  placeholder="Apt/Flat/Building Number or Landmarks (Optional)"
+                  value={formData.addressDetails}
+                  onChange={(e) => setFormData({ ...formData, addressDetails: e.target.value })}
+                  style={styles.input}
                 />
                 <div ref={mapRef} style={styles.mapContainer} />
                 <textarea

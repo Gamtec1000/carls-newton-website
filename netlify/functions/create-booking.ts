@@ -15,6 +15,7 @@ interface BookingRequest {
   email: string;
   phone: string;
   address: string;
+  address_details?: string;
   city?: string;
   latitude?: number;
   longitude?: number;
@@ -90,6 +91,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           email: bookingData.email,
           phone: bookingData.phone,
           address: bookingData.address,
+          address_details: bookingData.address_details || null,
           city: bookingData.city || null,
           latitude: bookingData.latitude || null,
           longitude: bookingData.longitude || null,
@@ -136,6 +138,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
           <p><strong>Address:</strong> ${bookingData.address}</p>
+          ${bookingData.address_details ? `<p><strong>Address Details:</strong> ${bookingData.address_details}</p>` : ''}
           ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
           ${bookingData.latitude && bookingData.longitude ? `<p><strong>Location:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Map</a></p>` : ''}
           <hr />

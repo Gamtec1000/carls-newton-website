@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT NOT NULL,
+  address_details TEXT,
   city TEXT,
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
@@ -30,6 +31,7 @@ COMMENT ON COLUMN public.bookings.organization_name IS 'Name of the organization
 COMMENT ON COLUMN public.bookings.email IS 'Customer email address';
 COMMENT ON COLUMN public.bookings.phone IS 'Customer phone number';
 COMMENT ON COLUMN public.bookings.address IS 'Full address where the show will take place';
+COMMENT ON COLUMN public.bookings.address_details IS 'Additional address details like apartment, building number, or landmarks';
 COMMENT ON COLUMN public.bookings.city IS 'City extracted from the address';
 COMMENT ON COLUMN public.bookings.latitude IS 'Latitude coordinate of the booking location';
 COMMENT ON COLUMN public.bookings.longitude IS 'Longitude coordinate of the booking location';
