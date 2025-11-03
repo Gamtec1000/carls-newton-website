@@ -7,7 +7,7 @@ import {
   getBookingsForDate,
   validateBookingForm,
 } from '../utils/bookingValidation';
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
@@ -54,29 +54,33 @@ const EnhancedBookingCalendar: React.FC = () => {
 
     const initMaps = async () => {
       try {
-        const loader = new Loader({
-          apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-          version: 'weekly',
-          libraries: ['places'],
+        // Set API options before loading libraries
+        setOptions({
+          key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+          v: 'weekly',
         });
 
-        await (loader as any).load();
+        // Import the required libraries using the new functional API
+        const { Map } = await importLibrary('maps') as google.maps.MapsLibrary;
+        const { Marker } = await importLibrary('marker') as google.maps.MarkerLibrary;
+        const { Autocomplete } = await importLibrary('places') as google.maps.PlacesLibrary;
 
         // Initialize map centered on UAE
         if (mapRef.current && !mapInstanceRef.current) {
-          mapInstanceRef.current = new google.maps.Map(mapRef.current, {
+          mapInstanceRef.current = new Map(mapRef.current, {
             center: { lat: 25.2048, lng: 55.2708 }, // Dubai
             zoom: 11,
             disableDefaultUI: false,
             zoomControl: true,
             mapTypeControl: false,
             streetViewControl: false,
+            mapId: 'DEMO_MAP_ID', // Required for advanced markers
           });
         }
 
         // Initialize Places Autocomplete
         if (addressInputRef.current && !autocompleteRef.current) {
-          autocompleteRef.current = new google.maps.places.Autocomplete(
+          autocompleteRef.current = new Autocomplete(
             addressInputRef.current,
             {
               componentRestrictions: { country: ['ae', 'sa', 'kw', 'qa', 'om', 'bh', 'eg'] },
@@ -95,7 +99,7 @@ const EnhancedBookingCalendar: React.FC = () => {
               let city = '';
               if (place.address_components) {
                 const cityComponent = place.address_components.find(
-                  (component) =>
+                  (component: google.maps.GeocoderAddressComponent) =>
                     component.types.includes('locality') ||
                     component.types.includes('administrative_area_level_1')
                 );
@@ -119,7 +123,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                   markerRef.current.setMap(null);
                 }
 
-                markerRef.current = new google.maps.Marker({
+                markerRef.current = new Marker({
                   position: { lat, lng },
                   map: mapInstanceRef.current,
                   title: address,
