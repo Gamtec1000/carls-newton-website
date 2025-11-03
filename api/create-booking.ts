@@ -1,4 +1,4 @@
-import { Handler, HandlerEvent } from '@netlify/functions';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
@@ -31,34 +31,24 @@ const PACKAGE_PRICES: Record<string, number> = {
   halfday: 2500,
 };
 
-export const handler: Handler = async (event: HandlerEvent) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
   // Handle OPTIONS request for CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   // Only allow POST
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const bookingData: BookingRequest = JSON.parse(event.body || '{}');
+    const bookingData: BookingRequest = req.body;
 
     // Validate required fields
     if (
@@ -71,11 +61,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       !bookingData.date ||
       !bookingData.time_slot
     ) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing required fields' }),
-      };
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Get price for package
@@ -109,11 +95,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to create booking', details: dbError.message }),
-      };
+      return res.status(500).json({
+        error: 'Failed to create booking',
+        details: dbError.message
+      });
     }
 
     // Send email notification via Resend
@@ -166,24 +151,16 @@ export const handler: Handler = async (event: HandlerEvent) => {
       // Don't fail the booking if email fails
     }
 
-    return {
-      statusCode: 201,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        booking: booking,
-        message: 'Booking created successfully',
-      }),
-    };
+    return res.status(201).json({
+      success: true,
+      booking: booking,
+      message: 'Booking created successfully',
+    });
   } catch (error) {
     console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      }),
-    };
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-};
+}
