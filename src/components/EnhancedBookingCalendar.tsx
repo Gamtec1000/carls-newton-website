@@ -66,7 +66,7 @@ const EnhancedBookingCalendar: React.FC = () => {
         if (mapRef.current && !mapInstanceRef.current) {
           mapInstanceRef.current = new google.maps.Map(mapRef.current, {
             center: { lat: 25.2048, lng: 55.2708 }, // Dubai
-            zoom: 12,
+            zoom: 11,
             disableDefaultUI: false,
             zoomControl: true,
             mapTypeControl: false,
@@ -630,7 +630,7 @@ const EnhancedBookingCalendar: React.FC = () => {
     } as React.CSSProperties,
     mapContainer: {
       width: '100%',
-      height: '300px',
+      height: '350px',
       borderRadius: '12px',
       marginTop: '16px',
       border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -873,12 +873,14 @@ const EnhancedBookingCalendar: React.FC = () => {
                 <div style={styles.phoneInputContainer}>
                   <PhoneInput
                     international
+                    countryCallingCodeEditable={false}
                     defaultCountry="AE"
                     countries={['AE', 'SA', 'KW', 'QA', 'OM', 'BH', 'EG']}
                     value={formData.phone}
                     onChange={(value) => setFormData({ ...formData, phone: value || '' })}
                     placeholder="Phone Number *"
                     required
+                    style={{ position: 'relative' }}
                   />
                 </div>
                 <div style={styles.locationLabel}>
@@ -894,9 +896,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   style={styles.input}
                 />
-                {formData.latitude && formData.longitude && (
-                  <div ref={mapRef} style={styles.mapContainer} />
-                )}
+                <div ref={mapRef} style={styles.mapContainer} />
                 <textarea
                   placeholder="Special requests or questions (optional)"
                   value={formData.message}
