@@ -51,7 +51,7 @@ export default async function handler(req, res) {
       .from('bookings')
       .update(updates)
       .eq('id', bookingId)
-      .select('id, booking_number, customer_name, organization_name, email, phone, full_address, address, package_type, date, time_slot, status, payment_status, price, special_requests')
+      .select() // Select all columns to work before and after migration
       .single();
 
     if (dbError) {
