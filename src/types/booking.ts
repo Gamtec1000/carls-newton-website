@@ -30,11 +30,16 @@ export interface CalendarDay {
 // Database booking interface
 export interface Booking {
   id: string;
+  booking_number?: string; // CN-001000 format (optional if migration not applied yet)
+  title?: string; // Mr/Ms/Dr/Mrs/Prof
   customer_name: string;
+  job_position?: string;
   organization_name: string;
   email: string;
   phone: string;
-  address: string;
+  address: string; // Legacy field - use full_address
+  full_address?: string; // Primary address field in database
+  address_details?: string;
   city?: string;
   latitude?: number;
   longitude?: number;
@@ -45,6 +50,7 @@ export interface Booking {
   payment_status: 'pending' | 'paid' | 'refunded';
   price: number;
   message?: string;
+  special_requests?: string;
   created_at: string;
 }
 

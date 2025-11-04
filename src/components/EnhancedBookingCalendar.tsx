@@ -344,7 +344,19 @@ const EnhancedBookingCalendar: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setBookings(data.bookings || []);
+        // Validate and sanitize booking data to prevent undefined errors
+        const safeBookings = (data.bookings || []).map((booking: any) => ({
+          ...booking,
+          // Ensure critical fields have fallback values
+          email: booking.email || '',
+          address: booking.full_address || booking.address || '',
+          full_address: booking.full_address || booking.address || '',
+          package_type: booking.package_type || 'classic',
+          time_slot: booking.time_slot || '09:00 AM',
+          status: booking.status || 'pending',
+        }));
+        setBookings(safeBookings);
+        console.log('📅 Fetched bookings:', safeBookings.length);
       }
     } catch (err) {
       console.error('Error fetching bookings:', err);
