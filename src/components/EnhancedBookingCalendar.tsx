@@ -25,6 +25,16 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
+  // Persistent customer data across bookings
+  const [persistentCustomerData, setPersistentCustomerData] = useState({
+    title: 'Mr' as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof',
+    name: '',
+    jobPosition: '',
+    organizationName: '',
+    email: '',
+    phone: '',
+  });
+
   // Form data with location fields
   const [formData, setFormData] = useState({
     title: 'Mr' as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof',
@@ -110,9 +120,35 @@ const EnhancedBookingCalendar: React.FC = () => {
     });
   };
 
+  // Cleanup function for map and autocomplete
+  const cleanupMap = () => {
+    console.log('Cleaning up map and autocomplete instances');
+
+    // Clear autocomplete listeners
+    if (autocompleteRef.current) {
+      google.maps.event.clearInstanceListeners(autocompleteRef.current);
+      autocompleteRef.current = null;
+    }
+
+    // Remove marker
+    if (markerRef.current) {
+      markerRef.current.map = null;
+      markerRef.current = null;
+    }
+
+    // Clear map instance
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current = null;
+    }
+  };
+
   // Initialize Google Maps and Places Autocomplete
   useEffect(() => {
-    if (!showBookingModal) return;
+    if (!showBookingModal) {
+      // Clean up when modal closes
+      cleanupMap();
+      return;
+    }
 
     const initMaps = async () => {
       // Check if refs are available
@@ -125,6 +161,12 @@ const EnhancedBookingCalendar: React.FC = () => {
       setMapError(null);
 
       try {
+        // Clean up any existing instances first
+        cleanupMap();
+
+        // Small delay to ensure cleanup is complete
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         // Wait for Google Maps to load
         await loadGoogleMaps();
 
@@ -132,7 +174,7 @@ const EnhancedBookingCalendar: React.FC = () => {
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as any;
 
         // Initialize map - try to get user's current location first
-        if (mapRef.current && !mapInstanceRef.current) {
+        if (mapRef.current) {
           let center = { lat: 25.2048, lng: 55.2708 }; // Dubai fallback
           let zoom = 11;
 
@@ -160,7 +202,7 @@ const EnhancedBookingCalendar: React.FC = () => {
             }
           }
 
-          // Create map with user's location or Dubai fallback
+          // Create new map instance each time
           mapInstanceRef.current = new google.maps.Map(mapRef.current, {
             center,
             zoom,
@@ -171,10 +213,12 @@ const EnhancedBookingCalendar: React.FC = () => {
             fullscreenControl: false,
             mapId: 'BOOKING_MAP', // Required for AdvancedMarkerElement
           });
+
+          console.log('Map initialized successfully');
         }
 
-        // Initialize Places Autocomplete
-        if (addressInputRef.current && !autocompleteRef.current) {
+        // Initialize Places Autocomplete - create new instance each time
+        if (addressInputRef.current) {
           autocompleteRef.current = new google.maps.places.Autocomplete(
             addressInputRef.current,
             {
@@ -387,6 +431,22 @@ const EnhancedBookingCalendar: React.FC = () => {
       setError(null);
       setSuccess(false);
       setBookingDetails(null);
+
+      // Pre-fill customer data from previous booking, but clear location fields
+      setFormData({
+        ...persistentCustomerData,
+        address: '',
+        addressDetails: '',
+        city: '',
+        latitude: null,
+        longitude: null,
+        specialRequests: '',
+      });
+
+      // Clear the address input field
+      if (addressInputRef.current) {
+        addressInputRef.current.value = '';
+      }
     }
   };
 
@@ -473,8 +533,28 @@ const EnhancedBookingCalendar: React.FC = () => {
         email: formData.email
       });
 
+      // Save customer data for next booking
+      setPersistentCustomerData({
+        title: formData.title,
+        name: formData.name,
+        jobPosition: formData.jobPosition,
+        organizationName: formData.organizationName,
+        email: formData.email,
+        phone: formData.phone,
+      });
+
       setSuccess(true);
-      setFormData({ title: 'Mr', name: '', jobPosition: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
+
+      // Clear only location-specific fields, keep customer info
+      setFormData(prev => ({
+        ...prev,
+        address: '',
+        addressDetails: '',
+        city: '',
+        latitude: null,
+        longitude: null,
+        specialRequests: '',
+      }));
 
       // Refresh bookings
       await fetchBookings();
@@ -1068,7 +1148,44 @@ const EnhancedBookingCalendar: React.FC = () => {
 
               {/* Contact Information */}
               <div style={styles.section}>
-                <div style={styles.sectionTitle}>Contact Information</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div style={styles.sectionTitle}>Contact Information</div>
+                  {(persistentCustomerData.name || persistentCustomerData.email) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPersistentCustomerData({
+                          title: 'Mr',
+                          name: '',
+                          jobPosition: '',
+                          organizationName: '',
+                          email: '',
+                          phone: '',
+                        });
+                        setFormData(prev => ({
+                          ...prev,
+                          title: 'Mr',
+                          name: '',
+                          jobPosition: '',
+                          organizationName: '',
+                          email: '',
+                          phone: '',
+                        }));
+                      }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#6366f1',
+                        textDecoration: 'underline',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0',
+                      }}
+                    >
+                      Booking for a different customer?
+                    </button>
+                  )}
+                </div>
 
                 {/* Title and Name in a row */}
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
