@@ -363,11 +363,8 @@ const EnhancedBookingCalendar: React.FC = () => {
     }
   };
 
-  // Generate calendar days for the current month
-  const generateCalendarDays = (): CalendarDay[] => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
+  // Generate calendar days for a specific month and year
+  const generateCalendarDays = (year: number, month: number): CalendarDay[] => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const prevMonthLastDay = new Date(year, month, 0);
@@ -589,7 +586,15 @@ const EnhancedBookingCalendar: React.FC = () => {
     }
   };
 
-  const calendarDays = generateCalendarDays();
+  // Generate calendar days for current month and next month
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+  const nextMonthYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+
+  const currentMonthDays = generateCalendarDays(currentYear, currentMonth);
+  const nextMonthDays = generateCalendarDays(nextMonthYear, nextMonth);
+
   const availableTimeSlots = selectedDate
     ? generateTimeSlots(
         bookings,
@@ -609,30 +614,35 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   const styles = {
     container: {
-      maxWidth: '1200px',
+      maxWidth: '1400px',
       margin: '0 auto',
-      padding: '40px 20px',
+      padding: '20px',
+    },
+    twoMonthGrid: {
+      display: 'grid',
+      gridTemplateColumns: window.innerWidth < 1024 ? '1fr' : '1fr 1fr',
+      gap: window.innerWidth < 1024 ? '30px' : '40px',
     },
     card: {
       background: 'rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(10px)',
-      borderRadius: '24px',
+      borderRadius: '20px',
       border: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '32px',
+      padding: '24px',
     },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: '32px',
+      marginBottom: '20px',
     },
     monthTitle: {
-      fontSize: '28px',
+      fontSize: '24px',
       fontWeight: 'bold',
       color: 'white',
       display: 'flex',
       alignItems: 'center',
-      gap: '12px',
+      gap: '10px',
     },
     navButtons: {
       display: 'flex',
@@ -641,8 +651,8 @@ const EnhancedBookingCalendar: React.FC = () => {
     navButton: {
       background: 'rgba(255, 255, 255, 0.1)',
       border: '1px solid rgba(255, 255, 255, 0.2)',
-      borderRadius: '12px',
-      padding: '12px',
+      borderRadius: '10px',
+      padding: '10px',
       cursor: 'pointer',
       transition: 'all 0.3s',
       display: 'flex',
@@ -651,15 +661,16 @@ const EnhancedBookingCalendar: React.FC = () => {
     } as React.CSSProperties,
     legend: {
       display: 'flex',
-      gap: '24px',
-      marginBottom: '24px',
+      gap: '20px',
+      marginBottom: '20px',
       flexWrap: 'wrap' as const,
+      justifyContent: 'center',
     },
     legendItem: {
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      fontSize: '14px',
+      fontSize: '13px',
       color: 'rgba(255, 255, 255, 0.7)',
     },
     legendBox: (color: string) => ({
@@ -672,20 +683,20 @@ const EnhancedBookingCalendar: React.FC = () => {
     weekDaysGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '8px',
-      marginBottom: '8px',
+      gap: '6px',
+      marginBottom: '6px',
     },
     weekDay: {
       color: '#A78BFA',
-      fontSize: '14px',
+      fontSize: '13px',
       fontWeight: '600',
       textAlign: 'center' as const,
-      padding: '12px',
+      padding: '8px 4px',
     },
     calendarGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '8px',
+      gap: '6px',
     },
     dayCell: (day: CalendarDay) => {
       let backgroundColor = 'rgba(255, 255, 255, 0.03)';
@@ -701,12 +712,12 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       return {
-        aspectRatio: '1',
+        minHeight: '50px',
         display: 'flex',
         flexDirection: 'column' as const,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: '12px',
+        borderRadius: '10px',
         fontSize: '16px',
         fontWeight: '500',
         cursor: day.isAvailable && day.isCurrentMonth ? 'pointer' : 'default',
@@ -721,6 +732,7 @@ const EnhancedBookingCalendar: React.FC = () => {
           ? 'rgba(255, 255, 255, 0.4)'
           : 'white',
         opacity: !day.isAvailable && day.isCurrentMonth ? 0.5 : 1,
+        padding: '8px 4px',
       };
     },
     bookingDot: {
@@ -843,28 +855,32 @@ const EnhancedBookingCalendar: React.FC = () => {
     },
     input: {
       width: '100%',
-      padding: '12px 16px',
+      padding: '14px 16px',
       borderRadius: '12px',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      background: 'rgba(255, 255, 255, 0.05)',
-      color: 'white',
+      border: '2px solid rgba(255, 255, 255, 0.2)',
+      background: 'rgba(255, 255, 255, 0.1)',
+      color: '#ffffff',
       fontSize: '16px',
       marginBottom: '16px',
       outline: 'none',
+      backdropFilter: 'blur(10px)',
+      fontWeight: '500',
     } as React.CSSProperties,
     textarea: {
       width: '100%',
-      padding: '12px 16px',
+      padding: '14px 16px',
       borderRadius: '12px',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      background: 'rgba(255, 255, 255, 0.05)',
-      color: 'white',
+      border: '2px solid rgba(255, 255, 255, 0.2)',
+      background: 'rgba(255, 255, 255, 0.1)',
+      color: '#ffffff',
       fontSize: '16px',
       marginBottom: '16px',
       outline: 'none',
       minHeight: '100px',
       resize: 'vertical' as const,
       fontFamily: 'inherit',
+      backdropFilter: 'blur(10px)',
+      fontWeight: '500',
     } as React.CSSProperties,
     submitButton: {
       width: '100%',
@@ -919,87 +935,149 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.header}>
-          <div style={styles.monthTitle}>
-            <Calendar size={32} />
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </div>
-          <div style={styles.navButtons}>
-            <button
-              onClick={handlePrevMonth}
-              style={styles.navButton}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <ChevronLeft size={20} color="white" />
-            </button>
-            <button
-              onClick={handleNextMonth}
-              style={styles.navButton}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <ChevronRight size={20} color="white" />
-            </button>
-          </div>
+      {/* Navigation Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '20px',
+        gap: '20px'
+      }}>
+        <button
+          onClick={handlePrevMonth}
+          style={styles.navButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <ChevronLeft size={20} color="white" />
+        </button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: 'white'
+        }}>
+          <Calendar size={24} />
+          <span>{monthNames[currentMonth]} {currentYear} - {monthNames[nextMonth]} {nextMonthYear}</span>
         </div>
+        <button
+          onClick={handleNextMonth}
+          style={styles.navButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <ChevronRight size={20} color="white" />
+        </button>
+      </div>
 
-        <div style={styles.legend}>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(34, 197, 94, 0.2)')} />
-            <span>Available</span>
-          </div>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(239, 68, 68, 0.3)')} />
-            <span>Booked</span>
-          </div>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(6, 182, 212, 0.2)')} />
-            <span>Today</span>
-          </div>
+      {/* Legend */}
+      <div style={styles.legend}>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(34, 197, 94, 0.2)')} />
+          <span>Available</span>
         </div>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(239, 68, 68, 0.3)')} />
+          <span>Booked</span>
+        </div>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(6, 182, 212, 0.2)')} />
+          <span>Today</span>
+        </div>
+      </div>
 
-        <div style={styles.weekDaysGrid}>
-          {weekDays.map(day => (
-            <div key={day} style={styles.weekDay}>
-              {day}
+      {/* Two-Month Grid */}
+      <div style={styles.twoMonthGrid}>
+        {/* First Month */}
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <div style={styles.monthTitle}>
+              {monthNames[currentMonth]} {currentYear}
             </div>
-          ))}
+          </div>
+
+          <div style={styles.weekDaysGrid}>
+            {weekDays.map(day => (
+              <div key={day} style={styles.weekDay}>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.calendarGrid}>
+            {currentMonthDays.map((day, index) => (
+              <div
+                key={index}
+                style={styles.dayCell(day)}
+                onClick={() => handleDateClick(day)}
+                onMouseEnter={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
+              >
+                <div>{day.date.getDate()}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div style={styles.calendarGrid}>
-          {calendarDays.map((day, index) => (
-            <div
-              key={index}
-              style={styles.dayCell(day)}
-              onClick={() => handleDateClick(day)}
-              onMouseEnter={(e) => {
-                if (day.isAvailable && day.isCurrentMonth) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (day.isAvailable && day.isCurrentMonth) {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }
-              }}
-            >
-              <div>{day.date.getDate()}</div>
+        {/* Second Month */}
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <div style={styles.monthTitle}>
+              {monthNames[nextMonth]} {nextMonthYear}
             </div>
-          ))}
+          </div>
+
+          <div style={styles.weekDaysGrid}>
+            {weekDays.map(day => (
+              <div key={day} style={styles.weekDay}>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.calendarGrid}>
+            {nextMonthDays.map((day, index) => (
+              <div
+                key={index}
+                style={styles.dayCell(day)}
+                onClick={() => handleDateClick(day)}
+                onMouseEnter={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
+              >
+                <div>{day.date.getDate()}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -1011,6 +1089,30 @@ const EnhancedBookingCalendar: React.FC = () => {
           }
         }}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()} data-modal-content>
+            <style>
+              {`
+                [data-modal-content] input::placeholder,
+                [data-modal-content] textarea::placeholder {
+                  color: rgba(255, 255, 255, 0.5);
+                  opacity: 1;
+                }
+                [data-modal-content] input::-webkit-input-placeholder,
+                [data-modal-content] textarea::-webkit-input-placeholder {
+                  color: rgba(255, 255, 255, 0.5);
+                  opacity: 1;
+                }
+                [data-modal-content] input::-moz-placeholder,
+                [data-modal-content] textarea::-moz-placeholder {
+                  color: rgba(255, 255, 255, 0.5);
+                  opacity: 1;
+                }
+                [data-modal-content] input:-ms-input-placeholder,
+                [data-modal-content] textarea:-ms-input-placeholder {
+                  color: rgba(255, 255, 255, 0.5);
+                  opacity: 1;
+                }
+              `}
+            </style>
             <div style={styles.modalHeader}>
               <div style={styles.modalTitle}>
                 Book Your Show - {selectedDate.toLocaleDateString('en-US', {
@@ -1221,9 +1323,18 @@ const EnhancedBookingCalendar: React.FC = () => {
               <form onSubmit={handleBooking}>
               {/* Package Selection */}
               <div style={styles.section}>
-                <div style={styles.sectionTitle}>
+                <h3 style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: '20px',
+                  marginTop: '0'
+                }}>
                   Select Package
-                </div>
+                </h3>
                 <div style={styles.packageGrid}>
                   <div
                     style={styles.packageCard(selectedPackage === 'preschool')}
@@ -1263,10 +1374,22 @@ const EnhancedBookingCalendar: React.FC = () => {
 
               {/* Time Slot Selection */}
               <div style={styles.section}>
-                <div style={styles.sectionTitle}>
-                  <Clock size={20} />
+                <h3 style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: '20px',
+                  marginTop: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <Clock size={20} style={{ color: '#667eea' }} />
                   Select Time Slot
-                </div>
+                </h3>
                 {availableTimeSlots.length > 0 ? (
                   <div style={styles.timeSlotsGrid}>
                     {availableTimeSlots.map((slot, index) => (
@@ -1291,7 +1414,18 @@ const EnhancedBookingCalendar: React.FC = () => {
               {/* Contact Information */}
               <div style={styles.section}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <div style={styles.sectionTitle}>Contact Information</div>
+                  <h3 style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    marginBottom: '0',
+                    marginTop: '0'
+                  }}>
+                    Contact Information
+                  </h3>
                   {(persistentCustomerData.name || persistentCustomerData.email) && (
                     <button
                       type="button"
@@ -1334,18 +1468,54 @@ const EnhancedBookingCalendar: React.FC = () => {
                   <select
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof' })}
+                    required
                     style={{
-                      ...styles.input,
                       width: '120px',
+                      padding: '14px 16px',
+                      fontSize: '16px',
+                      border: '2px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      outline: 'none',
+                      backdropFilter: 'blur(10px)',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 16px center',
+                      paddingRight: '40px',
                       marginBottom: 0
                     }}
-                    required
                   >
-                    <option value="Mr">Mr</option>
-                    <option value="Ms">Ms</option>
-                    <option value="Mrs">Mrs</option>
-                    <option value="Dr">Dr</option>
-                    <option value="Prof">Prof</option>
+                    <option value="Mr" style={{
+                      background: '#1e293b',
+                      color: '#ffffff',
+                      padding: '10px'
+                    }}>Mr</option>
+                    <option value="Ms" style={{
+                      background: '#1e293b',
+                      color: '#ffffff',
+                      padding: '10px'
+                    }}>Ms</option>
+                    <option value="Mrs" style={{
+                      background: '#1e293b',
+                      color: '#ffffff',
+                      padding: '10px'
+                    }}>Mrs</option>
+                    <option value="Dr" style={{
+                      background: '#1e293b',
+                      color: '#ffffff',
+                      padding: '10px'
+                    }}>Dr</option>
+                    <option value="Prof" style={{
+                      background: '#1e293b',
+                      color: '#ffffff',
+                      padding: '10px'
+                    }}>Prof</option>
                   </select>
                   <input
                     type="text"
@@ -1399,10 +1569,22 @@ const EnhancedBookingCalendar: React.FC = () => {
                     style={{ position: 'relative' }}
                   />
                 </div>
-                <div style={{ ...styles.locationLabel, marginTop: '24px' }}>
-                  <MapPin size={16} />
-                  <span>Location</span>
-                </div>
+                <h3 style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: '20px',
+                  marginTop: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <MapPin size={20} style={{ color: '#667eea' }} />
+                  Location
+                </h3>
                 <input
                   ref={addressInputRef}
                   type="text"
@@ -1467,7 +1649,18 @@ const EnhancedBookingCalendar: React.FC = () => {
 
               {/* Special Requests */}
               <div style={{ ...styles.section, marginTop: '32px' }}>
-                <div style={styles.sectionTitle}>Special Requests or Topics to Cover (Optional)</div>
+                <h3 style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: '20px',
+                  marginTop: '0'
+                }}>
+                  Special Requests or Topics to Cover (Optional)
+                </h3>
                 <textarea
                   placeholder="Any specific topics, experiments, or special requirements..."
                   value={formData.specialRequests}
