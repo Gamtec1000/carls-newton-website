@@ -21,6 +21,7 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showSuccessView, setShowSuccessView] = useState(false); // Controls showing success instead of form
   const [bookingDetails, setBookingDetails] = useState<{ bookingId: string; packageType: string; date: string; organizationName: string; email: string } | null>(null);
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -430,6 +431,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       setSelectedTimeSlot(null);
       setError(null);
       setSuccess(false);
+      setShowSuccessView(false); // Always show form when opening modal
       setBookingDetails(null);
 
       // Pre-fill customer data from previous booking, but clear location fields
@@ -543,30 +545,22 @@ const EnhancedBookingCalendar: React.FC = () => {
         phone: formData.phone,
       });
 
+      // Show success view instead of form
       setSuccess(true);
+      setShowSuccessView(true);
 
-      // Clear only location-specific fields, keep customer info
-      setFormData(prev => ({
-        ...prev,
-        address: '',
-        addressDetails: '',
-        city: '',
-        latitude: null,
-        longitude: null,
-        specialRequests: '',
-      }));
+      // Scroll modal to top to show success message
+      setTimeout(() => {
+        const modalContent = document.querySelector('[data-modal-content]');
+        if (modalContent) {
+          modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 100);
 
       // Refresh bookings
       await fetchBookings();
 
-      // Close modal after 8 seconds to give time to read and click WhatsApp
-      setTimeout(() => {
-        setShowBookingModal(false);
-        setSelectedDate(null);
-        setSelectedTimeSlot(null);
-        setSuccess(false);
-        setBookingDetails(null);
-      }, 8000);
+      // DO NOT auto-close modal - let user close it manually or book another date
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create booking');
     } finally {
@@ -990,7 +984,7 @@ const EnhancedBookingCalendar: React.FC = () => {
 
       {showBookingModal && selectedDate && (
         <div style={styles.modal} onClick={() => setShowBookingModal(false)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()} data-modal-content>
             <div style={styles.modalHeader}>
               <div style={styles.modalTitle}>
                 Book Your Show - {selectedDate.toLocaleDateString('en-US', {
@@ -1014,42 +1008,80 @@ const EnhancedBookingCalendar: React.FC = () => {
               </button>
             </div>
 
-            {error && (
+            {!showSuccessView && error && (
               <div style={styles.alert('error')}>
                 <AlertCircle size={20} />
                 <span>{error}</span>
               </div>
             )}
 
-            {success && bookingDetails && (
+            {showSuccessView && bookingDetails ? (
+              // SUCCESS VIEW - Replaces entire form
               <div style={{
-                ...styles.alert('success'),
+                padding: '40px 20px',
+                textAlign: 'center',
+                minHeight: '500px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '15px',
-                padding: '20px',
-                textAlign: 'center'
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                  <CheckCircle size={24} />
-                  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>🎉 Awesome! Your science adventure is booked!</span>
+                {/* Big animated success checkmark */}
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '40px',
+                  marginBottom: '20px',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}>
+                  ✓
                 </div>
 
-                <div style={{ background: '#dcfce7', padding: '12px', borderRadius: '8px', margin: '10px 0' }}>
-                  <p style={{ margin: '0', color: '#166534', fontWeight: 'bold', fontSize: '16px' }}>
-                    Booking #{bookingDetails.bookingId}
+                <h2 style={{
+                  color: '#6366f1',
+                  fontSize: '28px',
+                  margin: '0 0 10px 0'
+                }}>
+                  🎉 Booking Confirmed!
+                </h2>
+
+                <div style={{
+                  background: '#dcfce7',
+                  padding: '15px 30px',
+                  borderRadius: '12px',
+                  margin: '20px 0',
+                  border: '2px solid #10b981'
+                }}>
+                  <p style={{
+                    margin: 0,
+                    color: '#166534',
+                    fontSize: '20px',
+                    fontWeight: 'bold'
+                  }}>
+                    {bookingDetails.bookingId}
                   </p>
                 </div>
 
-                <p style={{ margin: '0', fontSize: '14px' }}>
+                <p style={{
+                  fontSize: '16px',
+                  lineHeight: '1.6',
+                  color: '#1f2937',
+                  margin: '20px 0',
+                  maxWidth: '500px'
+                }}>
+                  🚀 <strong>Awesome!</strong> Your science adventure is booked!<br />
                   Check your email (<strong>{bookingDetails.email}</strong>) for all the exciting details!
                 </p>
-                <p style={{ margin: '0', fontSize: '14px' }}>
-                  We can't wait to bring the WOW factor to your event! 🎉✨
-                </p>
+
                 <a
                   href={`https://wa.me/971543771243?text=${encodeURIComponent(
-                    `Hi Carls Newton! I just booked ${bookingDetails.packageType} for ${bookingDetails.date} at ${bookingDetails.organizationName}. Booking #${bookingDetails.bookingId}. I have a question!`
+                    `Hi Carls Newton! I just booked ${bookingDetails.packageType} for ${bookingDetails.date} (Booking ${bookingDetails.bookingId}). I have a question!`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -1057,26 +1089,103 @@ const EnhancedBookingCalendar: React.FC = () => {
                     display: 'inline-block',
                     background: '#25D366',
                     color: 'white',
-                    padding: '12px 24px',
+                    padding: '15px 30px',
                     textDecoration: 'none',
-                    borderRadius: '25px',
+                    borderRadius: '50px',
                     fontWeight: 'bold',
-                    fontSize: '14px',
-                    transition: 'transform 0.2s',
-                    cursor: 'pointer'
+                    fontSize: '16px',
+                    margin: '20px 0',
+                    transition: 'transform 0.2s'
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                   onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 >
                   💬 Chat with us on WhatsApp
                 </a>
-                <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>
-                  We'll confirm within 24 hours!
-                </p>
-              </div>
-            )}
 
-            <form onSubmit={handleBooking}>
+                <p style={{
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  margin: '20px 0'
+                }}>
+                  We'll confirm within 24 hours! 🎉
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Reset for next booking
+                    setShowSuccessView(false);
+                    setSuccess(false);
+                    setBookingDetails(null);
+                    // Clear location-specific fields
+                    setFormData(prev => ({
+                      ...persistentCustomerData,
+                      address: '',
+                      addressDetails: '',
+                      city: '',
+                      latitude: null,
+                      longitude: null,
+                      specialRequests: '',
+                    }));
+                    // Clear address input
+                    if (addressInputRef.current) {
+                      addressInputRef.current.value = '';
+                    }
+                    // Keep modal open, ready for next booking
+                  }}
+                  style={{
+                    marginTop: '30px',
+                    padding: '12px 24px',
+                    background: '#6366f1',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = '#4f46e5')}
+                  onMouseOut={(e) => (e.currentTarget.style.background = '#6366f1')}
+                >
+                  📅 Book Another Date
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBookingModal(false);
+                    setShowSuccessView(false);
+                    setSuccess(false);
+                    setBookingDetails(null);
+                  }}
+                  style={{
+                    marginTop: '10px',
+                    padding: '10px 20px',
+                    background: 'transparent',
+                    color: '#6b7280',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#f3f4f6';
+                    e.currentTarget.style.borderColor = '#9ca3af';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              // FORM VIEW
+              <form onSubmit={handleBooking}>
               {/* Package Selection */}
               <div style={styles.section}>
                 <div style={styles.sectionTitle}>
@@ -1356,6 +1465,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                 {loading ? 'Processing...' : success ? 'Booking Confirmed!' : 'Confirm Booking'}
               </button>
             </form>
+            )}
           </div>
         </div>
       )}
