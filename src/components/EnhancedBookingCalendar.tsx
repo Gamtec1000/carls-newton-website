@@ -7,7 +7,6 @@ import {
   getBookingsForDate,
   validateBookingForm,
 } from '../utils/bookingValidation';
-import { Loader } from '@googlemaps/js-api-loader';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
@@ -22,6 +21,8 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Form data with location fields
   const [formData, setFormData] = useState({
@@ -30,10 +31,11 @@ const EnhancedBookingCalendar: React.FC = () => {
     email: '',
     phone: '',
     address: '',
+    addressDetails: '',
     city: '',
     latitude: null as number | null,
     longitude: null as number | null,
-    message: '',
+    specialRequests: '',
   });
 
   // Google Maps refs
@@ -41,36 +43,130 @@ const EnhancedBookingCalendar: React.FC = () => {
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const markerRef = useRef<any>(null); // AdvancedMarkerElement type
 
   // Fetch bookings on component mount and when month changes
   useEffect(() => {
     fetchBookings();
   }, [currentDate]);
 
+  // Load Google Maps script
+  const loadGoogleMaps = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (window.google && window.google.maps && window.google.maps.Map) {
+        resolve();
+        return;
+      }
+
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+
+      if (!apiKey) {
+        reject(new Error('Google Maps API key is missing'));
+        return;
+      }
+
+      // Check if script is already being loaded
+      const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
+      if (existingScript) {
+        // Script exists, wait for it to load
+        existingScript.addEventListener('load', () => {
+          setTimeout(() => {
+            if (window.google && window.google.maps && window.google.maps.Map) {
+              resolve();
+            } else {
+              reject(new Error('Google Maps failed to initialize'));
+            }
+          }, 100);
+        });
+        return;
+      }
+
+      // Create script
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        // Wait a bit more to ensure google.maps is fully available
+        setTimeout(() => {
+          if (window.google && window.google.maps && window.google.maps.Map) {
+            resolve();
+          } else {
+            reject(new Error('Google Maps failed to initialize'));
+          }
+        }, 100);
+      };
+
+      script.onerror = () => {
+        reject(new Error('Failed to load Google Maps script. Check your API key and network connection.'));
+      };
+
+      document.head.appendChild(script);
+    });
+  };
+
   // Initialize Google Maps and Places Autocomplete
   useEffect(() => {
-    if (!showBookingModal || !addressInputRef.current || !mapRef.current) return;
+    if (!showBookingModal) return;
 
     const initMaps = async () => {
+      // Check if refs are available
+      if (!addressInputRef.current || !mapRef.current) {
+        console.warn('Map or input ref not available yet');
+        return;
+      }
+
+      setMapLoading(true);
+      setMapError(null);
+
       try {
-        const loader = new Loader({
-          apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-          version: 'weekly',
-          libraries: ['places'],
-        });
+        // Wait for Google Maps to load
+        await loadGoogleMaps();
 
-        await (loader as any).load();
+        // Load the marker library for AdvancedMarkerElement
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as any;
 
-        // Initialize map centered on UAE
+        // Initialize map - try to get user's current location first
         if (mapRef.current && !mapInstanceRef.current) {
+          let center = { lat: 25.2048, lng: 55.2708 }; // Dubai fallback
+          let zoom = 11;
+
+          // Try to get user's actual location
+          if (navigator.geolocation) {
+            try {
+              const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                  resolve,
+                  reject,
+                  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+              });
+
+              // Use user's current location
+              center = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              zoom = 13; // Closer zoom for current location
+
+              console.log('Using user location:', center);
+            } catch (geoError) {
+              console.log('Geolocation denied or unavailable, using Dubai default');
+            }
+          }
+
+          // Create map with user's location or Dubai fallback
           mapInstanceRef.current = new google.maps.Map(mapRef.current, {
-            center: { lat: 25.2048, lng: 55.2708 }, // Dubai
-            zoom: 11,
+            center,
+            zoom,
             disableDefaultUI: false,
             zoomControl: true,
             mapTypeControl: false,
             streetViewControl: false,
+            fullscreenControl: false,
+            mapId: 'BOOKING_MAP', // Required for AdvancedMarkerElement
           });
         }
 
@@ -80,60 +176,109 @@ const EnhancedBookingCalendar: React.FC = () => {
             addressInputRef.current,
             {
               componentRestrictions: { country: ['ae', 'sa', 'kw', 'qa', 'om', 'bh', 'eg'] },
-              fields: ['formatted_address', 'geometry', 'address_components'],
+              fields: ['name', 'formatted_address', 'geometry', 'address_components'],
             }
           );
 
-          autocompleteRef.current.addListener('place_changed', () => {
+          autocompleteRef.current.addListener('place_changed', async () => {
             const place = autocompleteRef.current?.getPlace();
-            if (place?.geometry?.location) {
-              const lat = place.geometry.location.lat();
-              const lng = place.geometry.location.lng();
-              const address = place.formatted_address || '';
 
-              // Extract city from address components
-              let city = '';
-              if (place.address_components) {
-                const cityComponent = place.address_components.find(
-                  (component) =>
-                    component.types.includes('locality') ||
-                    component.types.includes('administrative_area_level_1')
-                );
-                city = cityComponent?.long_name || '';
+            if (!place?.geometry?.location) {
+              console.error('No geometry found for place');
+              return;
+            }
+
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+
+            // Get the BEST address to save
+            // Priority: place.name > formatted_address without plus codes
+            let addressToSave = place.name || place.formatted_address || '';
+
+            // If formatted_address contains plus codes (like CG8W+8VV), prefer place.name
+            if (place.formatted_address && place.formatted_address.match(/[A-Z0-9]{4}\+[A-Z0-9]{2,3}/)) {
+              // Has plus code, use name instead if available
+              addressToSave = place.name || place.formatted_address;
+              console.log('Plus code detected, using place name:', place.name);
+            }
+
+            // Clean up - remove plus codes if they still exist
+            addressToSave = addressToSave.replace(/[A-Z0-9]{4}\+[A-Z0-9]{2,3}\s*-?\s*/g, '').trim();
+
+            // Remove leading/trailing dashes and extra spaces
+            addressToSave = addressToSave.replace(/^[-\s]+|[-\s]+$/g, '').replace(/\s+/g, ' ');
+
+            console.log('Saving address:', addressToSave);
+            console.log('Original formatted_address:', place.formatted_address);
+            console.log('Place name:', place.name);
+
+            // Extract city from address components
+            let city = '';
+            if (place.address_components) {
+              const cityComponent = place.address_components.find(
+                (component) =>
+                  component.types.includes('locality') ||
+                  component.types.includes('administrative_area_level_1')
+              );
+              city = cityComponent?.long_name || '';
+            }
+
+            // Update form data with clean address
+            setFormData((prev) => ({
+              ...prev,
+              address: addressToSave,
+              city,
+              latitude: lat,
+              longitude: lng,
+            }));
+
+            // Update input to show clean address
+            if (addressInputRef.current) {
+              addressInputRef.current.value = addressToSave;
+            }
+
+            // Update map and marker
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.setCenter({ lat, lng });
+              mapInstanceRef.current.setZoom(15);
+
+              // Remove old marker if exists
+              if (markerRef.current) {
+                markerRef.current.map = null;
               }
 
-              setFormData((prev) => ({
-                ...prev,
-                address,
-                city,
-                latitude: lat,
-                longitude: lng,
-              }));
+              // Load marker library and create new AdvancedMarkerElement (not deprecated Marker)
+              try {
+                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as any;
 
-              // Update map and marker
-              if (mapInstanceRef.current) {
-                mapInstanceRef.current.setCenter({ lat, lng });
-                mapInstanceRef.current.setZoom(15);
-
-                if (markerRef.current) {
-                  markerRef.current.setMap(null);
-                }
-
-                markerRef.current = new google.maps.Marker({
-                  position: { lat, lng },
+                markerRef.current = new AdvancedMarkerElement({
                   map: mapInstanceRef.current,
-                  title: address,
+                  position: { lat, lng },
+                  title: addressToSave,
                 });
+
+                console.log('✓ Marker placed at:', addressToSave);
+              } catch (markerError) {
+                console.error('Error creating marker:', markerError);
               }
             }
           });
         }
+
+        setMapLoading(false);
       } catch (error) {
         console.error('Error loading Google Maps:', error);
+        setMapError(error instanceof Error ? error.message : 'Failed to load map');
+        setMapLoading(false);
       }
     };
 
-    initMaps();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      initMaps();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [showBookingModal]);
 
   const fetchBookings = async () => {
@@ -270,19 +415,27 @@ const EnhancedBookingCalendar: React.FC = () => {
     setLoading(true);
 
     try {
+      const PACKAGE_PRICES = {
+        preschool: 1200,
+        classic: 1800,
+        halfday: 2500,
+      };
+
       const bookingData = {
         customer_name: formData.name,
         organization_name: formData.organizationName,
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        address_details: formData.addressDetails,
         city: formData.city,
         latitude: formData.latitude,
         longitude: formData.longitude,
         package_type: selectedPackage,
         date: selectedDate.toISOString().split('T')[0],
         time_slot: selectedTimeSlot,
-        message: formData.message,
+        price: PACKAGE_PRICES[selectedPackage],
+        special_requests: formData.specialRequests,
       };
 
       const response = await fetch('/api/create-booking', {
@@ -300,7 +453,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       setSuccess(true);
-      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', city: '', latitude: null, longitude: null, message: '' });
+      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -883,9 +1036,9 @@ const EnhancedBookingCalendar: React.FC = () => {
                     style={{ position: 'relative' }}
                   />
                 </div>
-                <div style={styles.locationLabel}>
+                <div style={{ ...styles.locationLabel, marginTop: '24px' }}>
                   <MapPin size={16} />
-                  <span>Location (Search for your address)</span>
+                  <span>Location</span>
                 </div>
                 <input
                   ref={addressInputRef}
@@ -896,11 +1049,66 @@ const EnhancedBookingCalendar: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   style={styles.input}
                 />
-                <div ref={mapRef} style={styles.mapContainer} />
+                <div style={{ ...styles.mapContainer, marginBottom: '24px', position: 'relative' }}>
+                  {mapLoading && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '12px',
+                      zIndex: 10,
+                    }}>
+                      <div style={{ textAlign: 'center', color: '#A78BFA' }}>
+                        <div style={{ marginBottom: '8px' }}>Loading map...</div>
+                        <div style={{ fontSize: '12px', opacity: 0.7 }}>Please wait</div>
+                      </div>
+                    </div>
+                  )}
+                  {mapError && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      zIndex: 10,
+                    }}>
+                      <div style={{ textAlign: 'center', color: '#FCA5A5' }}>
+                        <AlertCircle size={32} style={{ marginBottom: '8px' }} />
+                        <div style={{ fontSize: '14px' }}>{mapError}</div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={mapRef} style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Apt/Flat/Building Number or Landmarks (Optional)"
+                  value={formData.addressDetails}
+                  onChange={(e) => setFormData({ ...formData, addressDetails: e.target.value })}
+                  style={{...styles.input, marginTop: 0}}
+                />
+              </div>
+
+              {/* Special Requests */}
+              <div style={{ ...styles.section, marginTop: '32px' }}>
+                <div style={styles.sectionTitle}>Special Requests or Topics to Cover (Optional)</div>
                 <textarea
-                  placeholder="Special requests or questions (optional)"
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Any specific topics, experiments, or special requirements..."
+                  value={formData.specialRequests}
+                  onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
                   style={styles.textarea}
                 />
               </div>

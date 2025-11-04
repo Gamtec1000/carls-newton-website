@@ -31,58 +31,101 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('=== CREATE BOOKING API CALLED ===');
+    console.log('Received booking data:', JSON.stringify(req.body, null, 2));
+
     const bookingData = req.body;
 
     // Validate required fields
-    if (
-      !bookingData.customer_name ||
-      !bookingData.organization_name ||
-      !bookingData.email ||
-      !bookingData.phone ||
-      !bookingData.full_address ||
-      !bookingData.package_type ||
-      !bookingData.date ||
-      !bookingData.time_slot
-    ) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const address = bookingData.full_address || bookingData.address;
+
+    const required = {
+      customer_name: bookingData.customer_name,
+      organization_name: bookingData.organization_name,
+      email: bookingData.email,
+      phone: bookingData.phone,
+      address: address,
+      package_type: bookingData.package_type,
+      date: bookingData.date,
+      time_slot: bookingData.time_slot,
+    };
+
+    const missing = Object.keys(required).filter(key => !required[key]);
+
+    if (missing.length > 0) {
+      console.error('Missing required fields:', missing);
+      return res.status(400).json({
+        error: 'Missing required fields',
+        missing: missing
+      });
     }
 
     // Get price for package
     const price = PACKAGE_PRICES[bookingData.package_type] || bookingData.price;
 
+    if (!price) {
+      console.error('Invalid package type or missing price:', bookingData.package_type);
+      return res.status(400).json({ error: 'Invalid package type or missing price' });
+    }
+
+    // Check environment variables
+    console.log('Checking environment variables...');
+    console.log('Supabase URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    console.log('Supabase URL length:', process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0);
+    console.log('Supabase Key length:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0);
+
+    // Prepare insert data
+    const insertData = {
+      customer_name: bookingData.customer_name,
+      organization_name: bookingData.organization_name,
+      email: bookingData.email,
+      phone: bookingData.phone,
+      full_address: address,
+      address_details: bookingData.address_details || null,
+      city: bookingData.city || null,
+      latitude: bookingData.latitude || null,
+      longitude: bookingData.longitude || null,
+      package_type: bookingData.package_type,
+      date: bookingData.date,
+      time_slot: bookingData.time_slot,
+      status: 'pending',
+      payment_status: 'pending',
+      price: price,
+      message: bookingData.message || bookingData.special_requests || null,
+      special_requests: bookingData.special_requests || bookingData.message || null,
+    };
+
+    console.log('Creating booking in Supabase...');
+    console.log('Attempting to insert data:', JSON.stringify(insertData, null, 2));
+
     // Create booking in Supabase
     const { data: booking, error: dbError } = await supabase
       .from('bookings')
-      .insert([
-        {
-          customer_name: bookingData.customer_name,
-          organization_name: bookingData.organization_name,
-          email: bookingData.email,
-          phone: bookingData.phone,
-          full_address: bookingData.full_address,
-          address_details: bookingData.address_details || null,
-          city: bookingData.city || null,
-          latitude: bookingData.latitude || null,
-          longitude: bookingData.longitude || null,
-          package_type: bookingData.package_type,
-          date: bookingData.date,
-          time_slot: bookingData.time_slot,
-          status: 'pending',
-          payment_status: 'pending',
-          price: price,
-          message: bookingData.message || null,
-        },
-      ])
+      .insert([insertData])
       .select()
       .single();
 
     if (dbError) {
-      console.error('Database error:', dbError);
+      console.error('=== SUPABASE INSERT FAILED ===');
+      console.error('Error object:', dbError);
+      console.error('Error code:', dbError.code);
+      console.error('Error message:', dbError.message);
+      console.error('Error details:', dbError.details);
+      console.error('Error hint:', dbError.hint);
+      console.error('Full error JSON:', JSON.stringify(dbError, null, 2));
+
       return res.status(500).json({
-        error: 'Failed to create booking',
-        details: dbError.message
+        error: 'Failed to create booking in database',
+        supabaseError: dbError.message,
+        code: dbError.code,
+        details: dbError.details,
+        hint: dbError.hint,
+        insertData: insertData // Include what we tried to insert for debugging
       });
     }
+
+    console.log('Booking created successfully:', booking.id);
 
     // Send email notifications via Resend
     try {
@@ -113,7 +156,7 @@ export default async function handler(req, res) {
           <p><strong>Organization/School:</strong> ${bookingData.organization_name}</p>
           <p><strong>Email:</strong> ${bookingData.email}</p>
           <p><strong>Phone:</strong> ${bookingData.phone}</p>
-          <p><strong>Address:</strong> ${bookingData.full_address}</p>
+          <p><strong>Address:</strong> ${address}</p>
           ${bookingData.address_details ? `<p><strong>Address Details:</strong> ${bookingData.address_details}</p>` : ''}
           ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
           ${bookingData.latitude && bookingData.longitude ? `<p><strong>Location:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Map</a></p>` : ''}
@@ -123,7 +166,7 @@ export default async function handler(req, res) {
           <p><strong>Date:</strong> ${formattedDate}</p>
           <p><strong>Time:</strong> ${bookingData.time_slot}</p>
           <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
-          ${bookingData.message ? `<p><strong>Message:</strong> ${bookingData.message}</p>` : ''}
+          ${(bookingData.special_requests || bookingData.message) ? `<p><strong>Special Requests:</strong> ${bookingData.special_requests || bookingData.message}</p>` : ''}
           <hr />
           <p><strong>Status:</strong> Pending Confirmation</p>
           <p><strong>Payment Status:</strong> Pending</p>
@@ -151,7 +194,7 @@ export default async function handler(req, res) {
               <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
               <p><strong>Date:</strong> ${formattedDate}</p>
               <p><strong>Time:</strong> ${bookingData.time_slot}</p>
-              <p><strong>Location:</strong> ${bookingData.full_address}</p>
+              <p><strong>Location:</strong> ${address}</p>
               <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
             </div>
 
@@ -182,9 +225,12 @@ export default async function handler(req, res) {
         `,
       });
     } catch (emailError) {
-      console.error('Email error:', emailError);
+      console.error('Email sending error (non-fatal):', emailError);
+      console.error('Email error details:', emailError.message);
       // Don't fail the booking if email fails
     }
+
+    console.log('Booking process completed successfully');
 
     return res.status(201).json({
       success: true,
@@ -193,10 +239,15 @@ export default async function handler(req, res) {
       message: 'Booking created successfully',
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('=== FATAL ERROR IN CREATE-BOOKING ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
+
     return res.status(500).json({
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
