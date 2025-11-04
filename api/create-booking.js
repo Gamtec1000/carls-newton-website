@@ -40,7 +40,9 @@ export default async function handler(req, res) {
     const address = bookingData.full_address || bookingData.address;
 
     const required = {
+      title: bookingData.title,
       customer_name: bookingData.customer_name,
+      job_position: bookingData.job_position,
       organization_name: bookingData.organization_name,
       email: bookingData.email,
       phone: bookingData.phone,
@@ -77,7 +79,9 @@ export default async function handler(req, res) {
 
     // Prepare insert data
     const insertData = {
+      title: bookingData.title,
       customer_name: bookingData.customer_name,
+      job_position: bookingData.job_position,
       organization_name: bookingData.organization_name,
       email: bookingData.email,
       phone: bookingData.phone,
@@ -164,14 +168,15 @@ export default async function handler(req, res) {
 
             <div style="background: #f9fafb; padding: 20px; border-radius: 10px; border-left: 4px solid #6366f1;">
               <h3 style="margin-top: 0; color: #1f2937;">Contact Information</h3>
-              <p><strong>Name:</strong> ${bookingData.customer_name}</p>
+              <p><strong>Name:</strong> ${bookingData.title} ${bookingData.customer_name}</p>
+              <p><strong>Job Position:</strong> ${bookingData.job_position}</p>
               <p><strong>Email:</strong> <a href="mailto:${bookingData.email}">${bookingData.email}</a></p>
               <p><strong>Phone:</strong> <a href="tel:${bookingData.phone}">${bookingData.phone}</a></p>
               <p><strong>Organization:</strong> ${bookingData.organization_name}</p>
 
               <!-- Quick WhatsApp contact button for admin -->
               <div style="margin-top: 15px;">
-                <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20${encodeURIComponent(packageNames[bookingData.package_type])}%20(Booking%20%23${displayBookingId}).%20Let%27s%20confirm%20the%20details!"
+                <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${bookingData.title}%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20${encodeURIComponent(packageNames[bookingData.package_type])}%20(Booking%20%23${displayBookingId}).%20Let%27s%20confirm%20the%20details!"
                    style="display: inline-block; background: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 25px; font-size: 14px;">
                   💬 WhatsApp Customer
                 </a>
@@ -223,7 +228,7 @@ export default async function handler(req, res) {
             <h1 style="color: #6366f1;">🚀 Woohoo! Your Science Show is Booked!</h1>
 
             <p style="font-size: 16px; line-height: 1.6;">
-              Dear ${bookingData.customer_name},
+              Dear ${bookingData.title} ${bookingData.customer_name},
             </p>
 
             <p style="font-size: 16px; line-height: 1.6;">

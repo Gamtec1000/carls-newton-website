@@ -27,7 +27,9 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   // Form data with location fields
   const [formData, setFormData] = useState({
+    title: 'Mr' as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof',
     name: '',
+    jobPosition: '',
     organizationName: '',
     email: '',
     phone: '',
@@ -424,7 +426,9 @@ const EnhancedBookingCalendar: React.FC = () => {
       };
 
       const bookingData = {
+        title: formData.title,
         customer_name: formData.name,
+        job_position: formData.jobPosition,
         organization_name: formData.organizationName,
         email: formData.email,
         phone: formData.phone,
@@ -470,7 +474,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       });
 
       setSuccess(true);
-      setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
+      setFormData({ title: 'Mr', name: '', jobPosition: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
 
       // Refresh bookings
       await fetchBookings();
@@ -1065,17 +1069,51 @@ const EnhancedBookingCalendar: React.FC = () => {
               {/* Contact Information */}
               <div style={styles.section}>
                 <div style={styles.sectionTitle}>Contact Information</div>
+
+                {/* Title and Name in a row */}
+                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                  <select
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof' })}
+                    style={{
+                      ...styles.input,
+                      width: '120px',
+                      marginBottom: 0
+                    }}
+                    required
+                  >
+                    <option value="Mr">Mr</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Prof">Prof</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Your Name *"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    style={{
+                      ...styles.input,
+                      flex: 1,
+                      marginBottom: 0
+                    }}
+                  />
+                </div>
+
                 <input
                   type="text"
-                  placeholder="Your Name *"
+                  placeholder="Job Position (e.g., Science Coordinator, Head Teacher) *"
                   required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.jobPosition}
+                  onChange={(e) => setFormData({ ...formData, jobPosition: e.target.value })}
                   style={styles.input}
                 />
+
                 <input
                   type="text"
-                  placeholder="Enter organization or school name"
+                  placeholder="Enter organization or school name *"
                   required
                   value={formData.organizationName}
                   onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
