@@ -21,6 +21,7 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState<{ bookingId: string; packageType: string; date: string; organizationName: string; email: string } | null>(null);
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -383,6 +384,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       setSelectedTimeSlot(null);
       setError(null);
       setSuccess(false);
+      setBookingDetails(null);
     }
   };
 
@@ -452,19 +454,35 @@ const EnhancedBookingCalendar: React.FC = () => {
         throw new Error(result.error || 'Failed to create booking');
       }
 
+      // Store booking details for WhatsApp link
+      const packageNames = {
+        preschool: 'Preschool Special',
+        classic: 'Classic Show',
+        halfday: 'Half-Day Experience'
+      };
+
+      setBookingDetails({
+        bookingId: result.bookingId,
+        packageType: packageNames[selectedPackage],
+        date: selectedDate?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) || '',
+        organizationName: formData.organizationName,
+        email: formData.email
+      });
+
       setSuccess(true);
       setFormData({ name: '', organizationName: '', email: '', phone: '', address: '', addressDetails: '', city: '', latitude: null, longitude: null, specialRequests: '' });
 
       // Refresh bookings
       await fetchBookings();
 
-      // Close modal after 2 seconds
+      // Close modal after 8 seconds to give time to read and click WhatsApp
       setTimeout(() => {
         setShowBookingModal(false);
         setSelectedDate(null);
         setSelectedTimeSlot(null);
         setSuccess(false);
-      }, 2000);
+        setBookingDetails(null);
+      }, 8000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create booking');
     } finally {
@@ -919,10 +937,58 @@ const EnhancedBookingCalendar: React.FC = () => {
               </div>
             )}
 
-            {success && (
-              <div style={styles.alert('success')}>
-                <CheckCircle size={20} />
-                <span>Booking created successfully! We'll contact you soon.</span>
+            {success && bookingDetails && (
+              <div style={{
+                ...styles.alert('success'),
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+                padding: '20px',
+                textAlign: 'center'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  <CheckCircle size={24} />
+                  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>🎉 Awesome! Your science adventure is booked!</span>
+                </div>
+
+                <div style={{ background: '#dcfce7', padding: '12px', borderRadius: '8px', margin: '10px 0' }}>
+                  <p style={{ margin: '0', color: '#166534', fontWeight: 'bold', fontSize: '16px' }}>
+                    Booking #{bookingDetails.bookingId}
+                  </p>
+                </div>
+
+                <p style={{ margin: '0', fontSize: '14px' }}>
+                  Check your email (<strong>{bookingDetails.email}</strong>) for all the exciting details!
+                </p>
+                <p style={{ margin: '0', fontSize: '14px' }}>
+                  We can't wait to bring the WOW factor to your event! 🎉✨
+                </p>
+                <a
+                  href={`https://wa.me/971543771243?text=${encodeURIComponent(
+                    `Hi Carls Newton! I just booked ${bookingDetails.packageType} for ${bookingDetails.date} at ${bookingDetails.organizationName}. Booking #${bookingDetails.bookingId}. I have a question!`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    background: '#25D366',
+                    color: 'white',
+                    padding: '12px 24px',
+                    textDecoration: 'none',
+                    borderRadius: '25px',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    transition: 'transform 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                  onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                >
+                  💬 Chat with us on WhatsApp
+                </a>
+                <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>
+                  We'll confirm within 24 hours!
+                </p>
               </div>
             )}
 
