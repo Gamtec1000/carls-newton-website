@@ -545,6 +545,9 @@ const EnhancedBookingCalendar: React.FC = () => {
         phone: formData.phone,
       });
 
+      console.log('✅ Booking successful! Booking ID:', result.bookingId);
+      console.log('Showing success view...');
+
       // Show success view instead of form
       setSuccess(true);
       setShowSuccessView(true);
@@ -557,8 +560,14 @@ const EnhancedBookingCalendar: React.FC = () => {
         }
       }, 100);
 
-      // Refresh bookings
-      await fetchBookings();
+      // Refresh bookings (with error handling to prevent white screen)
+      try {
+        await fetchBookings();
+        console.log('✅ Bookings refreshed successfully');
+      } catch (refreshError) {
+        console.error('Warning: Failed to refresh bookings list:', refreshError);
+        // Don't show error to user - booking was successful, just refresh failed
+      }
 
       // DO NOT auto-close modal - let user close it manually or book another date
     } catch (err) {
@@ -983,7 +992,12 @@ const EnhancedBookingCalendar: React.FC = () => {
       </div>
 
       {showBookingModal && selectedDate && (
-        <div style={styles.modal} onClick={() => setShowBookingModal(false)}>
+        <div style={styles.modal} onClick={() => {
+          // Don't close modal if loading or showing success view
+          if (!loading && !showSuccessView) {
+            setShowBookingModal(false);
+          }
+        }}>
           <div style={styles.modalContent} onClick={(e) => e.stopPropagation()} data-modal-content>
             <div style={styles.modalHeader}>
               <div style={styles.modalTitle}>
@@ -995,7 +1009,14 @@ const EnhancedBookingCalendar: React.FC = () => {
                 })}
               </div>
               <button
-                onClick={() => setShowBookingModal(false)}
+                onClick={() => {
+                  // Always allow closing via X button
+                  cleanupMap();
+                  setShowBookingModal(false);
+                  setShowSuccessView(false);
+                  setSuccess(false);
+                  setBookingDetails(null);
+                }}
                 style={styles.closeButton}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
