@@ -96,7 +96,7 @@ export default async function handler(req, res) {
               <h1 style="color: #10b981;">🎊 IT'S OFFICIAL! Your Science Show is CONFIRMED!</h1>
 
               <p style="font-size: 16px; line-height: 1.6;">
-                Dear ${booking.customer_name},
+                Dear ${booking.title ? booking.title + ' ' : ''}${booking.customer_name},
               </p>
 
               <p style="font-size: 16px; line-height: 1.6;">

@@ -76,8 +76,13 @@ export function isTimeSlotAvailable(
     const timeDiff = Math.abs(requestedTime - bookedTime);
 
     // Check if this booking is by the same customer at the same location
-    const sameCustomer = customerEmail && booking.email.toLowerCase() === customerEmail.toLowerCase();
-    const sameLocation = customerAddress && booking.address.toLowerCase() === customerAddress.toLowerCase();
+    // Add null checks to prevent "Cannot read properties of undefined" errors
+    const sameCustomer = customerEmail && booking.email &&
+      booking.email.toLowerCase() === customerEmail.toLowerCase();
+    // Handle both 'address' and 'full_address' fields (database has full_address)
+    const bookingAddress = booking.full_address || booking.address || '';
+    const sameLocation = customerAddress && bookingAddress &&
+      bookingAddress.toLowerCase() === customerAddress.toLowerCase();
     const skipBuffer = sameCustomer && sameLocation;
 
     // Apply 2-hour buffer UNLESS it's the same customer at the same location

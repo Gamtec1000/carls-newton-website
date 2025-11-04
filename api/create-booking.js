@@ -40,7 +40,9 @@ export default async function handler(req, res) {
     const address = bookingData.full_address || bookingData.address;
 
     const required = {
+      title: bookingData.title,
       customer_name: bookingData.customer_name,
+      job_position: bookingData.job_position,
       organization_name: bookingData.organization_name,
       email: bookingData.email,
       phone: bookingData.phone,
@@ -77,7 +79,9 @@ export default async function handler(req, res) {
 
     // Prepare insert data
     const insertData = {
+      title: bookingData.title,
       customer_name: bookingData.customer_name,
+      job_position: bookingData.job_position,
       organization_name: bookingData.organization_name,
       email: bookingData.email,
       phone: bookingData.phone,
@@ -147,71 +151,78 @@ export default async function handler(req, res) {
         day: 'numeric',
       });
 
-      console.log('Sending admin email to carls.newton10@gmail.com...');
+      console.log('=== SENDING ADMIN EMAIL ===');
+      console.log('To: carls.newton10@gmail.com');
+      console.log('Booking Number:', displayBookingId);
+      console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+
+      if (!process.env.RESEND_API_KEY) {
+        console.error('❌ RESEND_API_KEY is not set!');
+        throw new Error('RESEND_API_KEY environment variable is not configured');
+      }
 
       // Send admin notification email
       const adminEmailResult = await resend.emails.send({
         from: 'Carls Newton Bookings <bookings@resend.dev>',
         to: 'carls.newton10@gmail.com',
-        subject: `🎯 New Booking #${displayBookingId}: ${bookingData.customer_name} - ${bookingData.organization_name}`,
+        subject: `🎯 New Booking ${displayBookingId}: ${bookingData.organization_name}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #6366f1;">🎉 New Science Show Booked!</h2>
 
             <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-              <h3 style="margin: 0; color: #166534;">Booking #${displayBookingId}</h3>
+              <h3 style="margin: 0; color: #166534; font-size: 24px;">
+                Booking ${displayBookingId}
+              </h3>
             </div>
 
             <div style="background: #f9fafb; padding: 20px; border-radius: 10px; border-left: 4px solid #6366f1;">
-              <h3 style="margin-top: 0; color: #1f2937;">Contact Information</h3>
-              <p><strong>Name:</strong> ${bookingData.customer_name}</p>
-              <p><strong>Email:</strong> <a href="mailto:${bookingData.email}">${bookingData.email}</a></p>
-              <p><strong>Phone:</strong> <a href="tel:${bookingData.phone}">${bookingData.phone}</a></p>
-              <p><strong>Organization:</strong> ${bookingData.organization_name}</p>
+              <h3 style="margin-top: 0; color: #1f2937;">👤 Contact Information</h3>
+              <p style="margin: 8px 0;"><strong>Name:</strong> ${bookingData.title} ${bookingData.customer_name}</p>
+              ${bookingData.job_position ? `<p style="margin: 8px 0;"><strong>Position:</strong> ${bookingData.job_position}</p>` : ''}
+              <p style="margin: 8px 0;"><strong>Email:</strong> <a href="mailto:${bookingData.email}">${bookingData.email}</a></p>
+              <p style="margin: 8px 0;"><strong>Phone:</strong> <a href="tel:${bookingData.phone}">${bookingData.phone}</a></p>
+              <p style="margin: 8px 0;"><strong>Organization:</strong> ${bookingData.organization_name}</p>
 
               <!-- Quick WhatsApp contact button for admin -->
               <div style="margin-top: 15px;">
-                <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20${encodeURIComponent(packageNames[bookingData.package_type])}%20(Booking%20%23${displayBookingId}).%20Let%27s%20confirm%20the%20details!"
-                   style="display: inline-block; background: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 25px; font-size: 14px;">
+                <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${bookingData.title}%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20(${displayBookingId}).%20Let%27s%20confirm!"
+                   style="display: inline-block; background: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-size: 14px; font-weight: bold;">
                   💬 WhatsApp Customer
                 </a>
               </div>
             </div>
 
             <div style="background: #eff6ff; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #3b82f6;">
-              <h3 style="margin-top: 0; color: #1f2937;">Event Details</h3>
-              <p><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
-              <p><strong>Price:</strong> AED ${price.toLocaleString()}</p>
-              <p><strong>Date:</strong> ${formattedDate}</p>
-              <p><strong>Time:</strong> ${bookingData.time_slot}</p>
-              <p><strong>Location:</strong> ${address}</p>
-              ${bookingData.address_details ? `<p><strong>Details:</strong> ${bookingData.address_details}</p>` : ''}
-              ${bookingData.city ? `<p><strong>City:</strong> ${bookingData.city}</p>` : ''}
-              ${bookingData.latitude && bookingData.longitude ? `<p><strong>Map:</strong> <a href="https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}" target="_blank">View on Google Maps</a></p>` : ''}
+              <h3 style="margin-top: 0; color: #1f2937;">📅 Event Details</h3>
+              <p style="margin: 8px 0;"><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
+              <p style="margin: 8px 0;"><strong>Price:</strong> AED ${price.toLocaleString()}</p>
+              <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
+              <p style="margin: 8px 0;"><strong>Time:</strong> ${bookingData.time_slot}</p>
+              <p style="margin: 8px 0;"><strong>Location:</strong> ${address}</p>
+              ${bookingData.address_details ? `<p style="margin: 8px 0;"><strong>Details:</strong> ${bookingData.address_details}</p>` : ''}
             </div>
 
             ${(bookingData.special_requests || bookingData.message) ? `
               <div style="background: #fef3c7; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #f59e0b;">
                 <h3 style="margin-top: 0; color: #1f2937;">⭐ Special Requests</h3>
-                <p style="white-space: pre-wrap;">${bookingData.special_requests || bookingData.message}</p>
+                <p style="white-space: pre-wrap; margin: 0;">${bookingData.special_requests || bookingData.message}</p>
               </div>
             ` : ''}
 
-            <div style="margin-top: 30px; padding: 15px; background: #dcfce7; border-radius: 8px;">
+            <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-top: 20px;">
               <p style="margin: 0; color: #166534;">
                 <strong>Status:</strong> Pending Confirmation<br>
-                <strong>Next Step:</strong> Reach out within 24 hours to confirm and discuss payment
+                <strong>Next Step:</strong> Contact within 24 hours
               </p>
             </div>
-
-            <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
-              🎯 Booking #${displayBookingId} - Review and contact the customer!
-            </p>
           </div>
         `,
       });
 
-      console.log('Admin email sent successfully:', adminEmailResult);
+      console.log('✅ Admin email sent successfully!');
+      console.log('Email ID:', adminEmailResult.id);
+      console.log('Admin email response:', JSON.stringify(adminEmailResult, null, 2));
 
       // Send customer confirmation email
       await resend.emails.send({
@@ -223,7 +234,7 @@ export default async function handler(req, res) {
             <h1 style="color: #6366f1;">🚀 Woohoo! Your Science Show is Booked!</h1>
 
             <p style="font-size: 16px; line-height: 1.6;">
-              Dear ${bookingData.customer_name},
+              Dear ${bookingData.title} ${bookingData.customer_name},
             </p>
 
             <p style="font-size: 16px; line-height: 1.6;">
@@ -291,9 +302,11 @@ export default async function handler(req, res) {
 
       console.log('Customer email sent successfully');
     } catch (emailError) {
-      console.error('Email sending error (non-fatal):', emailError);
-      console.error('Email error details:', emailError.message);
-      // Don't fail the booking if email fails
+      console.error('❌ EMAIL SENDING FAILED:');
+      console.error('Error:', emailError);
+      console.error('Error message:', emailError.message);
+      console.error('Error stack:', emailError.stack);
+      // Don't fail the booking if email fails, but log it prominently
     }
 
     console.log('Booking process completed successfully');
