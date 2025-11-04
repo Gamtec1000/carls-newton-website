@@ -950,6 +950,13 @@ const EnhancedBookingCalendar: React.FC = () => {
                   <CheckCircle size={24} />
                   <span style={{ fontSize: '18px', fontWeight: 'bold' }}>🎉 Awesome! Your science adventure is booked!</span>
                 </div>
+
+                <div style={{ background: '#dcfce7', padding: '12px', borderRadius: '8px', margin: '10px 0' }}>
+                  <p style={{ margin: '0', color: '#166534', fontWeight: 'bold', fontSize: '16px' }}>
+                    Booking #{bookingDetails.bookingId}
+                  </p>
+                </div>
+
                 <p style={{ margin: '0', fontSize: '14px' }}>
                   Check your email (<strong>{bookingDetails.email}</strong>) for all the exciting details!
                 </p>
@@ -958,7 +965,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                 </p>
                 <a
                   href={`https://wa.me/971543771243?text=${encodeURIComponent(
-                    `Hi Carls Newton! I just booked ${bookingDetails.packageType} for ${bookingDetails.date} at ${bookingDetails.organizationName}. Booking ID: ${bookingDetails.bookingId}. I have a question!`
+                    `Hi Carls Newton! I just booked ${bookingDetails.packageType} for ${bookingDetails.date} at ${bookingDetails.organizationName}. Booking #${bookingDetails.bookingId}. I have a question!`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

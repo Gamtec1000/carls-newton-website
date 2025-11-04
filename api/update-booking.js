@@ -51,7 +51,7 @@ export default async function handler(req, res) {
       .from('bookings')
       .update(updates)
       .eq('id', bookingId)
-      .select()
+      .select('id, booking_number, customer_name, organization_name, email, phone, full_address, address, package_type, date, time_slot, status, payment_status, price, special_requests')
       .single();
 
     if (dbError) {
@@ -69,6 +69,9 @@ export default async function handler(req, res) {
     // Send confirmation email when status changes to 'confirmed'
     if (updateData.status === 'confirmed') {
       try {
+        // Use booking_number for display, fallback to id if not generated yet
+        const displayBookingId = booking.booking_number || booking.id;
+
         const packageNames = {
           preschool: 'Preschool Special (30-45 mins)',
           classic: 'Classic Show (45-60 mins)',
@@ -81,6 +84,8 @@ export default async function handler(req, res) {
           month: 'long',
           day: 'numeric',
         });
+
+        console.log('Sending confirmation email for booking:', displayBookingId);
 
         await resend.emails.send({
           from: 'Carls Newton Bookings <bookings@resend.dev>',
@@ -101,7 +106,7 @@ export default async function handler(req, res) {
 
               <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
                 <h2 style="margin-top: 0; color: white;">✅ CONFIRMED DETAILS</h2>
-                <p style="margin: 8px 0;"><strong>Booking ID:</strong> ${booking.id}</p>
+                <p style="margin: 8px 0;"><strong>Booking Number:</strong> ${displayBookingId}</p>
                 <p style="margin: 8px 0;"><strong>Organization:</strong> ${booking.organization_name}</p>
                 <p style="margin: 8px 0;"><strong>Experience:</strong> ${packageNames[booking.package_type]}</p>
                 <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
@@ -112,7 +117,7 @@ export default async function handler(req, res) {
 
               <!-- WHATSAPP BUTTON -->
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://wa.me/971543771243?text=Hi%20Carls%20Newton!%20My%20booking%20is%20confirmed!%20Booking%20ID:%20${booking.id}.%20I%20have%20a%20question!"
+                <a href="https://wa.me/971543771243?text=Hi%20Carls%20Newton!%20My%20booking%20is%20confirmed!%20Booking%20%23${displayBookingId}.%20I%20have%20a%20question!"
                    style="display: inline-block; background: #25D366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;">
                   💬 Chat with us on WhatsApp
                 </a>
@@ -159,11 +164,14 @@ export default async function handler(req, res) {
               <p style="color: #10b981; font-weight: bold; font-size: 18px; text-align: center; margin-top: 20px;">
                 We can't wait to meet you and your amazing students! 🎉🔬<br/>
                 <span style="font-weight: normal; color: #1f2937; font-size: 16px;">The Carls Newton Team</span><br/>
-                <span style="font-weight: normal; color: #6b7280; font-size: 14px;">Where Science Meets Imagination!</span>
+                <span style="font-weight: normal; color: #6b7280; font-size: 14px;">Where Science Meets Imagination!</span><br/>
+                <span style="font-weight: normal; color: #6b7280; font-size: 12px;">Booking #${displayBookingId}</span>
               </p>
             </div>
           `,
         });
+
+        console.log('Confirmation email sent successfully');
       } catch (emailError) {
         console.error('Email error:', emailError);
         // Don't fail the update if email fails
