@@ -363,11 +363,8 @@ const EnhancedBookingCalendar: React.FC = () => {
     }
   };
 
-  // Generate calendar days for the current month
-  const generateCalendarDays = (): CalendarDay[] => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
+  // Generate calendar days for a specific month and year
+  const generateCalendarDays = (year: number, month: number): CalendarDay[] => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const prevMonthLastDay = new Date(year, month, 0);
@@ -589,7 +586,15 @@ const EnhancedBookingCalendar: React.FC = () => {
     }
   };
 
-  const calendarDays = generateCalendarDays();
+  // Generate calendar days for current month and next month
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+  const nextMonthYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+
+  const currentMonthDays = generateCalendarDays(currentYear, currentMonth);
+  const nextMonthDays = generateCalendarDays(nextMonthYear, nextMonth);
+
   const availableTimeSlots = selectedDate
     ? generateTimeSlots(
         bookings,
@@ -609,30 +614,35 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   const styles = {
     container: {
-      maxWidth: '1200px',
+      maxWidth: '1400px',
       margin: '0 auto',
-      padding: '40px 20px',
+      padding: '20px',
+    },
+    twoMonthGrid: {
+      display: 'grid',
+      gridTemplateColumns: window.innerWidth < 1024 ? '1fr' : '1fr 1fr',
+      gap: window.innerWidth < 1024 ? '30px' : '40px',
     },
     card: {
       background: 'rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(10px)',
-      borderRadius: '24px',
+      borderRadius: '20px',
       border: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '32px',
+      padding: '24px',
     },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: '32px',
+      marginBottom: '20px',
     },
     monthTitle: {
-      fontSize: '28px',
+      fontSize: '24px',
       fontWeight: 'bold',
       color: 'white',
       display: 'flex',
       alignItems: 'center',
-      gap: '12px',
+      gap: '10px',
     },
     navButtons: {
       display: 'flex',
@@ -641,8 +651,8 @@ const EnhancedBookingCalendar: React.FC = () => {
     navButton: {
       background: 'rgba(255, 255, 255, 0.1)',
       border: '1px solid rgba(255, 255, 255, 0.2)',
-      borderRadius: '12px',
-      padding: '12px',
+      borderRadius: '10px',
+      padding: '10px',
       cursor: 'pointer',
       transition: 'all 0.3s',
       display: 'flex',
@@ -651,15 +661,16 @@ const EnhancedBookingCalendar: React.FC = () => {
     } as React.CSSProperties,
     legend: {
       display: 'flex',
-      gap: '24px',
-      marginBottom: '24px',
+      gap: '20px',
+      marginBottom: '20px',
       flexWrap: 'wrap' as const,
+      justifyContent: 'center',
     },
     legendItem: {
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      fontSize: '14px',
+      fontSize: '13px',
       color: 'rgba(255, 255, 255, 0.7)',
     },
     legendBox: (color: string) => ({
@@ -672,20 +683,20 @@ const EnhancedBookingCalendar: React.FC = () => {
     weekDaysGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '8px',
-      marginBottom: '8px',
+      gap: '6px',
+      marginBottom: '6px',
     },
     weekDay: {
       color: '#A78BFA',
-      fontSize: '14px',
+      fontSize: '13px',
       fontWeight: '600',
       textAlign: 'center' as const,
-      padding: '12px',
+      padding: '8px 4px',
     },
     calendarGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '8px',
+      gap: '6px',
     },
     dayCell: (day: CalendarDay) => {
       let backgroundColor = 'rgba(255, 255, 255, 0.03)';
@@ -701,12 +712,12 @@ const EnhancedBookingCalendar: React.FC = () => {
       }
 
       return {
-        aspectRatio: '1',
+        minHeight: '50px',
         display: 'flex',
         flexDirection: 'column' as const,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: '12px',
+        borderRadius: '10px',
         fontSize: '16px',
         fontWeight: '500',
         cursor: day.isAvailable && day.isCurrentMonth ? 'pointer' : 'default',
@@ -721,6 +732,7 @@ const EnhancedBookingCalendar: React.FC = () => {
           ? 'rgba(255, 255, 255, 0.4)'
           : 'white',
         opacity: !day.isAvailable && day.isCurrentMonth ? 0.5 : 1,
+        padding: '8px 4px',
       };
     },
     bookingDot: {
@@ -923,87 +935,149 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.header}>
-          <div style={styles.monthTitle}>
-            <Calendar size={32} />
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </div>
-          <div style={styles.navButtons}>
-            <button
-              onClick={handlePrevMonth}
-              style={styles.navButton}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <ChevronLeft size={20} color="white" />
-            </button>
-            <button
-              onClick={handleNextMonth}
-              style={styles.navButton}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <ChevronRight size={20} color="white" />
-            </button>
-          </div>
+      {/* Navigation Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '20px',
+        gap: '20px'
+      }}>
+        <button
+          onClick={handlePrevMonth}
+          style={styles.navButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <ChevronLeft size={20} color="white" />
+        </button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: 'white'
+        }}>
+          <Calendar size={24} />
+          <span>{monthNames[currentMonth]} {currentYear} - {monthNames[nextMonth]} {nextMonthYear}</span>
         </div>
+        <button
+          onClick={handleNextMonth}
+          style={styles.navButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <ChevronRight size={20} color="white" />
+        </button>
+      </div>
 
-        <div style={styles.legend}>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(34, 197, 94, 0.2)')} />
-            <span>Available</span>
-          </div>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(239, 68, 68, 0.3)')} />
-            <span>Booked</span>
-          </div>
-          <div style={styles.legendItem}>
-            <div style={styles.legendBox('rgba(6, 182, 212, 0.2)')} />
-            <span>Today</span>
-          </div>
+      {/* Legend */}
+      <div style={styles.legend}>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(34, 197, 94, 0.2)')} />
+          <span>Available</span>
         </div>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(239, 68, 68, 0.3)')} />
+          <span>Booked</span>
+        </div>
+        <div style={styles.legendItem}>
+          <div style={styles.legendBox('rgba(6, 182, 212, 0.2)')} />
+          <span>Today</span>
+        </div>
+      </div>
 
-        <div style={styles.weekDaysGrid}>
-          {weekDays.map(day => (
-            <div key={day} style={styles.weekDay}>
-              {day}
+      {/* Two-Month Grid */}
+      <div style={styles.twoMonthGrid}>
+        {/* First Month */}
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <div style={styles.monthTitle}>
+              {monthNames[currentMonth]} {currentYear}
             </div>
-          ))}
+          </div>
+
+          <div style={styles.weekDaysGrid}>
+            {weekDays.map(day => (
+              <div key={day} style={styles.weekDay}>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.calendarGrid}>
+            {currentMonthDays.map((day, index) => (
+              <div
+                key={index}
+                style={styles.dayCell(day)}
+                onClick={() => handleDateClick(day)}
+                onMouseEnter={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
+              >
+                <div>{day.date.getDate()}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div style={styles.calendarGrid}>
-          {calendarDays.map((day, index) => (
-            <div
-              key={index}
-              style={styles.dayCell(day)}
-              onClick={() => handleDateClick(day)}
-              onMouseEnter={(e) => {
-                if (day.isAvailable && day.isCurrentMonth) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (day.isAvailable && day.isCurrentMonth) {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }
-              }}
-            >
-              <div>{day.date.getDate()}</div>
+        {/* Second Month */}
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <div style={styles.monthTitle}>
+              {monthNames[nextMonth]} {nextMonthYear}
             </div>
-          ))}
+          </div>
+
+          <div style={styles.weekDaysGrid}>
+            {weekDays.map(day => (
+              <div key={day} style={styles.weekDay}>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.calendarGrid}>
+            {nextMonthDays.map((day, index) => (
+              <div
+                key={index}
+                style={styles.dayCell(day)}
+                onClick={() => handleDateClick(day)}
+                onMouseEnter={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (day.isAvailable && day.isCurrentMonth) {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
+              >
+                <div>{day.date.getDate()}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
