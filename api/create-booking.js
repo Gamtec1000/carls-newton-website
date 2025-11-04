@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       organization_name: bookingData.organization_name,
       email: bookingData.email,
       phone: bookingData.phone,
-      address: address,
+      full_address: address,
       address_details: bookingData.address_details || null,
       city: bookingData.city || null,
       latitude: bookingData.latitude || null,
