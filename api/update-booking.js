@@ -85,51 +85,81 @@ export default async function handler(req, res) {
         await resend.emails.send({
           from: 'Carls Newton Bookings <bookings@resend.dev>',
           to: booking.email,
-          subject: 'Booking Confirmed - Carls Newton Science Shows',
+          subject: '🎊 CONFIRMED! Your Science Adventure Awaits!',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #10b981;">Booking Confirmed!</h2>
-              <p>Dear ${booking.customer_name},</p>
-              <p>Great news! Your booking has been confirmed. We're excited to bring science to life for your students!</p>
+              <h1 style="color: #10b981;">🎊 IT'S OFFICIAL! Your Science Show is CONFIRMED!</h1>
 
-              <div style="background-color: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-                <h3 style="margin-top: 0; color: #065f46;">Confirmed Booking Details</h3>
-                <p><strong>Booking ID:</strong> ${booking.id}</p>
-                <p><strong>Organization/School:</strong> ${booking.organization_name}</p>
-                <p><strong>Package:</strong> ${packageNames[booking.package_type]}</p>
-                <p><strong>Date:</strong> ${formattedDate}</p>
-                <p><strong>Time:</strong> ${booking.time_slot}</p>
-                <p><strong>Location:</strong> ${booking.full_address || booking.address}</p>
-                <p><strong>Price:</strong> AED ${booking.price?.toLocaleString()}</p>
-              </div>
-
-              <h3 style="color: #1f2937;">Next Steps</h3>
-              <ol>
-                <li><strong>Payment:</strong> ${booking.payment_status === 'paid' ? 'Payment received - Thank you!' : 'Please arrange payment as discussed'}</li>
-                <li><strong>Preparation:</strong> We'll arrive 30 minutes before the show to set up</li>
-                <li><strong>Requirements:</strong> Please ensure there's adequate space and power outlets</li>
-              </ol>
-
-              <h3 style="color: #1f2937;">What to Expect</h3>
-              <p>Our science show will include:</p>
-              <ul>
-                <li>Interactive demonstrations</li>
-                <li>Hands-on experiments</li>
-                <li>Educational content aligned with curriculum</li>
-                <li>Engaging activities for all students</li>
-              </ul>
-
-              <p style="margin-top: 30px;">If you have any questions or need to make changes, please contact us:</p>
-              <p>
-                <strong>Email:</strong> carls.newton10@gmail.com<br/>
-                <strong>Phone:</strong> ${booking.phone}
+              <p style="font-size: 16px; line-height: 1.6;">
+                Dear ${booking.customer_name},
               </p>
 
-              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
+              <p style="font-size: 16px; line-height: 1.6;">
+                <strong>Fantastic news!</strong> Your booking is now 100% confirmed! 🎉
+                We're counting down the days until we can blow minds with amazing science experiments!
+              </p>
 
-              <p style="color: #10b981; font-weight: bold; margin-top: 20px;">
-                We look forward to seeing you soon!<br/>
-                <span style="font-weight: normal; color: #1f2937;">Carls Newton Science Shows</span>
+              <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h2 style="margin-top: 0; color: white;">✅ CONFIRMED DETAILS</h2>
+                <p style="margin: 8px 0;"><strong>Booking ID:</strong> ${booking.id}</p>
+                <p style="margin: 8px 0;"><strong>Organization:</strong> ${booking.organization_name}</p>
+                <p style="margin: 8px 0;"><strong>Experience:</strong> ${packageNames[booking.package_type]}</p>
+                <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
+                <p style="margin: 8px 0;"><strong>Time:</strong> ${booking.time_slot}</p>
+                <p style="margin: 8px 0;"><strong>Location:</strong> ${booking.full_address || booking.address}</p>
+                <p style="margin: 8px 0;"><strong>Price:</strong> AED ${booking.price?.toLocaleString()}</p>
+              </div>
+
+              <!-- WHATSAPP BUTTON -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="https://wa.me/971543771243?text=Hi%20Carls%20Newton!%20My%20booking%20is%20confirmed!%20Booking%20ID:%20${booking.id}.%20I%20have%20a%20question!"
+                   style="display: inline-block; background: #25D366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;">
+                  💬 Chat with us on WhatsApp
+                </a>
+                <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                  Need to discuss details? Message us anytime!
+                </p>
+              </div>
+
+              <h3 style="color: #10b981;">🎯 Next Steps</h3>
+              <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                <p style="margin: 5px 0;"><strong>✓ Payment:</strong> ${booking.payment_status === 'paid' ? 'All paid - you\'re all set! 💰✓' : 'Please complete payment as discussed with our team'}</p>
+                <p style="margin: 5px 0;"><strong>✓ Preparation:</strong> We'll arrive 30 minutes early to set up the science lab!</p>
+                <p style="margin: 5px 0;"><strong>✓ Space Requirements:</strong> Make sure there's room for experiments and power outlets nearby</p>
+              </div>
+
+              <h3 style="color: #10b981;">🔬 What to Expect - The Science Magic!</h3>
+              <p style="font-size: 16px; line-height: 1.6;">
+                Get ready for an unforgettable experience! Your students will experience:
+              </p>
+              <ul style="font-size: 16px; line-height: 1.8;">
+                <li>🌟 <strong>Interactive demonstrations</strong> that make science come alive</li>
+                <li>🧪 <strong>Hands-on experiments</strong> where students become scientists</li>
+                <li>📚 <strong>Educational content</strong> aligned with curriculum standards</li>
+                <li>🎭 <strong>Engaging activities</strong> that spark curiosity and wonder</li>
+                <li>🤯 <strong>Mind-blowing moments</strong> that students will talk about for weeks!</li>
+              </ul>
+
+              <p style="font-size: 16px; line-height: 1.6; background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                <strong>💡 Pro Tip:</strong> Have your camera ready! You'll want to capture those priceless "WOW!" faces when we do the big experiments! 📸
+              </p>
+
+              <p style="font-size: 16px; line-height: 1.6; margin-top: 30px;">
+                Questions? Last-minute changes? Just want to chat about science? We're here for you!
+              </p>
+
+              <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f9fafb; border-radius: 10px;">
+                <p style="font-size: 16px; margin: 5px 0;">📧 <strong>Email:</strong> carls.newton10@gmail.com</p>
+                <p style="font-size: 16px; margin: 5px 0;">💬 <strong>WhatsApp:</strong> +971 54 377 1243</p>
+                <p style="font-size: 16px; margin: 5px 0;">📞 <strong>Phone:</strong> ${booking.phone}</p>
+              </div>
+
+              <hr style="border: none; border-top: 2px solid #e5e7eb; margin: 30px 0;" />
+
+              <p style="color: #10b981; font-weight: bold; font-size: 18px; text-align: center; margin-top: 20px;">
+                We can't wait to meet you and your amazing students! 🎉🔬<br/>
+                <span style="font-weight: normal; color: #1f2937; font-size: 16px;">The Carls Newton Team</span><br/>
+                <span style="font-weight: normal; color: #6b7280; font-size: 14px;">Where Science Meets Imagination!</span>
               </p>
             </div>
           `,
