@@ -20,6 +20,7 @@ const styles = {
     background: 'rgba(88, 28, 135, 0.9)',
     backdropFilter: 'blur(10px)',
     borderBottom: '1px solid rgba(168, 85, 247, 0.3)',
+    overflow: 'visible',
   },
   logo: {
     background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
@@ -88,16 +89,16 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              minHeight: '60px',
+              minHeight: '70px',
               padding: '12px 0',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 10 }}>
               <img
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: '50px',
+                  height: '100px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
