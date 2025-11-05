@@ -90,7 +90,8 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              height: '64px',
+              height: '80px',
+              padding: '10px 0'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -98,10 +99,12 @@ export default function CarlsNewtonLanding() {
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: '56px',
+                  height: window.innerWidth < 768 ? '55px' : '70px',
                   width: 'auto',
-                  objectFit: 'contain'
+                  objectFit: 'contain',
+                  cursor: 'pointer'
                 }}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               />
             </div>
 
@@ -109,29 +112,54 @@ export default function CarlsNewtonLanding() {
               style={{
                 display: 'flex',
                 gap: '32px',
+                alignItems: 'center'
               }}
             >
               <a
                 href="#shows"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
+                style={{
+                  color: '#06B6D4',
+                  textDecoration: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
               >
                 Shows
               </a>
               <a
                 href="#packages"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
+                style={{
+                  color: '#06B6D4',
+                  textDecoration: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
               >
                 Packages
               </a>
               <a
                 href="#booking"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
+                style={{
+                  color: '#06B6D4',
+                  textDecoration: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
               >
                 Booking
               </a>
               <a
                 href="#testimonials"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
+                style={{
+                  color: '#06B6D4',
+                  textDecoration: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
               >
                 Reviews
               </a>
