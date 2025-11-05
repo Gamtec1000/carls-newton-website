@@ -79,7 +79,7 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              minHeight: '70px',
+              height: '70px',
               padding: '12px 0',
             }}
           >
