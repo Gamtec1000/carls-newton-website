@@ -620,9 +620,9 @@ const EnhancedBookingCalendar: React.FC = () => {
     },
     twoMonthGrid: {
       display: 'grid',
-      gridTemplateColumns: window.innerWidth < 1024 ? '1fr' : '1fr 1fr',
-      gap: window.innerWidth < 1024 ? '30px' : '40px',
-    },
+      gridTemplateColumns: '1fr 1fr',
+      gap: '40px',
+    } as React.CSSProperties,
     card: {
       background: 'rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(10px)',

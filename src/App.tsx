@@ -90,8 +90,8 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              height: '80px',
-              padding: '10px 0'
+              height: '140px',
+              padding: '15px 0'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -99,7 +99,7 @@ export default function CarlsNewtonLanding() {
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: window.innerWidth < 768 ? '55px' : '70px',
+                  height: '120px',
                   width: 'auto',
                   objectFit: 'contain',
                   cursor: 'pointer'
