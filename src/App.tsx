@@ -90,7 +90,8 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              height: '64px',
+              minHeight: window.innerWidth < 768 ? '100px' : '144px',
+              padding: window.innerWidth < 768 ? '10px 0' : '12px 0',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -98,7 +99,7 @@ export default function CarlsNewtonLanding() {
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: '56px',
+                  height: window.innerWidth < 768 ? '80px' : '120px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
@@ -150,9 +151,9 @@ export default function CarlsNewtonLanding() {
       {/* Video Animation Section */}
       <section
         style={{
-          paddingTop: '80px',
+          paddingTop: window.innerWidth < 768 ? '120px' : '164px',
           paddingBottom: '40px',
-          padding: '80px 16px 40px',
+          padding: window.innerWidth < 768 ? '120px 16px 40px' : '164px 16px 40px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
