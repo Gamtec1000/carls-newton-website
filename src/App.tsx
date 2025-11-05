@@ -22,16 +22,6 @@ const styles = {
     borderBottom: '1px solid rgba(168, 85, 247, 0.3)',
     overflow: 'visible',
   },
-  logo: {
-    background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
-    borderRadius: '12px',
-    padding: '8px',
-    width: '48px',
-    height: '48px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   button: {
     background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
     padding: '12px 32px',
@@ -98,7 +88,7 @@ export default function CarlsNewtonLanding() {
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: '100px',
+                  height: '200px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
