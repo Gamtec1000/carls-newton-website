@@ -16,11 +16,9 @@ const styles = {
     color: 'white',
   },
   nav: {
-    position: 'fixed' as const,
     width: '100%',
     background: 'rgba(88, 28, 135, 0.9)',
     backdropFilter: 'blur(10px)',
-    zIndex: 50,
     borderBottom: '1px solid rgba(168, 85, 247, 0.3)',
   },
   logo: {
@@ -90,8 +88,8 @@ export default function CarlsNewtonLanding() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              minHeight: window.innerWidth < 768 ? '100px' : '144px',
-              padding: window.innerWidth < 768 ? '10px 0' : '12px 0',
+              minHeight: '60px',
+              padding: '12px 0',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -99,7 +97,7 @@ export default function CarlsNewtonLanding() {
                 src="/carls-newton-logo.png"
                 alt="Carls Newton Logo"
                 style={{
-                  height: window.innerWidth < 768 ? '80px' : '120px',
+                  height: '50px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
@@ -151,9 +149,9 @@ export default function CarlsNewtonLanding() {
       {/* Video Animation Section */}
       <section
         style={{
-          paddingTop: window.innerWidth < 768 ? '120px' : '164px',
+          paddingTop: '40px',
           paddingBottom: '40px',
-          padding: window.innerWidth < 768 ? '120px 16px 40px' : '164px 16px 40px',
+          padding: '40px 16px 40px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
