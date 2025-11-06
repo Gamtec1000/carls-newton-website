@@ -131,6 +131,6 @@ export default function TelemetryPanels() {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
