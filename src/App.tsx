@@ -15,6 +15,7 @@ import {
 import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
 import GooeyNav from './components/GooeyNav';
 import AIStotleModal from './components/AIStotleModal';
+import TelemetryPanels from './components/TelemetryPanels';
 
 const styles = {
   gradient: {
@@ -139,6 +140,21 @@ export default function CarlsNewtonLanding() {
             min-width: 120px;
           }
         }
+
+        /* Telemetry responsive styles */
+        @media (max-width: 1024px) {
+          .telemetry-panel {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            width: 100% !important;
+            max-width: 300px;
+            margin: 8px auto !important;
+          }
+        }
       `}</style>
 
       {/* GooeyNav */}
@@ -244,6 +260,8 @@ export default function CarlsNewtonLanding() {
               border: '3px solid rgba(6, 182, 212, 0.5)',
               boxShadow: '0 0 50px rgba(6, 182, 212, 0.3), inset 0 0 50px rgba(6, 182, 212, 0.05)',
             }}>
+              {/* Telemetry Panels */}
+              <TelemetryPanels />
               {/* Corner Brackets */}
               {[
                 { top: '8px', left: '8px', borderTop: '4px solid #06B6D4', borderLeft: '4px solid #06B6D4' },
