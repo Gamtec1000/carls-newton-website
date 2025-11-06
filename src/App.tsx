@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Rocket,
   Beaker,
@@ -5,8 +6,20 @@ import {
   Calendar,
   Star,
   ArrowRight,
+  Volume2,
+  Maximize,
+  Activity,
+  Wind,
+  Fuel,
+  Zap,
+  Thermometer,
+  Navigation,
 } from 'lucide-react';
 import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
+import GooeyNav from './components/GooeyNav';
+import AIStotleModal from './components/AIStotleModal';
+import TelemetryPanels from './components/TelemetryPanels';
+import AuthModal from './components/AuthModal';
 
 const styles = {
   gradient: {
@@ -67,103 +80,873 @@ const styles = {
 };
 
 export default function CarlsNewtonLanding() {
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [selectedPanel, setSelectedPanel] = useState<{title: string, content: string, color: string} | null>(null);
+
+  const openPanel = (detail: {title: string, content: string, color: string}) => {
+    setSelectedPanel(detail);
+  };
+
   return (
     <div style={styles.gradient}>
-      {/* Navigation */}
-      <nav style={styles.nav}>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        @keyframes buttonGlow {
+          0%, 100% { box-shadow: 0 0 15px currentColor; }
+          50% { box-shadow: 0 0 25px currentColor; }
+        }
+        @keyframes particleDrift {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(5px, -5px); }
+          50% { transform: translate(-3px, 3px); }
+          75% { transform: translate(3px, 5px); }
+        }
+        @keyframes ledBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0.3; }
+        }
+
+        .console-grid {
+          display: grid;
+          grid-template-columns: 160px 1fr 160px;
+          gap: 20px;
+          align-items: center;
+        }
+
+        .console-left-panel,
+        .console-right-panel {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+          .console-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+
+          .console-left-panel,
+          .console-right-panel {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .console-left-panel button,
+          .console-right-panel button {
+            min-width: 120px;
+          }
+        }
+
+        /* Telemetry responsive styles */
+        @media (max-width: 1024px) {
+          .telemetry-panel {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            width: 100% !important;
+            max-width: 300px;
+            margin: 8px auto !important;
+          }
+        }
+      `}</style>
+
+      {/* GooeyNav */}
+      <GooeyNav
+        items={[
+          { label: 'Shows', href: '#shows' },
+          { label: 'Packages', href: '#packages' },
+          { label: 'Booking', href: '#booking' },
+          { label: 'Reviews', href: '#testimonials' },
+          { label: 'AI-STOTLE', href: '#ai-stotle', onClick: () => setIsAIModalOpen(true) },
+        ]}
+        particleCount={20}
+        particleDistances={[90, 10]}
+        particleR={120}
+        initialActiveIndex={0}
+        animationTime={600}
+        timeVariance={300}
+        colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+        onAuthClick={() => setIsAuthModalOpen(true)}
+      />
+
+      {/* AI-STOTLE Modal */}
+      <AIStotleModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* Telemetry Detail Modal */}
+      {selectedPanel && (
         <div
-          style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+          onClick={() => setSelectedPanel(null)}
         >
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '70px',
-              padding: '12px 0',
+              width: '100%',
+              maxWidth: '500px',
+              padding: '32px',
+              background: 'linear-gradient(180deg, #1e1b4b 0%, #1e3a8a 100%)',
+              borderRadius: '24px',
+              border: `3px solid ${selectedPanel.color}`,
+              boxShadow: `0 0 60px ${selectedPanel.color}`,
+              position: 'relative',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 10 }}>
-              <img
-                src="/carls-newton-logo.png"
-                alt="Carls Newton Logo"
-                style={{
-                  height: '200px',
-                  width: 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-            </div>
-
-            <div
+            <button
+              onClick={() => setSelectedPanel(null)}
               style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '2px solid #EF4444',
+                cursor: 'pointer',
                 display: 'flex',
-                gap: '32px',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <a
-                href="#shows"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
-              >
-                Shows
-              </a>
-              <a
-                href="#packages"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
-              >
-                Packages
-              </a>
-              <a
-                href="#booking"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
-              >
-                Booking
-              </a>
-              <a
-                href="#testimonials"
-                style={{ color: '#06B6D4', textDecoration: 'none' }}
-              >
-                Reviews
-              </a>
-            </div>
-
-            <button
-              style={styles.button}
-              onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Book a Show
+              <span style={{ color: '#EF4444', fontSize: '20px' }}>×</span>
             </button>
+
+            <h2
+              style={{
+                fontSize: '28px',
+                fontWeight: 'bold',
+                color: selectedPanel.color,
+                marginBottom: '16px',
+                fontFamily: 'monospace',
+              }}
+            >
+              {selectedPanel.title}
+            </h2>
+            <p
+              style={{
+                fontSize: '16px',
+                color: '#C4B5FD',
+                lineHeight: '1.6',
+                whiteSpace: 'pre-line',
+              }}
+            >
+              {selectedPanel.content}
+            </p>
           </div>
         </div>
-      </nav>
+      )}
 
-      {/* Video Animation Section */}
+      {/* Spacer for fixed nav */}
+      <div style={{ height: '20px' }}></div>
+
+      {/* Interactive Console Video Section */}
       <section
         style={{
-          paddingTop: '40px',
-          paddingBottom: '40px',
-          padding: '40px 16px 40px',
+          paddingTop: '60px',
+          paddingBottom: '60px',
+          padding: '60px 16px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <div style={{ maxWidth: '1280px', width: '100%' }}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-              width: '50%',
-              height: 'auto',
-              borderRadius: '24px',
-              boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.3)',
-            }}
-          >
-            <source src="/carls newton.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+        <div style={{ maxWidth: '1400px', width: '100%' }}>
+          <div className="console-grid">
+            {/* LEFT PANEL - Telemetry + Control Buttons */}
+            <div className="console-left-panel">
+              {/* Life Support Telemetry */}
+              <div
+                onClick={() =>
+                  openPanel({
+                    title: '[ LIFE SUPPORT ]',
+                    content:
+                      'Oxygen Level: 95.3%\nStatus: NOMINAL\n\nCO₂ scrubbers operating at peak efficiency. Cabin atmosphere composition within acceptable parameters.\n\nNext maintenance: T+ 48:00:00',
+                    color: '#06B6D4',
+                  })
+                }
+                style={{
+                  width: '100%',
+                  minHeight: '220px',
+                  padding: '24px',
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  backdropFilter: 'blur(15px)',
+                  borderRadius: '12px',
+                  border: '2px solid #06B6D4',
+                  boxShadow: '0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.filter = 'brightness(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.filter = 'brightness(1)';
+                }}
+              >
+                <div style={{ fontSize: '11px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '12px' }}>
+                  [ SYS-01 LIFE SUPPORT ]
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: '#10B981',
+                    boxShadow: '0 0 10px #10B981',
+                    animation: 'pulse 2s infinite',
+                  }}
+                />
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Wind size={18} color="#06B6D4" style={{ animation: 'pulse 3s infinite' }} />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>O₂ LEVEL</span>
+                  </div>
+                  <div
+                    style={{
+                      height: '12px',
+                      background: 'rgba(6, 182, 212, 0.2)',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '95%',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #06B6D4, #0EA5E9)',
+                        borderRadius: '4px',
+                        boxShadow: '0 0 10px #06B6D4',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#06B6D4', fontFamily: 'monospace', marginTop: '6px' }}>
+                    95.3%
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
+                    CO₂ SCRUBBERS
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        style={{
+                          flex: 1,
+                          height: '8px',
+                          background: '#10B981',
+                          borderRadius: '2px',
+                          boxShadow: '0 0 4px #10B981',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#10B981', fontFamily: 'monospace' }}>NOMINAL • 0.04%</div>
+                </div>
+              </div>
+
+              {/* Fuel & Power Telemetry */}
+              <div
+                onClick={() =>
+                  openPanel({
+                    title: '[ FUEL & POWER ]',
+                    content:
+                      'Fuel Reserves: 70.2%\nPower Core: 98.7%\nStatus: OPTIMAL\n\nAll systems receiving adequate power. Fuel consumption within expected parameters.\n\nEstimated reserve time: 127 hours',
+                    color: '#F97316',
+                  })
+                }
+                style={{
+                  width: '100%',
+                  minHeight: '220px',
+                  padding: '24px',
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  backdropFilter: 'blur(15px)',
+                  borderRadius: '12px',
+                  border: '2px solid #F97316',
+                  boxShadow: '0 0 20px rgba(249, 115, 22, 0.4), inset 0 0 20px rgba(249, 115, 22, 0.1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.filter = 'brightness(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.filter = 'brightness(1)';
+                }}
+              >
+                <div style={{ fontSize: '11px', color: '#F97316', fontFamily: 'monospace', marginBottom: '12px' }}>
+                  [ PWR-03 FUEL & POWER ]
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: '#10B981',
+                    boxShadow: '0 0 10px #10B981',
+                    animation: 'pulse 2s infinite 1s',
+                  }}
+                />
+                <div style={{ marginBottom: '16px', position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Fuel size={18} color="#F97316" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>FUEL RESERVES</span>
+                  </div>
+                  <div
+                    style={{
+                      height: '50px',
+                      width: '70px',
+                      background: 'rgba(249, 115, 22, 0.2)',
+                      borderRadius: '6px',
+                      border: '2px solid #F97316',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      margin: '0 auto',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '70%',
+                        background: 'linear-gradient(180deg, #3B82F6, #06B6D4)',
+                        boxShadow: '0 0 10px #06B6D4',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#F97316', fontFamily: 'monospace', marginTop: '6px', textAlign: 'center' }}>
+                    ⛽ 70.2%
+                  </div>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
+                    POWER CORE
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        border: '2px solid #F97316',
+                        background: 'radial-gradient(circle, #F97316, #EA580C)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Zap size={20} color="white" />
+                    </div>
+                    <div style={{ fontSize: '16px', color: '#F97316', fontFamily: 'monospace', textAlign: 'right' }}>
+                      ⚡ 98.7%<br />
+                      <span style={{ fontSize: '11px' }}>OPTIMAL</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CENTER - Video Console */}
+            <div style={{
+              position: 'relative',
+              padding: '40px',
+              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(168, 85, 247, 0.08))',
+              borderRadius: '32px',
+              border: '3px solid rgba(6, 182, 212, 0.5)',
+              boxShadow: '0 0 50px rgba(6, 182, 212, 0.3), inset 0 0 50px rgba(6, 182, 212, 0.05)',
+              zIndex: 1,
+            }}>
+              {/* Telemetry Panels */}
+              <TelemetryPanels />
+              {/* Corner Brackets */}
+              {[
+                { top: '8px', left: '8px', borderTop: '4px solid #06B6D4', borderLeft: '4px solid #06B6D4' },
+                { top: '8px', right: '8px', borderTop: '4px solid #06B6D4', borderRight: '4px solid #06B6D4' },
+                { bottom: '8px', left: '8px', borderBottom: '4px solid #06B6D4', borderLeft: '4px solid #06B6D4' },
+                { bottom: '8px', right: '8px', borderBottom: '4px solid #06B6D4', borderRight: '4px solid #06B6D4' },
+              ].map((style, idx) => (
+                <div key={idx} style={{
+                  position: 'absolute',
+                  width: '50px',
+                  height: '50px',
+                  zIndex: 5,
+                  ...style,
+                }} />
+              ))}
+
+              {/* Status Bar */}
+              <div style={{
+                position: 'absolute',
+                top: '20px',
+                left: '70px',
+                right: '70px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                zIndex: 5,
+              }}>
+                <div style={{
+                  fontSize: '11px',
+                  color: '#06B6D4',
+                  fontFamily: 'monospace',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                }}>
+                  [ MAIN VIEWSCREEN ]
+                </div>
+
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {['#10B981', '#06B6D4', '#A855F7'].map((color, idx) => (
+                    <div key={idx} style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: color,
+                      boxShadow: `0 0 10px ${color}`,
+                      animation: `pulse 2s infinite ${idx * 0.3}s`,
+                    }} />
+                  ))}
+                </div>
+
+                <div style={{
+                  fontSize: '11px',
+                  color: '#10B981',
+                  fontFamily: 'monospace',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                }}>
+                  [ ONLINE ]
+                </div>
+              </div>
+
+              {/* Video */}
+              <video
+                id="console-video"
+                autoPlay
+                loop
+                muted={isMuted}
+                playsInline
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '16px',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+                  position: 'relative',
+                  zIndex: 2,
+                }}
+              >
+                <source src="/carls newton.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+
+              {/* Scan Line Effect */}
+              <div style={{
+                position: 'absolute',
+                top: '40px',
+                left: '40px',
+                right: '40px',
+                bottom: '40px',
+                borderRadius: '16px',
+                background: 'linear-gradient(180deg, transparent 0%, rgba(6, 182, 212, 0.03) 50%, transparent 100%)',
+                backgroundSize: '100% 4px',
+                animation: 'scan 4s linear infinite',
+                pointerEvents: 'none',
+                zIndex: 2,
+              }} />
+
+              {/* Floating Particles */}
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    width: '3px',
+                    height: '3px',
+                    borderRadius: '50%',
+                    background: i % 2 === 0 ? '#06B6D4' : '#A855F7',
+                    boxShadow: `0 0 6px ${i % 2 === 0 ? '#06B6D4' : '#A855F7'}`,
+                    top: `${20 + (i * 10)}%`,
+                    left: `${5 + (i * 12)}%`,
+                    animation: 'particleDrift 4s ease-in-out infinite',
+                    animationDelay: `${i * 0.5}s`,
+                    pointerEvents: 'none',
+                    zIndex: 3,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* RIGHT PANEL - Telemetry + Advanced Controls */}
+            <div className="console-right-panel">
+              {/* Environmental Telemetry */}
+              <div
+                onClick={() =>
+                  openPanel({
+                    title: '[ ENVIRONMENTAL ]',
+                    content:
+                      'Cabin Temperature: 22.1°C\nStatus: OPTIMAL\n\nThermal control system maintaining comfortable cabin environment. Microgravity conditions stable.\n\nGravity: 0.00 G (Freefall)',
+                    color: '#A855F7',
+                  })
+                }
+                style={{
+                  width: '100%',
+                  minHeight: '220px',
+                  padding: '24px',
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  backdropFilter: 'blur(15px)',
+                  borderRadius: '12px',
+                  border: '2px solid #A855F7',
+                  boxShadow: '0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.filter = 'brightness(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.filter = 'brightness(1)';
+                }}
+              >
+                <div style={{ fontSize: '11px', color: '#A855F7', fontFamily: 'monospace', marginBottom: '12px' }}>
+                  [ ENV-02 ENVIRONMENTAL ]
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: '#10B981',
+                    boxShadow: '0 0 10px #10B981',
+                    animation: 'pulse 2s infinite 0.5s',
+                  }}
+                />
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Thermometer size={18} color="#A855F7" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>CABIN TEMP</span>
+                  </div>
+                  <div
+                    style={{
+                      height: '12px',
+                      background: 'rgba(168, 85, 247, 0.2)',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '73%',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #3B82F6, #A855F7)',
+                        borderRadius: '4px',
+                        boxShadow: '0 0 10px #A855F7',
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#A855F7', fontFamily: 'monospace', marginTop: '6px' }}>
+                    22.1°C
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
+                    GRAVITY
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        border: '2px solid #A855F7',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        color: '#A855F7',
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      0.0
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#A855F7', fontFamily: 'monospace', textAlign: 'right' }}>
+                      MICROGRAVITY<br />MODE
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation Telemetry */}
+              <div
+                onClick={() =>
+                  openPanel({
+                    title: '[ NAVIGATION ]',
+                    content:
+                      'Altitude: 408 KM\nVelocity: 27,600 KM/H\nStatus: STABLE ORBIT\n\nMaintaining Low Earth Orbit (LEO). Orbital path nominal. No course corrections required.\n\nNext orbit: 92 minutes',
+                    color: '#06B6D4',
+                  })
+                }
+                style={{
+                  width: '100%',
+                  minHeight: '220px',
+                  padding: '24px',
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  backdropFilter: 'blur(15px)',
+                  borderRadius: '12px',
+                  border: '2px solid #06B6D4',
+                  boxShadow: '0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.filter = 'brightness(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.filter = 'brightness(1)';
+                }}
+              >
+                <div style={{ fontSize: '11px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '12px' }}>
+                  [ NAV-04 NAVIGATION ]
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: '#10B981',
+                    boxShadow: '0 0 10px #10B981',
+                    animation: 'pulse 2s infinite 1.5s',
+                  }}
+                />
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Navigation size={18} color="#06B6D4" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>ALTITUDE</span>
+                  </div>
+                  <div style={{ fontSize: '28px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    408
+                    <span style={{ fontSize: '14px', marginLeft: '4px' }}>KM</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#10B981', fontFamily: 'monospace' }}>↑ STABLE ORBIT</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
+                    VELOCITY
+                  </div>
+                  <div style={{ fontSize: '22px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    27,600
+                    <span style={{ fontSize: '12px', marginLeft: '4px' }}>KM/H</span>
+                  </div>
+                  <div
+                    style={{
+                      height: '6px',
+                      background: 'rgba(6, 182, 212, 0.2)',
+                      borderRadius: '2px',
+                      marginTop: '6px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '85%',
+                        height: '100%',
+                        background: '#06B6D4',
+                        borderRadius: '2px',
+                        boxShadow: '0 0 8px #06B6D4',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BOTTOM PANEL - Video Controls */}
+          <div style={{
+            marginTop: '24px',
+            padding: '20px 32px',
+            background: 'rgba(0, 0, 0, 0.4)',
+            borderRadius: '20px',
+            border: '2px solid rgba(6, 182, 212, 0.3)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '32px',
+            flexWrap: 'wrap',
+            position: 'relative',
+            zIndex: 10,
+          }}>
+            {/* Sound Control */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                style={{
+                  padding: '12px 20px',
+                  background: isMuted ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                  border: `2px solid ${isMuted ? '#EF4444' : '#10B981'}`,
+                  borderRadius: '10px',
+                  color: isMuted ? '#EF4444' : '#10B981',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  fontFamily: 'monospace',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 20px ${isMuted ? '#EF4444' : '#10B981'}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Volume2 size={16} />
+                {isMuted ? 'MUTED' : 'AUDIO ON'}
+              </button>
+
+              {/* Level Indicators */}
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '6px',
+                      height: `${12 + i * 4}px`,
+                      background: !isMuted && i < 3 ? '#10B981' : 'rgba(100, 100, 100, 0.3)',
+                      borderRadius: '2px',
+                      boxShadow: !isMuted && i < 3 ? '0 0 8px #10B981' : 'none',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Screen Mode */}
+            <button
+              onClick={() => {
+                const video = document.getElementById('console-video') as HTMLVideoElement;
+                if (!document.fullscreenElement) {
+                  video.requestFullscreen();
+                } else {
+                  document.exitFullscreen();
+                }
+              }}
+              style={{
+                padding: '12px 20px',
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '2px solid #A855F7',
+                borderRadius: '10px',
+                color: '#A855F7',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                fontFamily: 'monospace',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 20px #A855F7';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <Maximize size={16} />
+              FULLSCREEN
+            </button>
+
+            {/* System Status */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 16px',
+              background: 'rgba(6, 182, 212, 0.1)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              borderRadius: '10px',
+            }}>
+              <Activity size={16} color="#06B6D4" />
+              <span style={{
+                fontSize: '11px',
+                color: '#06B6D4',
+                fontFamily: 'monospace',
+              }}>
+                SYSTEM NOMINAL
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
