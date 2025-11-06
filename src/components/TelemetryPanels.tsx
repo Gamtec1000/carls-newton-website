@@ -217,15 +217,15 @@ export default function TelemetryPanels() {
         className="telemetry-panel"
         style={{
           position: 'absolute',
-          top: '80px',
-          left: '20px',
+          top: '70px',
+          left: '50px',
           width: '180px',
           padding: '16px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(15px)',
           borderRadius: '12px',
           border: '2px solid #06B6D4',
-          boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)',
+          boxShadow: '0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.1)',
           cursor: 'pointer',
           zIndex: 10,
         }}
@@ -324,15 +324,15 @@ export default function TelemetryPanels() {
         className="telemetry-panel"
         style={{
           position: 'absolute',
-          top: '80px',
-          right: '20px',
+          top: '70px',
+          right: '50px',
           width: '180px',
           padding: '16px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(15px)',
           borderRadius: '12px',
           border: '2px solid #A855F7',
-          boxShadow: '0 0 20px rgba(168, 85, 247, 0.3)',
+          boxShadow: '0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.1)',
           cursor: 'pointer',
           zIndex: 10,
         }}
@@ -479,15 +479,15 @@ export default function TelemetryPanels() {
         className="telemetry-panel"
         style={{
           position: 'absolute',
-          bottom: '180px',
-          left: '20px',
+          bottom: '130px',
+          left: '50px',
           width: '180px',
           padding: '16px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(15px)',
           borderRadius: '12px',
           border: '2px solid #F97316',
-          boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)',
+          boxShadow: '0 0 20px rgba(249, 115, 22, 0.4), inset 0 0 20px rgba(249, 115, 22, 0.1)',
           cursor: 'pointer',
           zIndex: 10,
         }}
@@ -642,15 +642,15 @@ export default function TelemetryPanels() {
         className="telemetry-panel"
         style={{
           position: 'absolute',
-          bottom: '180px',
-          right: '20px',
+          bottom: '130px',
+          right: '50px',
           width: '180px',
           padding: '16px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(15px)',
           borderRadius: '12px',
           border: '2px solid #06B6D4',
-          boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)',
+          boxShadow: '0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.1)',
           cursor: 'pointer',
           zIndex: 10,
         }}
@@ -755,15 +755,15 @@ export default function TelemetryPanels() {
         className="telemetry-panel"
         style={{
           position: 'absolute',
-          bottom: '100px',
+          bottom: '80px',
           left: '50%',
           transform: 'translateX(-50%)',
           padding: '12px 24px',
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(15px)',
           borderRadius: '12px',
           border: '2px solid #10B981',
-          boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)',
+          boxShadow: '0 0 20px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(16, 185, 129, 0.1)',
           cursor: 'pointer',
           zIndex: 10,
         }}
