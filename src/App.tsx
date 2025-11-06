@@ -155,7 +155,7 @@ export default function CarlsNewtonLanding() {
             muted
             playsInline
             style={{
-              width: '100%',
+              width: '50%',
               height: 'auto',
               borderRadius: '24px',
               boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.3)',
