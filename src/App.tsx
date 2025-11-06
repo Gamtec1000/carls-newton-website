@@ -19,6 +19,7 @@ import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
 import GooeyNav from './components/GooeyNav';
 import AIStotleModal from './components/AIStotleModal';
 import TelemetryPanels from './components/TelemetryPanels';
+import AuthModal from './components/AuthModal';
 
 const styles = {
   gradient: {
@@ -80,6 +81,7 @@ const styles = {
 
 export default function CarlsNewtonLanding() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [selectedPanel, setSelectedPanel] = useState<{title: string, content: string, color: string} | null>(null);
 
@@ -180,10 +182,14 @@ export default function CarlsNewtonLanding() {
         animationTime={600}
         timeVariance={300}
         colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+        onAuthClick={() => setIsAuthModalOpen(true)}
       />
 
       {/* AI-STOTLE Modal */}
       <AIStotleModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       {/* Telemetry Detail Modal */}
       {selectedPanel && (

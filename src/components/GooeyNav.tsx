@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import UserMenu from './UserMenu';
 
 interface NavItem {
   label: string;
@@ -15,6 +18,7 @@ interface GooeyNavProps {
   animationTime?: number;
   timeVariance?: number;
   colors?: number[];
+  onAuthClick?: () => void;
 }
 
 export default function GooeyNav({
@@ -26,7 +30,9 @@ export default function GooeyNav({
   animationTime = 600,
   timeVariance = 300,
   colors = [1, 2, 3, 1, 2, 3, 1, 4],
+  onAuthClick,
 }: GooeyNavProps) {
+  const { user } = useAuth();
   const [activeIndex, setActiveIndex] = useState(initialActiveIndex);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -226,34 +232,42 @@ export default function GooeyNav({
               })}
             </div>
 
-            {/* Book a Show Button */}
-            <button
-              style={{
-                background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
-                padding: '12px 28px',
-                borderRadius: '25px',
-                fontWeight: 'bold',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'white',
-                fontSize: '14px',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
-                transition: 'all 300ms ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
-              }}
-              onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Book a Show
-            </button>
+            {/* Auth Button or User Menu */}
+            {user ? (
+              <UserMenu />
+            ) : (
+              <button
+                onClick={onAuthClick}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+                  padding: '12px 28px',
+                  borderRadius: '25px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'white',
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
+                  transition: 'all 300ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
+                }}
+              >
+                <User size={18} />
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </nav>
