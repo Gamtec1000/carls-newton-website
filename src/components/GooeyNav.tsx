@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 interface NavItem {
   label: string;
   href: string;
+  onClick?: () => void;
 }
 
 interface GooeyNavProps {
@@ -44,10 +45,12 @@ export default function GooeyNav({
     }
   };
 
-  const handleClick = (index: number, href: string) => {
+  const handleClick = (index: number, item: NavItem) => {
     setActiveIndex(index);
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
+    if (item.onClick) {
+      item.onClick();
+    } else if (item.href.startsWith('#')) {
+      const element = document.querySelector(item.href);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
@@ -146,7 +149,7 @@ export default function GooeyNav({
                     className="gooey-nav-item"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleClick(index, item.href);
+                      handleClick(index, item);
                     }}
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
