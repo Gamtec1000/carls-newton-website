@@ -69,6 +69,16 @@ const styles = {
 export default function CarlsNewtonLanding() {
   return (
     <div style={styles.gradient}>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+      `}</style>
       {/* Navigation */}
       <nav style={styles.nav}>
         <div
@@ -148,22 +158,153 @@ export default function CarlsNewtonLanding() {
           alignItems: 'center',
         }}
       >
-        <div style={{ maxWidth: '1280px', width: '100%' }}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-              width: '50%',
-              height: 'auto',
-              borderRadius: '24px',
-              boxShadow: '0 25px 50px -12px rgba(6, 182, 212, 0.3)',
-            }}
-          >
-            <source src="/carls newton.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+        <div style={{ maxWidth: '1280px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <div style={{
+            position: 'relative',
+            width: '50%',
+            padding: '32px',
+            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(168, 85, 247, 0.1))',
+            borderRadius: '32px',
+            border: '2px solid rgba(6, 182, 212, 0.5)',
+            boxShadow: '0 0 40px rgba(6, 182, 212, 0.3), inset 0 0 40px rgba(6, 182, 212, 0.05)',
+          }}>
+            {/* Corner Indicators */}
+            <div style={{
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              width: '40px',
+              height: '40px',
+              borderTop: '3px solid #06B6D4',
+              borderLeft: '3px solid #06B6D4',
+              borderRadius: '4px 0 0 0',
+            }}></div>
+            <div style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              width: '40px',
+              height: '40px',
+              borderTop: '3px solid #06B6D4',
+              borderRight: '3px solid #06B6D4',
+              borderRadius: '0 4px 0 0',
+            }}></div>
+            <div style={{
+              position: 'absolute',
+              bottom: '8px',
+              left: '8px',
+              width: '40px',
+              height: '40px',
+              borderBottom: '3px solid #06B6D4',
+              borderLeft: '3px solid #06B6D4',
+              borderRadius: '0 0 0 4px',
+            }}></div>
+            <div style={{
+              position: 'absolute',
+              bottom: '8px',
+              right: '8px',
+              width: '40px',
+              height: '40px',
+              borderBottom: '3px solid #06B6D4',
+              borderRight: '3px solid #06B6D4',
+              borderRadius: '0 0 4px 0',
+            }}></div>
+
+            {/* Status Indicators */}
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: '8px',
+            }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#10B981',
+                boxShadow: '0 0 10px #10B981',
+                animation: 'pulse 2s infinite',
+              }}></div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#06B6D4',
+                boxShadow: '0 0 10px #06B6D4',
+                animation: 'pulse 2s infinite 0.3s',
+              }}></div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#A855F7',
+                boxShadow: '0 0 10px #A855F7',
+                animation: 'pulse 2s infinite 0.6s',
+              }}></div>
+            </div>
+
+            {/* Console Text */}
+            <div style={{
+              position: 'absolute',
+              top: '16px',
+              left: '60px',
+              fontSize: '10px',
+              color: '#06B6D4',
+              fontFamily: 'monospace',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+            }}>
+              [ VIEWING DECK ]
+            </div>
+            <div style={{
+              position: 'absolute',
+              top: '16px',
+              right: '60px',
+              fontSize: '10px',
+              color: '#06B6D4',
+              fontFamily: 'monospace',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+            }}>
+              [ ACTIVE ]
+            </div>
+
+            {/* Video */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{
+                width: '100%',
+                height: 'auto',
+                borderRadius: '16px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <source src="/carls newton.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Scan Line Effect */}
+            <div style={{
+              position: 'absolute',
+              top: '32px',
+              left: '32px',
+              right: '32px',
+              bottom: '32px',
+              borderRadius: '16px',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(6, 182, 212, 0.05) 50%, transparent 100%)',
+              backgroundSize: '100% 4px',
+              animation: 'scan 3s linear infinite',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}></div>
+          </div>
         </div>
       </section>
 
