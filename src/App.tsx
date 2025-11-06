@@ -9,8 +9,6 @@ import {
   Volume2,
   Maximize,
   Activity,
-  Clock,
-  BookOpen,
   Wind,
   Fuel,
   Zap,
@@ -83,7 +81,6 @@ const styles = {
 export default function CarlsNewtonLanding() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedPanel, setSelectedPanel] = useState<{title: string, content: string, color: string} | null>(null);
 
   const openPanel = (detail: {title: string, content: string, color: string}) => {
@@ -127,7 +124,7 @@ export default function CarlsNewtonLanding() {
         .console-right-panel {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 24px;
         }
 
         @media (max-width: 1024px) {
@@ -292,7 +289,8 @@ export default function CarlsNewtonLanding() {
                 }
                 style={{
                   width: '100%',
-                  padding: '16px',
+                  minHeight: '220px',
+                  padding: '24px',
                   background: 'rgba(0, 0, 0, 0.85)',
                   backdropFilter: 'blur(15px)',
                   borderRadius: '12px',
@@ -311,30 +309,30 @@ export default function CarlsNewtonLanding() {
                   e.currentTarget.style.filter = 'brightness(1)';
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '8px' }}>
+                <div style={{ fontSize: '11px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '12px' }}>
                   [ SYS-01 LIFE SUPPORT ]
                 </div>
                 <div
                   style={{
                     position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    width: '8px',
-                    height: '8px',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
                     borderRadius: '50%',
                     background: '#10B981',
                     boxShadow: '0 0 10px #10B981',
                     animation: 'pulse 2s infinite',
                   }}
                 />
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <Wind size={14} color="#06B6D4" style={{ animation: 'pulse 3s infinite' }} />
-                    <span style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace' }}>O₂ LEVEL</span>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Wind size={18} color="#06B6D4" style={{ animation: 'pulse 3s infinite' }} />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>O₂ LEVEL</span>
                   </div>
                   <div
                     style={{
-                      height: '8px',
+                      height: '12px',
                       background: 'rgba(6, 182, 212, 0.2)',
                       borderRadius: '4px',
                       overflow: 'hidden',
@@ -351,21 +349,21 @@ export default function CarlsNewtonLanding() {
                       }}
                     />
                   </div>
-                  <div style={{ fontSize: '13px', color: '#06B6D4', fontFamily: 'monospace', marginTop: '4px' }}>
+                  <div style={{ fontSize: '16px', color: '#06B6D4', fontFamily: 'monospace', marginTop: '6px' }}>
                     95.3%
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
                     CO₂ SCRUBBERS
                   </div>
-                  <div style={{ display: 'flex', gap: '3px', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
                     {[0, 1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
                         style={{
                           flex: 1,
-                          height: '6px',
+                          height: '8px',
                           background: '#10B981',
                           borderRadius: '2px',
                           boxShadow: '0 0 4px #10B981',
@@ -373,7 +371,7 @@ export default function CarlsNewtonLanding() {
                       />
                     ))}
                   </div>
-                  <div style={{ fontSize: '10px', color: '#10B981', fontFamily: 'monospace' }}>NOMINAL • 0.04%</div>
+                  <div style={{ fontSize: '12px', color: '#10B981', fontFamily: 'monospace' }}>NOMINAL • 0.04%</div>
                 </div>
               </div>
 
@@ -389,7 +387,8 @@ export default function CarlsNewtonLanding() {
                 }
                 style={{
                   width: '100%',
-                  padding: '16px',
+                  minHeight: '220px',
+                  padding: '24px',
                   background: 'rgba(0, 0, 0, 0.85)',
                   backdropFilter: 'blur(15px)',
                   borderRadius: '12px',
@@ -408,31 +407,31 @@ export default function CarlsNewtonLanding() {
                   e.currentTarget.style.filter = 'brightness(1)';
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#F97316', fontFamily: 'monospace', marginBottom: '8px' }}>
+                <div style={{ fontSize: '11px', color: '#F97316', fontFamily: 'monospace', marginBottom: '12px' }}>
                   [ PWR-03 FUEL & POWER ]
                 </div>
                 <div
                   style={{
                     position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    width: '8px',
-                    height: '8px',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
                     borderRadius: '50%',
                     background: '#10B981',
                     boxShadow: '0 0 10px #10B981',
                     animation: 'pulse 2s infinite 1s',
                   }}
                 />
-                <div style={{ marginBottom: '12px', position: 'relative' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <Fuel size={14} color="#F97316" />
-                    <span style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace' }}>FUEL RESERVES</span>
+                <div style={{ marginBottom: '16px', position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Fuel size={18} color="#F97316" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>FUEL RESERVES</span>
                   </div>
                   <div
                     style={{
-                      height: '40px',
-                      width: '60px',
+                      height: '50px',
+                      width: '70px',
                       background: 'rgba(249, 115, 22, 0.2)',
                       borderRadius: '6px',
                       border: '2px solid #F97316',
@@ -453,12 +452,12 @@ export default function CarlsNewtonLanding() {
                       }}
                     />
                   </div>
-                  <div style={{ fontSize: '13px', color: '#F97316', fontFamily: 'monospace', marginTop: '4px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '16px', color: '#F97316', fontFamily: 'monospace', marginTop: '6px', textAlign: 'center' }}>
                     ⛽ 70.2%
                   </div>
                 </div>
                 <div style={{ position: 'relative' }}>
-                  <div style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
                     POWER CORE
                   </div>
                   <div
@@ -470,8 +469,8 @@ export default function CarlsNewtonLanding() {
                   >
                     <div
                       style={{
-                        width: '32px',
-                        height: '32px',
+                        width: '40px',
+                        height: '40px',
                         borderRadius: '50%',
                         border: '2px solid #F97316',
                         background: 'radial-gradient(circle, #F97316, #EA580C)',
@@ -482,71 +481,15 @@ export default function CarlsNewtonLanding() {
                         cursor: 'pointer',
                       }}
                     >
-                      <Zap size={16} color="white" />
+                      <Zap size={20} color="white" />
                     </div>
-                    <div style={{ fontSize: '13px', color: '#F97316', fontFamily: 'monospace', textAlign: 'right' }}>
+                    <div style={{ fontSize: '16px', color: '#F97316', fontFamily: 'monospace', textAlign: 'right' }}>
                       ⚡ 98.7%<br />
-                      <span style={{ fontSize: '9px' }}>OPTIMAL</span>
+                      <span style={{ fontSize: '11px' }}>OPTIMAL</span>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Control Buttons */}
-              {[
-                { icon: <Star size={18} />, label: 'REVIEWS', color: '#EC4899', action: () => document.getElementById('testimonials')?.scrollIntoView({ behavior: 'smooth' }) },
-                { icon: <Calendar size={18} />, label: 'BOOKINGS', color: '#06B6D4', action: () => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' }) },
-                { icon: <Rocket size={18} />, label: 'PACKAGES', color: '#A855F7', action: () => document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' }) },
-              ].map((btn, idx) => (
-                <button
-                  key={idx}
-                  onClick={btn.action}
-                  style={{
-                    padding: '16px 12px',
-                    background: `linear-gradient(135deg, ${btn.color}22, ${btn.color}11)`,
-                    border: `2px solid ${btn.color}`,
-                    borderRadius: '12px',
-                    color: btn.color,
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    fontFamily: 'monospace',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    transition: 'all 0.3s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '6px',
-                    clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)',
-                    zIndex: 10,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}44, ${btn.color}22)`;
-                    e.currentTarget.style.boxShadow = `0 0 25px ${btn.color}`;
-                    e.currentTarget.style.transform = 'translateX(-5px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}22, ${btn.color}11)`;
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }}
-                >
-                  {/* LED Indicator */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '6px',
-                    right: '6px',
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: btn.color,
-                    boxShadow: `0 0 8px ${btn.color}`,
-                    animation: 'ledBlink 2s infinite',
-                  }} />
-                  {btn.icon}
-                  {btn.label}
-                </button>
-              ))}
             </div>
 
             {/* CENTER - Video Console */}
@@ -693,7 +636,8 @@ export default function CarlsNewtonLanding() {
                 }
                 style={{
                   width: '100%',
-                  padding: '16px',
+                  minHeight: '220px',
+                  padding: '24px',
                   background: 'rgba(0, 0, 0, 0.85)',
                   backdropFilter: 'blur(15px)',
                   borderRadius: '12px',
@@ -712,30 +656,30 @@ export default function CarlsNewtonLanding() {
                   e.currentTarget.style.filter = 'brightness(1)';
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#A855F7', fontFamily: 'monospace', marginBottom: '8px' }}>
+                <div style={{ fontSize: '11px', color: '#A855F7', fontFamily: 'monospace', marginBottom: '12px' }}>
                   [ ENV-02 ENVIRONMENTAL ]
                 </div>
                 <div
                   style={{
                     position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    width: '8px',
-                    height: '8px',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
                     borderRadius: '50%',
                     background: '#10B981',
                     boxShadow: '0 0 10px #10B981',
                     animation: 'pulse 2s infinite 0.5s',
                   }}
                 />
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <Thermometer size={14} color="#A855F7" />
-                    <span style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace' }}>CABIN TEMP</span>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Thermometer size={18} color="#A855F7" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>CABIN TEMP</span>
                   </div>
                   <div
                     style={{
-                      height: '8px',
+                      height: '12px',
                       background: 'rgba(168, 85, 247, 0.2)',
                       borderRadius: '4px',
                       overflow: 'hidden',
@@ -751,25 +695,25 @@ export default function CarlsNewtonLanding() {
                       }}
                     />
                   </div>
-                  <div style={{ fontSize: '13px', color: '#A855F7', fontFamily: 'monospace', marginTop: '4px' }}>
+                  <div style={{ fontSize: '16px', color: '#A855F7', fontFamily: 'monospace', marginTop: '6px' }}>
                     22.1°C
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
                     GRAVITY
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div
                       style={{
-                        width: '32px',
-                        height: '32px',
+                        width: '40px',
+                        height: '40px',
                         borderRadius: '50%',
                         border: '2px solid #A855F7',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '10px',
+                        fontSize: '12px',
                         color: '#A855F7',
                         fontFamily: 'monospace',
                         fontWeight: 'bold',
@@ -777,7 +721,7 @@ export default function CarlsNewtonLanding() {
                     >
                       0.0
                     </div>
-                    <div style={{ fontSize: '9px', color: '#A855F7', fontFamily: 'monospace', textAlign: 'right' }}>
+                    <div style={{ fontSize: '11px', color: '#A855F7', fontFamily: 'monospace', textAlign: 'right' }}>
                       MICROGRAVITY<br />MODE
                     </div>
                   </div>
@@ -796,7 +740,8 @@ export default function CarlsNewtonLanding() {
                 }
                 style={{
                   width: '100%',
-                  padding: '16px',
+                  minHeight: '220px',
+                  padding: '24px',
                   background: 'rgba(0, 0, 0, 0.85)',
                   backdropFilter: 'blur(15px)',
                   borderRadius: '12px',
@@ -815,47 +760,47 @@ export default function CarlsNewtonLanding() {
                   e.currentTarget.style.filter = 'brightness(1)';
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '8px' }}>
+                <div style={{ fontSize: '11px', color: '#06B6D4', fontFamily: 'monospace', marginBottom: '12px' }}>
                   [ NAV-04 NAVIGATION ]
                 </div>
                 <div
                   style={{
                     position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    width: '8px',
-                    height: '8px',
+                    top: '16px',
+                    right: '16px',
+                    width: '10px',
+                    height: '10px',
                     borderRadius: '50%',
                     background: '#10B981',
                     boxShadow: '0 0 10px #10B981',
                     animation: 'pulse 2s infinite 1.5s',
                   }}
                 />
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <Navigation size={14} color="#06B6D4" />
-                    <span style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace' }}>ALTITUDE</span>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Navigation size={18} color="#06B6D4" />
+                    <span style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace' }}>ALTITUDE</span>
                   </div>
-                  <div style={{ fontSize: '24px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                  <div style={{ fontSize: '28px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
                     408
-                    <span style={{ fontSize: '12px', marginLeft: '4px' }}>KM</span>
+                    <span style={{ fontSize: '14px', marginLeft: '4px' }}>KM</span>
                   </div>
-                  <div style={{ fontSize: '9px', color: '#10B981', fontFamily: 'monospace' }}>↑ STABLE ORBIT</div>
+                  <div style={{ fontSize: '11px', color: '#10B981', fontFamily: 'monospace' }}>↑ STABLE ORBIT</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: 'white', fontFamily: 'monospace', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '13px', color: 'white', fontFamily: 'monospace', marginBottom: '6px' }}>
                     VELOCITY
                   </div>
-                  <div style={{ fontSize: '18px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                  <div style={{ fontSize: '22px', color: '#06B6D4', fontFamily: 'monospace', fontWeight: 'bold' }}>
                     27,600
-                    <span style={{ fontSize: '10px', marginLeft: '4px' }}>KM/H</span>
+                    <span style={{ fontSize: '12px', marginLeft: '4px' }}>KM/H</span>
                   </div>
                   <div
                     style={{
-                      height: '4px',
+                      height: '6px',
                       background: 'rgba(6, 182, 212, 0.2)',
                       borderRadius: '2px',
-                      marginTop: '4px',
+                      marginTop: '6px',
                       overflow: 'hidden',
                     }}
                   >
@@ -871,62 +816,6 @@ export default function CarlsNewtonLanding() {
                   </div>
                 </div>
               </div>
-
-              {/* Control Buttons */}
-              {[
-                { icon: <Sparkles size={18} />, label: 'AI-STOTLE', color: '#10B981', action: () => setIsAIModalOpen(true) },
-                { icon: <Clock size={18} />, label: 'MISSION LOG', color: '#F97316', action: () => alert('Mission Log: Coming Soon!') },
-                { icon: <Beaker size={18} />, label: 'EXPERIMENTS', color: '#06B6D4', action: () => document.getElementById('shows')?.scrollIntoView({ behavior: 'smooth' }) },
-              ].map((btn, idx) => (
-                <button
-                  key={idx}
-                  onClick={btn.action}
-                  style={{
-                    padding: '16px 12px',
-                    background: `linear-gradient(135deg, ${btn.color}22, ${btn.color}11)`,
-                    border: `2px solid ${btn.color}`,
-                    borderRadius: '12px',
-                    color: btn.color,
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    fontFamily: 'monospace',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    transition: 'all 0.3s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '6px',
-                    clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px)',
-                    zIndex: 10,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}44, ${btn.color}22)`;
-                    e.currentTarget.style.boxShadow = `0 0 25px ${btn.color}`;
-                    e.currentTarget.style.transform = 'translateX(5px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}22, ${btn.color}11)`;
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }}
-                >
-                  {/* LED Indicator */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '6px',
-                    left: '6px',
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: btn.color,
-                    boxShadow: `0 0 8px ${btn.color}`,
-                    animation: 'ledBlink 2s infinite',
-                  }} />
-                  {btn.icon}
-                  {btn.label}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -1002,10 +891,8 @@ export default function CarlsNewtonLanding() {
                 const video = document.getElementById('console-video') as HTMLVideoElement;
                 if (!document.fullscreenElement) {
                   video.requestFullscreen();
-                  setIsFullscreen(true);
                 } else {
                   document.exitFullscreen();
-                  setIsFullscreen(false);
                 }
               }}
               style={{
