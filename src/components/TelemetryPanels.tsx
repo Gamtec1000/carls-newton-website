@@ -227,6 +227,7 @@ export default function TelemetryPanels() {
           border: '2px solid #06B6D4',
           boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)',
           cursor: 'pointer',
+          zIndex: 10,
         }}
         onClick={() =>
           openPanel({
@@ -333,6 +334,7 @@ export default function TelemetryPanels() {
           border: '2px solid #A855F7',
           boxShadow: '0 0 20px rgba(168, 85, 247, 0.3)',
           cursor: 'pointer',
+          zIndex: 10,
         }}
         onClick={() =>
           openPanel({
@@ -487,6 +489,7 @@ export default function TelemetryPanels() {
           border: '2px solid #F97316',
           boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)',
           cursor: 'pointer',
+          zIndex: 10,
         }}
         onClick={() =>
           openPanel({
@@ -649,6 +652,7 @@ export default function TelemetryPanels() {
           border: '2px solid #06B6D4',
           boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)',
           cursor: 'pointer',
+          zIndex: 10,
         }}
         onClick={() =>
           openPanel({
@@ -761,6 +765,7 @@ export default function TelemetryPanels() {
           border: '2px solid #10B981',
           boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)',
           cursor: 'pointer',
+          zIndex: 10,
         }}
         onClick={() =>
           openPanel({

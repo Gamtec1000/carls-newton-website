@@ -221,6 +221,7 @@ export default function CarlsNewtonLanding() {
                     alignItems: 'center',
                     gap: '6px',
                     clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)',
+                    zIndex: 10,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}44, ${btn.color}22)`;
@@ -259,6 +260,7 @@ export default function CarlsNewtonLanding() {
               borderRadius: '32px',
               border: '3px solid rgba(6, 182, 212, 0.5)',
               boxShadow: '0 0 50px rgba(6, 182, 212, 0.3), inset 0 0 50px rgba(6, 182, 212, 0.05)',
+              zIndex: 1,
             }}>
               {/* Telemetry Panels */}
               <TelemetryPanels />
@@ -273,6 +275,7 @@ export default function CarlsNewtonLanding() {
                   position: 'absolute',
                   width: '50px',
                   height: '50px',
+                  zIndex: 5,
                   ...style,
                 }} />
               ))}
@@ -286,6 +289,7 @@ export default function CarlsNewtonLanding() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                zIndex: 5,
               }}>
                 <div style={{
                   fontSize: '11px',
@@ -334,7 +338,7 @@ export default function CarlsNewtonLanding() {
                   borderRadius: '16px',
                   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
                   position: 'relative',
-                  zIndex: 1,
+                  zIndex: 2,
                 }}
               >
                 <source src="/carls newton.mp4" type="video/mp4" />
@@ -405,6 +409,7 @@ export default function CarlsNewtonLanding() {
                     alignItems: 'center',
                     gap: '6px',
                     clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px)',
+                    zIndex: 10,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = `linear-gradient(135deg, ${btn.color}44, ${btn.color}22)`;
@@ -448,6 +453,8 @@ export default function CarlsNewtonLanding() {
             alignItems: 'center',
             gap: '32px',
             flexWrap: 'wrap',
+            position: 'relative',
+            zIndex: 10,
           }}>
             {/* Sound Control */}
             <div style={{
