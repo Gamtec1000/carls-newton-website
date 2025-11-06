@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Support both VITE_ (local development) and NEXT_PUBLIC_ (Vercel deployment) prefixes
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ||
+                     import.meta.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ||
+                         import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file');
+  console.warn('Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (for local) or NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (for production) in your environment variables');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
