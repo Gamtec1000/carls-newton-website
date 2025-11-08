@@ -31,38 +31,56 @@ export default async function handler(req, res) {
   try {
     const { date, status, from_date, to_date } = req.query;
 
+    console.log('=== GET BOOKINGS API CALLED ===');
+    console.log('Query params:', { date, status, from_date, to_date });
+
     let query = supabase.from('bookings').select('*');
 
     // Filter by specific date
     if (date) {
+      console.log('Filtering by date:', date);
       query = query.eq('date', date);
     }
 
     // Filter by date range
     if (from_date) {
+      console.log('Filtering from_date:', from_date);
       query = query.gte('date', from_date);
     }
     if (to_date) {
+      console.log('Filtering to_date:', to_date);
       query = query.lte('date', to_date);
     }
 
     // Filter by status
     if (status) {
+      console.log('Filtering by status:', status);
       query = query.eq('status', status);
     }
 
     // Order by date and time
     query = query.order('date', { ascending: true }).order('time_slot', { ascending: true });
 
+    console.log('Executing Supabase query...');
     const { data: bookings, error } = await query;
 
     if (error) {
-      console.error('Database error:', error);
+      console.error('=== SUPABASE QUERY FAILED ===');
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      console.error('Full error:', JSON.stringify(error, null, 2));
+
       return res.status(500).json({
         error: 'Failed to fetch bookings',
-        details: error.message
+        details: error.message,
+        code: error.code,
+        hint: error.hint
       });
     }
+
+    console.log('Query successful. Found', bookings?.length || 0, 'bookings');
 
     return res.status(200).json({
       success: true,
