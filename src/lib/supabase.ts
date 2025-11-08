@@ -10,7 +10,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (for local) or NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (for production) in your environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
 // Types for our database tables
 export interface Profile {
@@ -19,6 +25,8 @@ export interface Profile {
   full_name: string;
   school_organization?: string;
   phone?: string;
+  job_position?: string;
+  subscribe_newsletter?: boolean;
   created_at?: string;
   updated_at?: string;
 }

@@ -10,9 +10,11 @@ interface SignUpData {
   full_name: string;
   school_organization?: string;
   phone?: string;
+  job_position?: string;
   interests: string[];
   resources: string[];
   methodologies: string[];
+  subscribe_newsletter?: boolean;
 }
 
 interface AuthContextType {
@@ -94,6 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           full_name: data.full_name,
           school_organization: data.school_organization,
           phone: data.phone,
+          job_position: data.job_position,
+          subscribe_newsletter: data.subscribe_newsletter,
         });
 
       if (profileError) throw profileError;
