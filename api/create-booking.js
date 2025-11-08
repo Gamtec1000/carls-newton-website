@@ -196,7 +196,7 @@ export default async function handler(req, res) {
             <div style="background: #eff6ff; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #3b82f6;">
               <h3 style="margin-top: 0; color: #1f2937;">📅 Event Details</h3>
               <p style="margin: 8px 0;"><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
-              <p style="margin: 8px 0;"><strong>Price:</strong> AED ${price.toLocaleString()}</p>
+              <p style="margin: 8px 0;"><strong>Price:</strong> د.إ ${price.toLocaleString()}</p>
               <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
               <p style="margin: 8px 0;"><strong>Time:</strong> ${bookingData.time_slot}</p>
               <p style="margin: 8px 0;"><strong>Location:</strong> ${address}</p>

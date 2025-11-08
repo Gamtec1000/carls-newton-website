@@ -78,7 +78,7 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
     } else if (q.includes('topic') || q.includes('subject') || q.includes('science')) {
       return 'Our shows cover a universe of topics! Physics (rockets, forces, energy), Chemistry (reactions, elements, mixtures), Biology (life systems), Earth Science (weather, geology), and more. We align with UAE curriculum and can customize based on what you\'re studying!';
     } else if (q.includes('price') || q.includes('cost')) {
-      return 'Our packages start at AED 1,200 for Preschool Specials, AED 1,800 for Classic Shows, and AED 2,500+ for Half-Day Experiences. Check our Packages section for full details. Every dirham goes into making science unforgettable for your students!';
+      return 'Our packages start at د.إ 1,200 for Preschool Specials, د.إ 1,800 for Classic Shows, and د.إ 2,500+ for Half-Day Experiences. Check our Packages section for full details. Every dirham goes into making science unforgettable for your students!';
     } else {
       return 'That\'s a fascinating question! As AI-STOTLE, I\'m here to help with information about our science shows, booking, packages, and experiments. Could you ask me something specific about our programs? Or explore our console for quick answers!';
     }

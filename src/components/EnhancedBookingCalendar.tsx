@@ -1345,7 +1345,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                   >
                     <div style={styles.packageName}>Preschool Special</div>
                     <div style={styles.packageDuration}>30-45 mins</div>
-                    <div style={styles.packagePrice}>AED 1,200</div>
+                    <div style={styles.packagePrice}>د.إ 1,200</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'classic')}
@@ -1356,7 +1356,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                   >
                     <div style={styles.packageName}>Classic Show</div>
                     <div style={styles.packageDuration}>45-60 mins</div>
-                    <div style={styles.packagePrice}>AED 1,800</div>
+                    <div style={styles.packagePrice}>د.إ 1,800</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'halfday')}
@@ -1367,7 +1367,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                   >
                     <div style={styles.packageName}>Half-Day Experience</div>
                     <div style={styles.packageDuration}>4 hours</div>
-                    <div style={styles.packagePrice}>AED 2,500</div>
+                    <div style={styles.packagePrice}>د.إ 2,500</div>
                   </div>
                 </div>
               </div>
