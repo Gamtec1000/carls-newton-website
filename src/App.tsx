@@ -1314,10 +1314,18 @@ export default function CarlsNewtonLanding() {
                     e.currentTarget.style.boxShadow = '0 0 30px rgba(251, 191, 36, 0.5)';
                   } else {
                     e.currentTarget.style.boxShadow = '0 0 30px rgba(6, 182, 212, 0.5)';
+                    if (!pkg.popular) {
+                      e.currentTarget.style.borderColor = '#06B6D4';
+                      e.currentTarget.style.borderWidth = '2px';
+                    }
                   }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = 'none';
+                  if (!pkg.premium && !pkg.popular) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.borderWidth = '1px';
+                  }
                 }}
               >
                 {pkg.popular && (
