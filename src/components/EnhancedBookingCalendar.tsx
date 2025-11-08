@@ -707,7 +707,7 @@ const EnhancedBookingCalendar: React.FC = () => {
       } else if (day.bookingCount && day.bookingCount > 0) {
         backgroundColor = 'rgba(239, 68, 68, 0.3)'; // Red for booked dates
       } else if (day.isToday) {
-        backgroundColor = 'rgba(6, 182, 212, 0.2)';
+        backgroundColor = 'rgba(251, 191, 36, 0.2)';
       } else if (day.isAvailable && day.isCurrentMonth) {
         backgroundColor = 'rgba(34, 197, 94, 0.2)'; // Green for available
       }
@@ -725,7 +725,7 @@ const EnhancedBookingCalendar: React.FC = () => {
         transition: 'all 0.3s',
         background: backgroundColor,
         border: day.isToday
-          ? '2px solid #06B6D4'
+          ? '2px solid #FBBF24'
           : '1px solid rgba(255, 255, 255, 0.1)',
         color: !day.isCurrentMonth
           ? 'rgba(255, 255, 255, 0.3)'
@@ -1046,7 +1046,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseLeave={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.border = day.isToday ? '2px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.border = day.isToday ? '2px solid #FBBF24' : '1px solid rgba(255, 255, 255, 0.1)';
                     e.currentTarget.style.boxShadow = 'none';
                   }
                 }}
@@ -1099,7 +1099,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseLeave={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.border = day.isToday ? '2px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.border = day.isToday ? '2px solid #FBBF24' : '1px solid rgba(255, 255, 255, 0.1)';
                     e.currentTarget.style.boxShadow = 'none';
                   }
                 }}

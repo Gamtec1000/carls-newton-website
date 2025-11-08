@@ -166,17 +166,19 @@ export default function GooeyNav({
                       textDecoration: 'none',
                       fontWeight: isActive ? 'bold' : '600',
                       fontSize: '14px',
+                      fontFamily: "'Aloe Vera Sans', sans-serif",
                       borderRadius: '20px',
                       background:
                         isActive || isHovered
                           ? `linear-gradient(135deg, ${color}22, ${color}11)`
                           : 'transparent',
-                      border: `2px solid ${isActive || isHovered ? color + '66' : 'transparent'}`,
+                      border: isHovered
+                        ? '2px solid #06B6D4'
+                        : '1px solid rgba(255, 255, 255, 0.3)',
                       transition: 'all 300ms ease',
                       cursor: 'pointer',
-                      textTransform: 'uppercase',
                       letterSpacing: '1px',
-                      filter: isActive || isHovered ? `drop-shadow(0 0 10px ${color})` : 'none',
+                      boxShadow: isHovered ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
                     }}
                   >
                     {/* Particle effects */}

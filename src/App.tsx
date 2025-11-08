@@ -173,7 +173,7 @@ export default function CarlsNewtonLanding() {
           { label: 'Packages', href: '#packages' },
           { label: 'Booking', href: '#booking' },
           { label: 'Reviews', href: '#testimonials' },
-          { label: 'AI-STOTLE', href: '#ai-stotle', onClick: () => setIsAIModalOpen(true) },
+          { label: 'AI-Stotle', href: '#ai-stotle', onClick: () => setIsAIModalOpen(true) },
         ]}
         particleCount={20}
         particleDistances={[90, 10]}
