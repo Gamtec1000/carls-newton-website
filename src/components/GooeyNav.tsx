@@ -164,7 +164,7 @@ export default function GooeyNav({
                       padding: '10px 20px',
                       color: isActive || isHovered ? color : '#C4B5FD',
                       textDecoration: 'none',
-                      fontWeight: isActive ? 'bold' : '600',
+                      fontWeight: '300',
                       fontSize: '14px',
                       fontFamily: "'Aloe Vera Sans', sans-serif",
                       borderRadius: '20px',
@@ -198,8 +198,8 @@ export default function GooeyNav({
                               width: '4px',
                               height: '4px',
                               borderRadius: '50%',
-                              background: color,
-                              boxShadow: `0 0 8px ${color}`,
+                              background: '#A855F7',
+                              boxShadow: '0 0 8px #A855F7',
                               top: '50%',
                               left: '50%',
                               animation: 'particleFloat 2s ease-in-out infinite',
@@ -247,22 +247,24 @@ export default function GooeyNav({
                   background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
                   padding: '12px 28px',
                   borderRadius: '25px',
-                  fontWeight: 'bold',
-                  border: 'none',
+                  fontWeight: '300',
+                  fontFamily: "'Aloe Vera Sans', sans-serif",
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
                   cursor: 'pointer',
                   color: 'white',
                   fontSize: '14px',
-                  textTransform: 'uppercase',
                   letterSpacing: '1px',
                   boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
                   transition: 'all 300ms ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.5)';
+                  e.currentTarget.style.border = '2px solid #06B6D4';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(6, 182, 212, 0.5)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.3)';
                   e.currentTarget.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
                 }}
               >
