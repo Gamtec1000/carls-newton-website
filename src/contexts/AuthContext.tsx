@@ -87,7 +87,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (authError) throw authError;
       if (!authData.user) throw new Error('User creation failed');
 
-      // 2. Create profile - try insert first, update if conflict
+      console.log('Auth user created:', authData.user.id);
+      console.log('Session exists:', !!authData.session);
+      console.log('Email confirmation required:', !authData.session);
+
+      // Check if email confirmation is required
+      // If no session, user needs to confirm email before we can create profile
+      if (!authData.session) {
+        console.log('Email confirmation required - profile will be created after confirmation');
+        // Show success message but don't create profile yet
+        // Profile will be created by database trigger or on first login after confirmation
+        return; // Exit early - user needs to confirm email
+      }
+
+      // 2. User is confirmed (session exists), create profile
+      console.log('Creating profile for confirmed user...');
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
@@ -141,40 +155,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // 3. Save preferences - delete existing ones first to avoid conflicts
-      await supabase
-        .from('user_preferences')
-        .delete()
-        .eq('user_id', authData.user.id);
-
-      const preferences = [
-        ...data.interests.map(i => ({
-          user_id: authData.user!.id,
-          interest_type: 'science_topic' as const,
-          interest_value: i,
-        })),
-        ...data.resources.map(r => ({
-          user_id: authData.user!.id,
-          interest_type: 'resource_type' as const,
-          interest_value: r,
-        })),
-        ...data.methodologies.map(m => ({
-          user_id: authData.user!.id,
-          interest_type: 'methodology' as const,
-          interest_value: m,
-        })),
-      ];
-
-      if (preferences.length > 0) {
-        const { error: prefsError } = await supabase
+      // 3. Save preferences - only if user is confirmed (session exists)
+      if (authData.session) {
+        console.log('Saving user preferences...');
+        // Delete existing ones first to avoid conflicts
+        await supabase
           .from('user_preferences')
-          .insert(preferences);
+          .delete()
+          .eq('user_id', authData.user.id);
 
-        if (prefsError) throw prefsError;
+        const preferences = [
+          ...data.interests.map(i => ({
+            user_id: authData.user!.id,
+            interest_type: 'science_topic' as const,
+            interest_value: i,
+          })),
+          ...data.resources.map(r => ({
+            user_id: authData.user!.id,
+            interest_type: 'resource_type' as const,
+            interest_value: r,
+          })),
+          ...data.methodologies.map(m => ({
+            user_id: authData.user!.id,
+            interest_type: 'methodology' as const,
+            interest_value: m,
+          })),
+        ];
+
+        if (preferences.length > 0) {
+          const { error: prefsError } = await supabase
+            .from('user_preferences')
+            .insert(preferences);
+
+          if (prefsError) {
+            console.error('Preferences save error:', prefsError);
+            throw prefsError;
+          }
+        }
+
+        // Fetch the newly created profile
+        await fetchProfile(authData.user.id);
       }
-
-      // Fetch the newly created profile
-      await fetchProfile(authData.user.id);
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
