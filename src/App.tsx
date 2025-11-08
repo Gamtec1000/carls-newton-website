@@ -1312,6 +1312,8 @@ export default function CarlsNewtonLanding() {
                 onMouseEnter={(e) => {
                   if (pkg.premium) {
                     e.currentTarget.style.boxShadow = '0 0 30px rgba(251, 191, 36, 0.5)';
+                  } else {
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(6, 182, 212, 0.5)';
                   }
                 }}
                 onMouseLeave={(e) => {
