@@ -87,10 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (authError) throw authError;
       if (!authData.user) throw new Error('User creation failed');
 
-      // 2. Create profile
+      // 2. Create profile (use upsert to handle existing profiles)
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           id: authData.user.id,
           email: data.email,
           full_name: data.full_name,
@@ -98,6 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           phone: data.phone,
           job_position: data.job_position,
           subscribe_newsletter: data.subscribe_newsletter,
+        }, {
+          onConflict: 'id'
         });
 
       if (profileError) throw profileError;
