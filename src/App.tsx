@@ -1242,7 +1242,7 @@ export default function CarlsNewtonLanding() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '32px',
             }}
           >
@@ -1281,6 +1281,21 @@ export default function CarlsNewtonLanding() {
                   'Take-home materials',
                 ],
               },
+              {
+                name: 'Custom Project',
+                duration: 'School-Wide Events',
+                price: '8,000+',
+                features: [
+                  'Science Fair Support',
+                  'Expert Guidance & Consultation',
+                  'Materials & Experiments',
+                  'Training Sessions',
+                  'Curriculum Alignment',
+                  'Best Experience Guarantee',
+                ],
+                premium: true,
+                description: 'Perfect for school-wide science fairs, STEM weeks, large events',
+              },
             ].map((pkg, idx) => (
               <div
                 key={idx}
@@ -1288,8 +1303,19 @@ export default function CarlsNewtonLanding() {
                   ...styles.card,
                   border: pkg.popular
                     ? '2px solid #06B6D4'
+                    : pkg.premium
+                    ? '2px solid #FBBF24'
                     : '1px solid rgba(255,255,255,0.1)',
                   position: 'relative',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  if (pkg.premium) {
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(251, 191, 36, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               >
                 {pkg.popular && (
@@ -1308,6 +1334,23 @@ export default function CarlsNewtonLanding() {
                     Most Popular
                   </div>
                 )}
+                {pkg.premium && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '-16px',
+                      right: '32px',
+                      background: 'linear-gradient(135deg, #FBBF24, #F97316)',
+                      padding: '4px 16px',
+                      borderRadius: '25px',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 15px rgba(251, 191, 36, 0.5)',
+                    }}
+                  >
+                    ⭐ Premium
+                  </div>
+                )}
 
                 <h3
                   style={{
@@ -1318,14 +1361,19 @@ export default function CarlsNewtonLanding() {
                 >
                   {pkg.name}
                 </h3>
-                <p style={{ color: '#C4B5FD', marginBottom: '16px' }}>
+                <p style={{ color: '#C4B5FD', marginBottom: pkg.description ? '8px' : '16px' }}>
                   {pkg.duration}
                 </p>
+                {pkg.description && (
+                  <p style={{ color: '#A78BFA', marginBottom: '16px', fontSize: '14px', fontStyle: 'italic' }}>
+                    {pkg.description}
+                  </p>
+                )}
                 <div style={{ marginBottom: '24px' }}>
                   <span style={{ fontSize: '36px', fontWeight: 'bold' }}>
-                    AED {pkg.price}
+                    {pkg.premium ? 'From AED ' : 'AED '}{pkg.price}
                   </span>
-                  {pkg.price !== 'Custom' && (
+                  {pkg.price !== 'Custom' && !pkg.premium && (
                     <span style={{ color: '#C4B5FD' }}> +</span>
                   )}
                 </div>
@@ -1349,7 +1397,7 @@ export default function CarlsNewtonLanding() {
                     >
                       <Star
                         size={20}
-                        color="#06B6D4"
+                        color={pkg.premium ? '#FBBF24' : '#06B6D4'}
                         style={{ flexShrink: 0, marginTop: '2px' }}
                       />
                       <span style={{ color: '#C4B5FD' }}>{feature}</span>
@@ -1359,12 +1407,38 @@ export default function CarlsNewtonLanding() {
 
                 <button
                   style={{
-                    ...(pkg.popular ? styles.button : styles.buttonSecondary),
+                    ...(pkg.popular ? styles.button : pkg.premium ? {
+                      background: 'linear-gradient(135deg, #FBBF24, #F97316)',
+                      padding: '12px 32px',
+                      borderRadius: '25px',
+                      fontWeight: 'bold',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontSize: '16px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.3s',
+                      boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)',
+                    } : styles.buttonSecondary),
                     width: '100%',
                     justifyContent: 'center',
                   }}
+                  onMouseEnter={(e) => {
+                    if (pkg.premium) {
+                      e.currentTarget.style.boxShadow = '0 6px 25px rgba(251, 191, 36, 0.5)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (pkg.premium) {
+                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(251, 191, 36, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }
+                  }}
                 >
-                  Learn More
+                  {pkg.premium ? 'Get Custom Quote' : 'Learn More'}
                 </button>
               </div>
             ))}
