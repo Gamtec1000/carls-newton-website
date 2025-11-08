@@ -627,9 +627,11 @@ const EnhancedBookingCalendar: React.FC = () => {
       background: 'rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(10px)',
       borderRadius: '20px',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
+      border: '2px solid #A855F7',
       padding: '24px',
-    },
+      boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)',
+      transition: 'all 0.3s',
+    } as React.CSSProperties,
     header: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -1004,7 +1006,15 @@ const EnhancedBookingCalendar: React.FC = () => {
       {/* Two-Month Grid */}
       <div style={styles.twoMonthGrid}>
         {/* First Month */}
-        <div style={styles.card}>
+        <div
+          style={styles.card}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.3)';
+          }}
+        >
           <div style={styles.header}>
             <div style={styles.monthTitle}>
               {monthNames[currentMonth]} {currentYear}
@@ -1028,8 +1038,8 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseEnter={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.border = '2px solid #A855F7';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(168, 85, 247, 0.5)';
+                    e.currentTarget.style.border = '2px solid #06B6D4';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(6, 182, 212, 0.5)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -1047,7 +1057,15 @@ const EnhancedBookingCalendar: React.FC = () => {
         </div>
 
         {/* Second Month */}
-        <div style={styles.card}>
+        <div
+          style={styles.card}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.3)';
+          }}
+        >
           <div style={styles.header}>
             <div style={styles.monthTitle}>
               {monthNames[nextMonth]} {nextMonthYear}
@@ -1071,8 +1089,8 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseEnter={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.border = '2px solid #A855F7';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(168, 85, 247, 0.5)';
+                    e.currentTarget.style.border = '2px solid #06B6D4';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(6, 182, 212, 0.5)';
                   }
                 }}
                 onMouseLeave={(e) => {
