@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Mail, Lock, User, Phone, School, Eye, EyeOff } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
@@ -26,9 +26,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [school, setSchool] = useState('');
+  const [jobPosition, setJobPosition] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
 
   // Interests State
   const [scienceTopics, setScienceTopics] = useState<string[]>([]);
@@ -85,7 +87,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setSuccess('');
 
     // Validation
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!fullName || !email || !password || !confirmPassword || !jobPosition) {
       setError('Please fill in all required fields');
       return;
     }
@@ -114,9 +116,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         full_name: fullName,
         school_organization: school,
         phone,
+        job_position: jobPosition,
         interests: scienceTopics,
         resources,
         methodologies,
+        subscribe_newsletter: subscribeNewsletter,
       });
 
       setSuccess('Account created! Please check your email to verify your account.');
@@ -142,12 +146,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const getPasswordStrength = (pwd: string) => {
     if (pwd.length === 0) return { strength: 0, label: '', color: '' };
     if (pwd.length < 8) return { strength: 1, label: 'Weak', color: '#EF4444' };
-    
+
     let strength = 1;
     if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) strength++;
     if (/\d/.test(pwd)) strength++;
     if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
-    
+
     if (strength === 2) return { strength: 2, label: 'Fair', color: '#F97316' };
     if (strength === 3) return { strength: 3, label: 'Good', color: '#FBBF24' };
     if (strength === 4) return { strength: 4, label: 'Strong', color: '#10B981' };
@@ -155,6 +159,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   const passwordStrength = getPasswordStrength(password);
+
+  const inputStyle = {
+    width: '100%',
+    padding: '16px 20px',
+    background: 'rgba(30, 41, 59, 0.5)',
+    border: '2px solid rgba(6, 182, 212, 0.3)',
+    borderRadius: '12px',
+    color: 'white',
+    fontSize: '16px',
+    fontFamily: "'Courier New', monospace",
+    letterSpacing: '0.5px',
+    outline: 'none',
+    transition: 'all 0.3s',
+  };
+
+  const inputFocusHandlers = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+      e.currentTarget.style.borderColor = '#06B6D4';
+      e.currentTarget.style.boxShadow = '0 0 20px rgba(6, 182, 212, 0.3)';
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
+      e.currentTarget.style.boxShadow = 'none';
+    },
+  };
 
   if (!isOpen) return null;
 
@@ -177,14 +206,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       <div
         style={{
           width: '100%',
-          maxWidth: activeTab === 'register' ? '700px' : '500px',
+          maxWidth: '600px',
           maxHeight: '90vh',
           overflowY: 'auto',
           padding: '40px',
-          background: 'linear-gradient(180deg, rgba(30, 27, 75, 0.98) 0%, rgba(30, 58, 138, 0.98) 100%)',
+          background: 'linear-gradient(180deg, rgba(30, 27, 75, 0.95) 0%, rgba(30, 58, 138, 0.95) 100%)',
           borderRadius: '24px',
-          border: '3px solid rgba(6, 182, 212, 0.5)',
-          boxShadow: '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 30px rgba(6, 182, 212, 0.1)',
+          border: '2px solid rgba(6, 182, 212, 0.3)',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -219,52 +248,66 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <X color="#EF4444" size={24} />
         </button>
 
-        {/* Tab Switcher */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '32px', justifyContent: 'center' }}>
-          <button
-            onClick={() => setActiveTab('signin')}
+        {/* Modal Header */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h2
             style={{
-              padding: '12px 32px',
-              background: activeTab === 'signin'
-                ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(168, 85, 247, 0.3))'
-                : 'transparent',
-              border: activeTab === 'signin'
-                ? '2px solid #06B6D4'
-                : '2px solid rgba(196, 181, 253, 0.3)',
-              borderRadius: '12px',
-              color: activeTab === 'signin' ? '#06B6D4' : '#C4B5FD',
-              fontSize: '16px',
+              fontSize: '32px',
               fontWeight: 'bold',
-              fontFamily: 'monospace',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              boxShadow: activeTab === 'signin' ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
+              background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '2px',
+              marginBottom: '24px',
             }}
           >
-            SIGN IN
-          </button>
-          <button
-            onClick={() => setActiveTab('register')}
-            style={{
-              padding: '12px 32px',
-              background: activeTab === 'register'
-                ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(168, 85, 247, 0.3))'
-                : 'transparent',
-              border: activeTab === 'register'
-                ? '2px solid #06B6D4'
-                : '2px solid rgba(196, 181, 253, 0.3)',
-              borderRadius: '12px',
-              color: activeTab === 'register' ? '#06B6D4' : '#C4B5FD',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              fontFamily: 'monospace',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              boxShadow: activeTab === 'register' ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
-            }}
-          >
-            REGISTER
-          </button>
+            WELCOME TO CARLS NEWTON
+          </h2>
+
+          {/* Tab Buttons */}
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <button
+              onClick={() => setActiveTab('signin')}
+              style={{
+                padding: '12px 32px',
+                background: activeTab === 'signin'
+                  ? 'linear-gradient(135deg, #06B6D4, #A855F7)'
+                  : 'transparent',
+                border: '2px solid #06B6D4',
+                borderRadius: '25px',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                letterSpacing: '1px',
+                boxShadow: activeTab === 'signin' ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
+              }}
+            >
+              SIGN IN
+            </button>
+            <button
+              onClick={() => setActiveTab('register')}
+              style={{
+                padding: '12px 32px',
+                background: activeTab === 'register'
+                  ? 'linear-gradient(135deg, #06B6D4, #A855F7)'
+                  : 'transparent',
+                border: '2px solid #06B6D4',
+                borderRadius: '25px',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                letterSpacing: '1px',
+                boxShadow: activeTab === 'register' ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
+              }}
+            >
+              REGISTER
+            </button>
+          </div>
         </div>
 
         {/* Error/Success Messages */}
@@ -277,7 +320,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               borderRadius: '8px',
               color: '#EF4444',
               marginBottom: '20px',
-              fontFamily: 'monospace',
               boxShadow: '0 0 15px rgba(239, 68, 68, 0.3)',
             }}
           >
@@ -293,7 +335,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               borderRadius: '8px',
               color: '#10B981',
               marginBottom: '20px',
-              fontFamily: 'monospace',
               boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)',
             }}
           >
@@ -305,95 +346,35 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <form onSubmit={handleSignIn}>
             {/* Email */}
             <div style={{ marginBottom: '20px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '8px',
-                  color: '#C4B5FD',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Mail size={16} color="#06B6D4" />
-                Email Address
-              </label>
               <input
                 type="email"
                 value={signInEmail}
                 onChange={(e) => setSignInEmail(e.target.value)}
+                placeholder="Email Address *"
                 required
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '2px solid rgba(6, 182, 212, 0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#06B6D4';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                style={inputStyle}
+                {...inputFocusHandlers}
               />
             </div>
 
             {/* Password */}
             <div style={{ marginBottom: '20px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '8px',
-                  color: '#C4B5FD',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Lock size={16} color="#06B6D4" />
-                Password
-              </label>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={signInPassword}
                   onChange={(e) => setSignInPassword(e.target.value)}
+                  placeholder="Password *"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '12px 45px 12px 16px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '2px solid rgba(6, 182, 212, 0.3)',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '14px',
-                    fontFamily: 'monospace',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#06B6D4';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                  style={{ ...inputStyle, paddingRight: '50px' }}
+                  {...inputFocusHandlers}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: 'absolute',
-                    right: '12px',
+                    right: '16px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
@@ -402,13 +383,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     color: '#06B6D4',
                   }}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div style={{ marginBottom: '24px' }}>
+            {/* Remember Me & Forgot Password */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <label
                 style={{
                   display: 'flex',
@@ -416,7 +397,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   gap: '8px',
                   color: '#C4B5FD',
                   fontSize: '14px',
-                  fontFamily: 'monospace',
                   cursor: 'pointer',
                 }}
               >
@@ -424,10 +404,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#06B6D4',
+                  }}
                 />
                 Remember me
               </label>
+              <a
+                href="#"
+                style={{
+                  color: '#06B6D4',
+                  fontSize: '14px',
+                  textDecoration: 'underline',
+                }}
+              >
+                Forgot password?
+              </a>
             </div>
 
             {/* Sign In Button */}
@@ -436,20 +431,30 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '14px 32px',
+                padding: '16px 32px',
                 background: loading
                   ? 'rgba(6, 182, 212, 0.3)'
                   : 'linear-gradient(135deg, #06B6D4, #A855F7)',
                 border: 'none',
-                borderRadius: '12px',
+                borderRadius: '25px',
                 color: 'white',
-                fontSize: '16px',
+                fontSize: '18px',
                 fontWeight: 'bold',
-                fontFamily: 'monospace',
+                letterSpacing: '1.5px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 marginBottom: '16px',
-                boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
                 transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(6, 182, 212, 0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
               }}
             >
               {loading ? 'SIGNING IN...' : 'SIGN IN'}
@@ -459,9 +464,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <div
               style={{
                 textAlign: 'center',
-                fontSize: '13px',
+                fontSize: '14px',
                 color: '#C4B5FD',
-                fontFamily: 'monospace',
               }}
             >
               Don't have an account?{' '}
@@ -471,6 +475,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   color: '#06B6D4',
                   cursor: 'pointer',
                   textDecoration: 'underline',
+                  fontWeight: 'bold',
                 }}
               >
                 Register
@@ -479,225 +484,100 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </form>
         ) : (
           <form onSubmit={handleRegister}>
+            {/* Contact Information Section */}
+            <h3
+              style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                color: '#A78BFA',
+                letterSpacing: '1px',
+                marginBottom: '16px',
+              }}
+            >
+              Contact Information
+            </h3>
+
             {/* Full Name */}
             <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <User size={14} color="#06B6D4" />
-                Full Name *
-              </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                placeholder="Full Name *"
                 required
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '2px solid rgba(6, 182, 212, 0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#06B6D4';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                style={inputStyle}
+                {...inputFocusHandlers}
               />
             </div>
 
             {/* Email */}
             <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Mail size={14} color="#06B6D4" />
-                Email Address *
-              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email Address *"
                 required
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '2px solid rgba(6, 182, 212, 0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#06B6D4';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                style={inputStyle}
+                {...inputFocusHandlers}
               />
             </div>
 
             {/* Phone */}
             <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Phone size={14} color="#06B6D4" />
-                Phone Number
-              </label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+971-50-123-4567"
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '2px solid rgba(6, 182, 212, 0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#06B6D4';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                placeholder="Phone Number"
+                style={inputStyle}
+                {...inputFocusHandlers}
               />
             </div>
 
             {/* School */}
             <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <School size={14} color="#06B6D4" />
-                School/Organization
-              </label>
               <input
                 type="text"
                 value={school}
                 onChange={(e) => setSchool(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '2px solid rgba(6, 182, 212, 0.3)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#06B6D4';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                placeholder="School/Organization"
+                style={inputStyle}
+                {...inputFocusHandlers}
+              />
+            </div>
+
+            {/* Job Position */}
+            <div style={{ marginBottom: '24px' }}>
+              <input
+                type="text"
+                value={jobPosition}
+                onChange={(e) => setJobPosition(e.target.value)}
+                placeholder="Job Position (e.g., Science Coordinator, Head Teacher) *"
+                required
+                style={inputStyle}
+                {...inputFocusHandlers}
               />
             </div>
 
             {/* Password */}
             <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Lock size={14} color="#06B6D4" />
-                Password *
-              </label>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password *"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '10px 40px 10px 14px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '2px solid rgba(6, 182, 212, 0.3)',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#06B6D4';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.3)';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                  style={{ ...inputStyle, paddingRight: '50px' }}
+                  {...inputFocusHandlers}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: 'absolute',
-                    right: '10px',
+                    right: '16px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
@@ -706,16 +586,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     color: '#06B6D4',
                   }}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {password && (
-                <div style={{ marginTop: '6px' }}>
+                <div style={{ marginTop: '8px' }}>
                   <div
                     style={{
-                      height: '4px',
+                      height: '6px',
                       background: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '2px',
+                      borderRadius: '3px',
                       overflow: 'hidden',
                     }}
                   >
@@ -730,58 +610,36 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </div>
                   <div
                     style={{
-                      fontSize: '11px',
+                      fontSize: '12px',
                       color: passwordStrength.color,
                       marginTop: '4px',
-                      fontFamily: 'monospace',
                     }}
                   >
-                    {passwordStrength.label}
+                    Password Strength: {passwordStrength.label}
                   </div>
                 </div>
               )}
             </div>
 
             {/* Confirm Password */}
-            <div style={{ marginBottom: '20px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '6px',
-                  color: '#C4B5FD',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                <Lock size={14} color="#06B6D4" />
-                Confirm Password *
-              </label>
+            <div style={{ marginBottom: '24px' }}>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm Password *"
                   required
                   style={{
-                    width: '100%',
-                    padding: '10px 40px 10px 14px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: `2px solid ${
-                      confirmPassword && password !== confirmPassword
-                        ? '#EF4444'
-                        : 'rgba(6, 182, 212, 0.3)'
-                    }`,
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    outline: 'none',
+                    ...inputStyle,
+                    paddingRight: '50px',
+                    borderColor: confirmPassword && password !== confirmPassword
+                      ? '#EF4444'
+                      : 'rgba(6, 182, 212, 0.3)',
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = confirmPassword && password !== confirmPassword ? '#EF4444' : '#06B6D4';
-                    e.currentTarget.style.boxShadow = `0 0 15px ${confirmPassword && password !== confirmPassword ? 'rgba(239, 68, 68, 0.3)' : 'rgba(6, 182, 212, 0.3)'}`;
+                    e.currentTarget.style.boxShadow = `0 0 20px ${confirmPassword && password !== confirmPassword ? 'rgba(239, 68, 68, 0.3)' : 'rgba(6, 182, 212, 0.3)'}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = confirmPassword && password !== confirmPassword ? '#EF4444' : 'rgba(6, 182, 212, 0.3)';
@@ -793,7 +651,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={{
                     position: 'absolute',
-                    right: '10px',
+                    right: '16px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
@@ -802,16 +660,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     color: '#06B6D4',
                   }}
                 >
-                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {confirmPassword && password !== confirmPassword && (
                 <div
                   style={{
-                    fontSize: '11px',
+                    fontSize: '12px',
                     color: '#EF4444',
-                    marginTop: '4px',
-                    fontFamily: 'monospace',
+                    marginTop: '6px',
                   }}
                 >
                   Passwords do not match
@@ -819,21 +676,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               )}
             </div>
 
-            {/* Interests Section */}
+            {/* Interests & Preferences Section */}
             <div
               style={{
-                padding: '16px',
-                background: 'rgba(168, 85, 247, 0.05)',
-                border: '2px solid rgba(168, 85, 247, 0.3)',
-                borderRadius: '12px',
-                marginBottom: '20px',
+                background: 'rgba(88, 28, 135, 0.3)',
+                borderRadius: '16px',
+                padding: '24px',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                marginBottom: '24px',
               }}
             >
               <h3
                 style={{
-                  color: '#A855F7',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #06B6D4, #A855F7, #EC4899)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '1px',
                   marginBottom: '16px',
                   display: 'flex',
                   alignItems: 'center',
@@ -844,132 +705,168 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </h3>
 
               {/* Science Topics */}
-              <div style={{ marginBottom: '14px' }}>
-                <div
+              <div style={{ marginBottom: '20px' }}>
+                <p
                   style={{
-                    color: '#C4B5FD',
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    marginBottom: '8px',
-                  }}
-                >
-                  🧪 Science Topics:
-                </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#06B6D4',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '8px',
                   }}
                 >
+                  🧪 Science Topics (select all that apply):
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
                   {scienceTopicsList.map((topic) => (
                     <label
                       key={topic}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        color: '#C4B5FD',
-                        fontSize: '11px',
-                        fontFamily: 'monospace',
+                        gap: '8px',
                         cursor: 'pointer',
+                        padding: '8px 12px',
+                        background: 'rgba(6, 182, 212, 0.1)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(6, 182, 212, 0.3)',
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(6, 182, 212, 0.2)';
+                        e.currentTarget.style.borderColor = '#06B6D4';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(6, 182, 212, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
                       }}
                     >
                       <input
                         type="checkbox"
                         checked={scienceTopics.includes(topic)}
                         onChange={() => toggleCheckbox(topic, scienceTopics, setScienceTopics)}
-                        style={{ width: '14px', height: '14px', cursor: 'pointer' }}
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          accentColor: '#06B6D4',
+                          cursor: 'pointer',
+                        }}
                       />
-                      {topic}
+                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{topic}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* Resources */}
-              <div style={{ marginBottom: '14px' }}>
-                <div
+              {/* Resources You Need */}
+              <div style={{ marginBottom: '20px' }}>
+                <p
                   style={{
-                    color: '#C4B5FD',
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    marginBottom: '8px',
-                  }}
-                >
-                  📚 Resources You Need:
-                </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#A855F7',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '8px',
                   }}
                 >
+                  📚 Resources You Need:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
                   {resourcesList.map((resource) => (
                     <label
                       key={resource}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        color: '#C4B5FD',
-                        fontSize: '11px',
-                        fontFamily: 'monospace',
+                        gap: '8px',
                         cursor: 'pointer',
+                        padding: '8px 12px',
+                        background: 'rgba(168, 85, 247, 0.1)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(168, 85, 247, 0.3)',
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(168, 85, 247, 0.2)';
+                        e.currentTarget.style.borderColor = '#A855F7';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(168, 85, 247, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.3)';
                       }}
                     >
                       <input
                         type="checkbox"
                         checked={resources.includes(resource)}
                         onChange={() => toggleCheckbox(resource, resources, setResources)}
-                        style={{ width: '14px', height: '14px', cursor: 'pointer' }}
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          accentColor: '#A855F7',
+                          cursor: 'pointer',
+                        }}
                       />
-                      {resource}
+                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{resource}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* Methodologies */}
+              {/* Learning Methodologies */}
               <div>
-                <div
+                <p
                   style={{
-                    color: '#C4B5FD',
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    marginBottom: '8px',
-                  }}
-                >
-                  🔬 Learning Methodologies:
-                </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#EC4899',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '8px',
                   }}
                 >
+                  🔬 Learning Methodologies:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
                   {methodologiesList.map((methodology) => (
                     <label
                       key={methodology}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        color: '#C4B5FD',
-                        fontSize: '11px',
-                        fontFamily: 'monospace',
+                        gap: '8px',
                         cursor: 'pointer',
+                        padding: '8px 12px',
+                        background: 'rgba(236, 72, 153, 0.1)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(236, 72, 153, 0.3)',
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(236, 72, 153, 0.2)';
+                        e.currentTarget.style.borderColor = '#EC4899';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(236, 72, 153, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.3)';
                       }}
                     >
                       <input
                         type="checkbox"
                         checked={methodologies.includes(methodology)}
                         onChange={() => toggleCheckbox(methodology, methodologies, setMethodologies)}
-                        style={{ width: '14px', height: '14px', cursor: 'pointer' }}
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          accentColor: '#EC4899',
+                          cursor: 'pointer',
+                        }}
                       />
-                      {methodology}
+                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{methodology}</span>
                     </label>
                   ))}
                 </div>
@@ -977,38 +874,75 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {/* Terms Agreement */}
-            <div style={{ marginBottom: '20px' }}>
-              <label
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'start',
+                gap: '12px',
+                cursor: 'pointer',
+                marginTop: '24px',
+                padding: '12px',
+                background: 'rgba(6, 182, 212, 0.05)',
+                borderRadius: '8px',
+                border: '1px solid rgba(6, 182, 212, 0.2)',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+                required
                 style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px',
-                  color: '#C4B5FD',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
+                  width: '20px',
+                  height: '20px',
+                  accentColor: '#06B6D4',
                   cursor: 'pointer',
+                  marginTop: '2px',
                 }}
-              >
-                <input
-                  type="checkbox"
-                  checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  required
-                  style={{ width: '16px', height: '16px', cursor: 'pointer', marginTop: '2px' }}
-                />
-                <span>
-                  I agree to the{' '}
-                  <span style={{ color: '#06B6D4', textDecoration: 'underline' }}>
-                    Terms & Conditions
-                  </span>{' '}
-                  and{' '}
-                  <span style={{ color: '#06B6D4', textDecoration: 'underline' }}>
-                    Privacy Policy
-                  </span>{' '}
-                  *
-                </span>
-              </label>
-            </div>
+              />
+              <span style={{ color: '#C4B5FD', fontSize: '14px', lineHeight: '1.5' }}>
+                I agree to the{' '}
+                <a href="/terms-and-conditions" target="_blank" style={{ color: '#06B6D4', textDecoration: 'underline' }}>
+                  Terms & Conditions
+                </a>
+                {' '}and{' '}
+                <a href="/privacy-policy" target="_blank" style={{ color: '#06B6D4', textDecoration: 'underline' }}>
+                  Privacy Policy
+                </a>
+                {' '}*
+              </span>
+            </label>
+
+            {/* Newsletter Subscription */}
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'start',
+                gap: '12px',
+                cursor: 'pointer',
+                marginTop: '16px',
+                padding: '12px',
+                background: 'rgba(168, 85, 247, 0.05)',
+                borderRadius: '8px',
+                border: '1px solid rgba(168, 85, 247, 0.2)',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={subscribeNewsletter}
+                onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  accentColor: '#A855F7',
+                  cursor: 'pointer',
+                  marginTop: '2px',
+                }}
+              />
+              <span style={{ color: '#C4B5FD', fontSize: '14px', lineHeight: '1.5' }}>
+                📬 Subscribe to our bi-weekly newsletter for exclusive science experiments, STEM resources, and special offers!
+              </span>
+            </label>
 
             {/* Register Button */}
             <button
@@ -1016,20 +950,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '14px 32px',
+                padding: '16px 32px',
                 background: loading
                   ? 'rgba(6, 182, 212, 0.3)'
                   : 'linear-gradient(135deg, #06B6D4, #A855F7)',
                 border: 'none',
-                borderRadius: '12px',
+                borderRadius: '25px',
                 color: 'white',
-                fontSize: '16px',
+                fontSize: '18px',
                 fontWeight: 'bold',
-                fontFamily: 'monospace',
+                letterSpacing: '1.5px',
                 cursor: loading ? 'not-allowed' : 'pointer',
+                marginTop: '24px',
                 marginBottom: '16px',
-                boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
                 transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(6, 182, 212, 0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
               }}
             >
               {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
@@ -1039,9 +984,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <div
               style={{
                 textAlign: 'center',
-                fontSize: '13px',
+                fontSize: '14px',
                 color: '#C4B5FD',
-                fontFamily: 'monospace',
               }}
             >
               Already have an account?{' '}
@@ -1051,6 +995,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   color: '#06B6D4',
                   cursor: 'pointer',
                   textDecoration: 'underline',
+                  fontWeight: 'bold',
                 }}
               >
                 Sign In
