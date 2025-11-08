@@ -53,7 +53,18 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 
--- 7. Create RLS Policies
+-- 7. Drop existing policies if they exist (to avoid conflicts)
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can insert own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can delete own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can view own bookings" ON bookings;
+DROP POLICY IF EXISTS "Users can create own bookings" ON bookings;
+DROP POLICY IF EXISTS "Users can update own bookings" ON bookings;
+
+-- 8. Create RLS Policies
 
 -- Profiles: Users can read their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -89,7 +100,7 @@ CREATE POLICY "Users can create own bookings" ON bookings
 CREATE POLICY "Users can update own bookings" ON bookings
   FOR UPDATE USING (auth.uid() = user_id);
 
--- 8. Create function to automatically update updated_at timestamp
+-- 9. Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -98,7 +109,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 9. Create triggers to automatically update updated_at
+-- 10. Create triggers to automatically update updated_at
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON profiles
   FOR EACH ROW
@@ -109,7 +120,7 @@ CREATE TRIGGER update_bookings_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- 10. Grant necessary permissions
+-- 11. Grant necessary permissions
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT ALL ON profiles TO authenticated;
 GRANT ALL ON user_preferences TO authenticated;
