@@ -10,9 +10,11 @@ interface SignUpData {
   full_name: string;
   school_organization?: string;
   phone?: string;
+  job_position?: string;
   interests: string[];
   resources: string[];
   methodologies: string[];
+  subscribe_newsletter?: boolean;
 }
 
 interface AuthContextType {
@@ -85,20 +87,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (authError) throw authError;
       if (!authData.user) throw new Error('User creation failed');
 
-      // 2. Create profile
-      const { error: profileError } = await supabase
+      // 2. Create profile - first check if it exists
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .insert({
-          id: authData.user.id,
-          email: data.email,
-          full_name: data.full_name,
-          school_organization: data.school_organization,
-          phone: data.phone,
-        });
+        .select('id')
+        .eq('id', authData.user.id)
+        .single();
 
-      if (profileError) throw profileError;
+      if (!existingProfile) {
+        // Profile doesn't exist, insert it
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: data.email,
+            full_name: data.full_name,
+            school_organization: data.school_organization,
+            phone: data.phone,
+            job_position: data.job_position,
+            subscribe_newsletter: data.subscribe_newsletter,
+          });
 
-      // 3. Save preferences
+        if (profileError) throw profileError;
+      } else {
+        // Profile exists, update it
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            email: data.email,
+            full_name: data.full_name,
+            school_organization: data.school_organization,
+            phone: data.phone,
+            job_position: data.job_position,
+            subscribe_newsletter: data.subscribe_newsletter,
+          })
+          .eq('id', authData.user.id);
+
+        if (profileError) throw profileError;
+      }
+
+      // 3. Save preferences - delete existing ones first to avoid conflicts
+      await supabase
+        .from('user_preferences')
+        .delete()
+        .eq('user_id', authData.user.id);
+
       const preferences = [
         ...data.interests.map(i => ({
           user_id: authData.user!.id,
