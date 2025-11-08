@@ -1177,7 +1177,21 @@ export default function CarlsNewtonLanding() {
                 color: 'linear-gradient(135deg, #F97316, #EF4444)',
               },
             ].map((feature, idx) => (
-              <div key={idx} style={styles.card}>
+              <div
+                key={idx}
+                style={{
+                  ...styles.card,
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.border = '2px solid #A855F7';
+                  e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 <div
                   style={{
                     width: '64px',
