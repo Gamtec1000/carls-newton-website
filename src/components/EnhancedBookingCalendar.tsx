@@ -627,9 +627,8 @@ const EnhancedBookingCalendar: React.FC = () => {
       background: 'rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(10px)',
       borderRadius: '20px',
-      border: '2px solid #A855F7',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
       padding: '24px',
-      boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)',
       transition: 'all 0.3s',
     } as React.CSSProperties,
     header: {
@@ -1009,10 +1008,12 @@ const EnhancedBookingCalendar: React.FC = () => {
         <div
           style={styles.card}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+            e.currentTarget.style.border = '2px solid #A855F7';
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.5)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.3)';
+            e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           <div style={styles.header}>
@@ -1060,10 +1061,12 @@ const EnhancedBookingCalendar: React.FC = () => {
         <div
           style={styles.card}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+            e.currentTarget.style.border = '2px solid #A855F7';
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.5)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.3)';
+            e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           <div style={styles.header}>
