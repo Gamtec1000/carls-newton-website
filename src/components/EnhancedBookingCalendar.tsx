@@ -757,13 +757,14 @@ const EnhancedBookingCalendar: React.FC = () => {
     modalContent: {
       background: 'linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 50%, #312e81 100%)',
       borderRadius: '24px',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
+      border: '2px solid #A855F7',
       padding: '32px',
       maxWidth: '600px',
       width: '100%',
       maxHeight: '90vh',
       overflowY: 'auto' as const,
       position: 'relative' as const,
+      boxShadow: '0 0 40px rgba(168, 85, 247, 0.4)',
     },
     modalHeader: {
       display: 'flex',
@@ -1027,11 +1028,15 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseEnter={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.border = '2px solid #A855F7';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(168, 85, 247, 0.5)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.border = day.isToday ? '2px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }
                 }}
               >
@@ -1066,11 +1071,15 @@ const EnhancedBookingCalendar: React.FC = () => {
                 onMouseEnter={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.border = '2px solid #A855F7';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(168, 85, 247, 0.5)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (day.isAvailable && day.isCurrentMonth) {
                     e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.border = day.isToday ? '2px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }
                 }}
               >
