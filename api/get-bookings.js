@@ -35,15 +35,15 @@ export default async function handler(req, res) {
 
     // Filter by specific date
     if (date) {
-      query = query.eq('booking_date', date);
+      query = query.eq('date', date);
     }
 
     // Filter by date range
     if (from_date) {
-      query = query.gte('booking_date', from_date);
+      query = query.gte('date', from_date);
     }
     if (to_date) {
-      query = query.lte('booking_date', to_date);
+      query = query.lte('date', to_date);
     }
 
     // Filter by status
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     }
 
     // Order by date and time
-    query = query.order('booking_date', { ascending: true }).order('booking_time', { ascending: true });
+    query = query.order('date', { ascending: true }).order('time_slot', { ascending: true });
 
     const { data: bookings, error } = await query;
 
