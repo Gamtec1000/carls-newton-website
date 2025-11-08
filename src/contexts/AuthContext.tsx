@@ -100,25 +100,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           subscribe_newsletter: data.subscribe_newsletter,
         });
 
-      // If profile already exists (unique constraint violation), update it
-      if (profileError && profileError.code === '23505') {
-        console.log('Profile already exists, updating instead...');
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            email: data.email,
-            full_name: data.full_name,
-            school_organization: data.school_organization,
-            phone: data.phone,
-            job_position: data.job_position,
-            subscribe_newsletter: data.subscribe_newsletter,
-          })
-          .eq('id', authData.user.id);
+      // If profile already exists (check multiple error codes for unique constraint)
+      if (profileError) {
+        console.log('Profile insert error detected:', profileError);
+        console.log('Error code:', profileError.code);
+        console.log('Error details:', profileError.details);
+        console.log('Error message:', profileError.message);
 
-        if (updateError) throw updateError;
-      } else if (profileError) {
-        console.error('Profile creation error:', profileError);
-        throw profileError;
+        // Check for unique constraint violation (code 23505 or message contains "duplicate" or "already exists")
+        const isDuplicateError =
+          profileError.code === '23505' ||
+          profileError.code === 'PGRST116' ||
+          (profileError.message && (
+            profileError.message.includes('duplicate') ||
+            profileError.message.includes('already exists') ||
+            profileError.message.includes('unique constraint')
+          ));
+
+        if (isDuplicateError) {
+          console.log('Profile already exists, updating instead...');
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              email: data.email,
+              full_name: data.full_name,
+              school_organization: data.school_organization,
+              phone: data.phone,
+              job_position: data.job_position,
+              subscribe_newsletter: data.subscribe_newsletter,
+            })
+            .eq('id', authData.user.id);
+
+          if (updateError) {
+            console.error('Profile update error:', updateError);
+            throw updateError;
+          }
+        } else {
+          console.error('Profile creation error (not duplicate):', profileError);
+          throw profileError;
+        }
       }
 
       // 3. Save preferences - delete existing ones first to avoid conflicts
