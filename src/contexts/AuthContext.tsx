@@ -87,31 +87,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (authError) throw authError;
       if (!authData.user) throw new Error('User creation failed');
 
-      // 2. Create profile - first check if it exists
-      const { data: existingProfile } = await supabase
+      // 2. Create profile - try insert first, update if conflict
+      const { error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', authData.user.id)
-        .single();
+        .insert({
+          id: authData.user.id,
+          email: data.email,
+          full_name: data.full_name,
+          school_organization: data.school_organization,
+          phone: data.phone,
+          job_position: data.job_position,
+          subscribe_newsletter: data.subscribe_newsletter,
+        });
 
-      if (!existingProfile) {
-        // Profile doesn't exist, insert it
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: data.email,
-            full_name: data.full_name,
-            school_organization: data.school_organization,
-            phone: data.phone,
-            job_position: data.job_position,
-            subscribe_newsletter: data.subscribe_newsletter,
-          });
-
-        if (profileError) throw profileError;
-      } else {
-        // Profile exists, update it
-        const { error: profileError } = await supabase
+      // If profile already exists (unique constraint violation), update it
+      if (profileError && profileError.code === '23505') {
+        console.log('Profile already exists, updating instead...');
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({
             email: data.email,
@@ -123,7 +115,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })
           .eq('id', authData.user.id);
 
-        if (profileError) throw profileError;
+        if (updateError) throw updateError;
+      } else if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw profileError;
       }
 
       // 3. Save preferences - delete existing ones first to avoid conflicts
