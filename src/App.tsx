@@ -1371,7 +1371,7 @@ export default function CarlsNewtonLanding() {
                 )}
                 <div style={{ marginBottom: '24px' }}>
                   <span style={{ fontSize: '36px', fontWeight: 'bold' }}>
-                    {pkg.premium ? 'From AED ' : 'AED '}{pkg.price}
+                    {pkg.premium ? 'From د.إ ' : 'د.إ '}{pkg.price}
                   </span>
                   {pkg.price !== 'Custom' && !pkg.premium && (
                     <span style={{ color: '#C4B5FD' }}> +</span>

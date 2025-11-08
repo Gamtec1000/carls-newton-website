@@ -112,7 +112,7 @@ export default async function handler(req, res) {
                 <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
                 <p style="margin: 8px 0;"><strong>Time:</strong> ${booking.time_slot}</p>
                 <p style="margin: 8px 0;"><strong>Location:</strong> ${booking.full_address || booking.address}</p>
-                <p style="margin: 8px 0;"><strong>Price:</strong> AED ${booking.price?.toLocaleString()}</p>
+                <p style="margin: 8px 0;"><strong>Price:</strong> د.إ ${booking.price?.toLocaleString()}</p>
               </div>
 
               <!-- WHATSAPP BUTTON -->

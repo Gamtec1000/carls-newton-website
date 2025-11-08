@@ -470,21 +470,21 @@ const BookingCalendar: React.FC = () => {
                     onClick={() => setSelectedPackage('preschool')}
                   >
                     <div style={styles.packageName}>Preschool</div>
-                    <div style={styles.packagePrice}>AED 1,200</div>
+                    <div style={styles.packagePrice}>د.إ 1,200</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'classic')}
                     onClick={() => setSelectedPackage('classic')}
                   >
                     <div style={styles.packageName}>Classic Show</div>
-                    <div style={styles.packagePrice}>AED 1,800</div>
+                    <div style={styles.packagePrice}>د.إ 1,800</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'halfday')}
                     onClick={() => setSelectedPackage('halfday')}
                   >
                     <div style={styles.packageName}>Half-Day</div>
-                    <div style={styles.packagePrice}>AED 2,500</div>
+                    <div style={styles.packagePrice}>د.إ 2,500</div>
                   </div>
                 </div>
               </div>
