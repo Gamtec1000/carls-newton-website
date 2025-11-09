@@ -882,7 +882,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           cursor: 'pointer',
                         }}
                       />
-                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{methodology}</span>
+                      <span style={{ color: '#C4B5FD', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif" }}>{methodology}</span>
                     </label>
                   ))}
                 </div>
@@ -916,7 +916,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   marginTop: '2px',
                 }}
               />
-              <span style={{ color: '#C4B5FD', fontSize: '14px', lineHeight: '1.5' }}>
+              <span style={{ color: '#C4B5FD', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif", lineHeight: '1.5' }}>
                 I agree to the{' '}
                 <a href="/terms-and-conditions" target="_blank" style={{ color: '#06B6D4', textDecoration: 'underline' }}>
                   Terms & Conditions
@@ -955,7 +955,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   marginTop: '2px',
                 }}
               />
-              <span style={{ color: '#C4B5FD', fontSize: '14px', lineHeight: '1.5' }}>
+              <span style={{ color: '#C4B5FD', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif", lineHeight: '1.5' }}>
                 📬 Subscribe to our bi-weekly newsletter for exclusive science experiments, STEM resources, and special offers!
               </span>
             </label>
@@ -975,6 +975,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 color: 'white',
                 fontSize: '18px',
                 fontWeight: 'bold',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 letterSpacing: '1.5px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 marginTop: '24px',
@@ -1001,6 +1002,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               style={{
                 textAlign: 'center',
                 fontSize: '14px',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 color: '#C4B5FD',
               }}
             >
