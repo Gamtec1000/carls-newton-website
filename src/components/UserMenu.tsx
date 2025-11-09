@@ -43,7 +43,7 @@ export default function UserMenu() {
           color: '#06B6D4',
           fontSize: '14px',
           fontWeight: 'bold',
-          fontFamily: 'monospace',
+          fontFamily: "'Aloe Vera Sans', sans-serif",
           cursor: 'pointer',
           transition: 'all 300ms ease',
           boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)',
@@ -88,14 +88,14 @@ export default function UserMenu() {
               background: 'rgba(6, 182, 212, 0.05)',
             }}
           >
-            <div style={{ color: '#06B6D4', fontSize: '14px', fontWeight: 'bold', fontFamily: 'monospace', marginBottom: '4px' }}>
+            <div style={{ color: '#06B6D4', fontSize: '14px', fontWeight: 'bold', fontFamily: "'Aloe Vera Sans', sans-serif", marginBottom: '4px' }}>
               {profile?.full_name}
             </div>
-            <div style={{ color: '#C4B5FD', fontSize: '11px', fontFamily: 'monospace' }}>
+            <div style={{ color: '#C4B5FD', fontSize: '11px', fontFamily: "'Aloe Vera Sans', sans-serif" }}>
               {profile?.email}
             </div>
             {profile?.school_organization && (
-              <div style={{ color: '#A855F7', fontSize: '11px', fontFamily: 'monospace', marginTop: '4px' }}>
+              <div style={{ color: '#A855F7', fontSize: '11px', fontFamily: "'Aloe Vera Sans', sans-serif", marginTop: '4px' }}>
                 🏫 {profile.school_organization}
               </div>
             )}
@@ -116,7 +116,7 @@ export default function UserMenu() {
                 border: 'none',
                 color: '#C4B5FD',
                 fontSize: '13px',
-                fontFamily: 'monospace',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -149,7 +149,7 @@ export default function UserMenu() {
                 border: 'none',
                 color: '#C4B5FD',
                 fontSize: '13px',
-                fontFamily: 'monospace',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -180,7 +180,7 @@ export default function UserMenu() {
                 border: 'none',
                 color: '#EF4444',
                 fontSize: '13px',
-                fontFamily: 'monospace',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',

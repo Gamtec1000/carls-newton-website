@@ -65,27 +65,6 @@ export default function GooeyNav({
 
   return (
     <>
-      <style>{`
-        @keyframes gooeyFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
-        @keyframes particleFloat {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(var(--tx), var(--ty)); }
-        }
-        @keyframes glow {
-          0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
-          50% { filter: drop-shadow(0 0 15px currentColor); }
-        }
-        .gooey-nav-item {
-          transition: all ${animationTime}ms ease;
-        }
-        .gooey-nav-item:hover {
-          animation: gooeyFloat 2s ease-in-out infinite;
-        }
-      `}</style>
-
       <nav
         style={{
           position: 'fixed',
@@ -152,7 +131,6 @@ export default function GooeyNav({
                   <a
                     key={index}
                     href={item.href}
-                    className="gooey-nav-item"
                     onClick={(e) => {
                       e.preventDefault();
                       handleClick(index, item);
@@ -181,53 +159,6 @@ export default function GooeyNav({
                       boxShadow: isHovered ? '0 0 20px rgba(6, 182, 212, 0.5)' : 'none',
                     }}
                   >
-                    {/* Particle effects */}
-                    {(isActive || isHovered) && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: '-20px',
-                          pointerEvents: 'none',
-                        }}
-                      >
-                        {[...Array(Math.min(particleCount / 4, 5))].map((_, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              position: 'absolute',
-                              width: '4px',
-                              height: '4px',
-                              borderRadius: '50%',
-                              background: '#A855F7',
-                              boxShadow: '0 0 8px #A855F7',
-                              top: '50%',
-                              left: '50%',
-                              animation: 'particleFloat 2s ease-in-out infinite',
-                              animationDelay: `${i * 0.2}s`,
-                              // @ts-ignore
-                              '--tx': `${Math.cos((i / 5) * Math.PI * 2) * 20}px`,
-                              '--ty': `${Math.sin((i / 5) * Math.PI * 2) * 20}px`,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Status LED */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '4px',
-                        right: '4px',
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: isActive ? color : 'transparent',
-                        boxShadow: isActive ? `0 0 8px ${color}` : 'none',
-                        animation: isActive ? 'glow 2s ease-in-out infinite' : 'none',
-                      }}
-                    />
-
                     {item.label}
                   </a>
                 );
