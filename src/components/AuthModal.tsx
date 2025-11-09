@@ -168,7 +168,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     borderRadius: '12px',
     color: 'white',
     fontSize: '16px',
-    fontFamily: "'Courier New', monospace",
+    fontFamily: "'Aloe Vera Sans', sans-serif",
     letterSpacing: '0.5px',
     outline: 'none',
     transition: 'all 0.3s',
@@ -254,6 +254,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             style={{
               fontSize: '32px',
               fontWeight: 'bold',
+              fontFamily: "'Aloe Vera Sans', sans-serif",
               background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -279,6 +280,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 color: 'white',
                 fontWeight: 'bold',
                 fontSize: '16px',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 cursor: 'pointer',
                 transition: 'all 0.3s',
                 letterSpacing: '1px',
@@ -299,6 +301,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 color: 'white',
                 fontWeight: 'bold',
                 fontSize: '16px',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 cursor: 'pointer',
                 transition: 'all 0.3s',
                 letterSpacing: '1px',
@@ -319,6 +322,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               border: '2px solid #EF4444',
               borderRadius: '8px',
               color: '#EF4444',
+              fontFamily: "'Aloe Vera Sans', sans-serif",
               marginBottom: '20px',
               boxShadow: '0 0 15px rgba(239, 68, 68, 0.3)',
             }}
@@ -334,6 +338,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               border: '2px solid #10B981',
               borderRadius: '8px',
               color: '#10B981',
+              fontFamily: "'Aloe Vera Sans', sans-serif",
               marginBottom: '20px',
               boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)',
             }}
@@ -397,6 +402,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   gap: '8px',
                   color: '#C4B5FD',
                   fontSize: '14px',
+                  fontFamily: "'Aloe Vera Sans', sans-serif",
                   cursor: 'pointer',
                 }}
               >
@@ -418,6 +424,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 style={{
                   color: '#06B6D4',
                   fontSize: '14px',
+                  fontFamily: "'Aloe Vera Sans', sans-serif",
                   textDecoration: 'underline',
                 }}
               >
@@ -440,6 +447,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 color: 'white',
                 fontSize: '18px',
                 fontWeight: 'bold',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 letterSpacing: '1.5px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 marginBottom: '16px',
@@ -465,6 +473,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               style={{
                 textAlign: 'center',
                 fontSize: '14px',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 color: '#C4B5FD',
               }}
             >
@@ -489,6 +498,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               style={{
                 fontSize: '20px',
                 fontWeight: 'bold',
+                fontFamily: "'Aloe Vera Sans', sans-serif",
                 color: '#A78BFA',
                 letterSpacing: '1px',
                 marginBottom: '16px',
@@ -611,6 +621,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   <div
                     style={{
                       fontSize: '12px',
+                      fontFamily: "'Aloe Vera Sans', sans-serif",
                       color: passwordStrength.color,
                       marginTop: '4px',
                     }}
@@ -667,6 +678,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <div
                   style={{
                     fontSize: '12px',
+                    fontFamily: "'Aloe Vera Sans', sans-serif",
                     color: '#EF4444',
                     marginTop: '6px',
                   }}
@@ -690,6 +702,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 style={{
                   fontSize: '18px',
                   fontWeight: 'bold',
+                  fontFamily: "'Aloe Vera Sans', sans-serif",
                   background: 'linear-gradient(135deg, #06B6D4, #A855F7, #EC4899)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -710,6 +723,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   style={{
                     fontSize: '16px',
                     fontWeight: 'bold',
+                    fontFamily: "'Aloe Vera Sans', sans-serif",
                     color: '#06B6D4',
                     marginBottom: '12px',
                     display: 'flex',
@@ -754,7 +768,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           cursor: 'pointer',
                         }}
                       />
-                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{topic}</span>
+                      <span style={{ color: '#C4B5FD', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif" }}>{topic}</span>
                     </label>
                   ))}
                 </div>
@@ -766,6 +780,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   style={{
                     fontSize: '16px',
                     fontWeight: 'bold',
+                    fontFamily: "'Aloe Vera Sans', sans-serif",
                     color: '#A855F7',
                     marginBottom: '12px',
                     display: 'flex',
@@ -810,7 +825,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           cursor: 'pointer',
                         }}
                       />
-                      <span style={{ color: '#C4B5FD', fontSize: '14px' }}>{resource}</span>
+                      <span style={{ color: '#C4B5FD', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif" }}>{resource}</span>
                     </label>
                   ))}
                 </div>
@@ -822,6 +837,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   style={{
                     fontSize: '16px',
                     fontWeight: 'bold',
+                    fontFamily: "'Aloe Vera Sans', sans-serif",
                     color: '#EC4899',
                     marginBottom: '12px',
                     display: 'flex',
