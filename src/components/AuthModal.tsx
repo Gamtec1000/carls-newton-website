@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import '../styles/phone-input.css';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -210,10 +213,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           maxHeight: '90vh',
           overflowY: 'auto',
           padding: '40px',
-          background: 'linear-gradient(180deg, rgba(30, 27, 75, 0.95) 0%, rgba(30, 58, 138, 0.95) 100%)',
+          background: 'linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 50%, #312e81 100%)',
           borderRadius: '24px',
-          border: '2px solid rgba(6, 182, 212, 0.3)',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+          border: '2px solid #A855F7',
+          boxShadow: '0 0 40px rgba(168, 85, 247, 0.4)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -250,21 +253,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         {/* Modal Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2
-            style={{
-              fontSize: '32px',
-              fontWeight: 'bold',
-              fontFamily: "'Aloe Vera Sans', sans-serif",
-              background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              letterSpacing: '2px',
-              marginBottom: '24px',
-            }}
-          >
-            WELCOME TO CARLS NEWTON
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <img
+              src="/carls-newton-logo.png"
+              alt="Carls Newton Logo"
+              style={{
+                height: '120px',
+                width: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+          </div>
 
           {/* Tab Buttons */}
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
@@ -535,13 +534,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {/* Phone */}
             <div style={{ marginBottom: '16px' }}>
-              <input
-                type="tel"
+              <PhoneInput
+                international
+                defaultCountry="AE"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(value) => setPhone(value || '')}
                 placeholder="Phone Number"
-                style={inputStyle}
-                {...inputFocusHandlers}
+                className="phone-input-auth"
               />
             </div>
 
