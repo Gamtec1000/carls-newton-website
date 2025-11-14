@@ -259,7 +259,7 @@ export default async function handler(req, res) {
       console.log('Booking Number:', displayBookingId);
 
       const adminEmailResult = await resend.emails.send({
-        from: 'Carls Newton <noreply@carlsnewton.com>',
+        from: 'Carls Newton <bookings@carlsnewton.com>',
         to: 'hello@carlsnewton.com',
         subject: `New Booking Received - ${bookingData.customer_name} - ${formattedDate}`,
         html: `
