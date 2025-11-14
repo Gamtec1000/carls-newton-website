@@ -144,94 +144,31 @@ export default async function handler(req, res) {
     console.log('Display booking ID:', displayBookingId);
 
     // Send email notifications via Resend
+    const packageNames = {
+      preschool: 'Preschool Special (30-45 mins)',
+      classic: 'Classic Show (45-60 mins)',
+      halfday: 'Half-Day Experience (4 hours)',
+    };
+
+    const formattedDate = new Date(bookingData.date).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    // Check Resend API key
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY is not set!');
+      console.error('Warning: Emails will not be sent. Booking created without notification.');
+    }
+
+    // Send customer confirmation email first
     try {
-      const packageNames = {
-        preschool: 'Preschool Special (30-45 mins)',
-        classic: 'Classic Show (45-60 mins)',
-        halfday: 'Half-Day Experience (4 hours)',
-      };
-
-      const formattedDate = new Date(bookingData.date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-
-      console.log('=== SENDING ADMIN EMAIL ===');
-      console.log('To: carls.newton10@gmail.com');
+      console.log('=== SENDING CUSTOMER EMAIL ===');
+      console.log('To:', bookingData.email);
       console.log('Booking Number:', displayBookingId);
-      console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
 
-      if (!process.env.RESEND_API_KEY) {
-        console.error('❌ RESEND_API_KEY is not set!');
-        throw new Error('RESEND_API_KEY environment variable is not configured');
-      }
-
-      // Send admin notification email
-      const adminEmailResult = await resend.emails.send({
-        from: 'Carls Newton Bookings <bookings@resend.dev>',
-        to: 'carls.newton10@gmail.com',
-        subject: `🎯 New Booking ${displayBookingId}: ${bookingData.organization_name}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #6366f1;">🎉 New Science Show Booked!</h2>
-
-            <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-              <h3 style="margin: 0; color: #166534; font-size: 24px;">
-                Booking ${displayBookingId}
-              </h3>
-            </div>
-
-            <div style="background: #f9fafb; padding: 20px; border-radius: 10px; border-left: 4px solid #6366f1;">
-              <h3 style="margin-top: 0; color: #1f2937;">👤 Contact Information</h3>
-              <p style="margin: 8px 0;"><strong>Name:</strong> ${bookingData.title} ${bookingData.customer_name}</p>
-              ${bookingData.job_position ? `<p style="margin: 8px 0;"><strong>Position:</strong> ${bookingData.job_position}</p>` : ''}
-              <p style="margin: 8px 0;"><strong>Email:</strong> <a href="mailto:${bookingData.email}">${bookingData.email}</a></p>
-              <p style="margin: 8px 0;"><strong>Phone:</strong> <a href="tel:${bookingData.phone}">${bookingData.phone}</a></p>
-              <p style="margin: 8px 0;"><strong>Organization:</strong> ${bookingData.organization_name}</p>
-
-              <!-- Quick WhatsApp contact button for admin -->
-              <div style="margin-top: 15px;">
-                <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${bookingData.title}%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20(${displayBookingId}).%20Let%27s%20confirm!"
-                   style="display: inline-block; background: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-size: 14px; font-weight: bold;">
-                  💬 WhatsApp Customer
-                </a>
-              </div>
-            </div>
-
-            <div style="background: #eff6ff; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #3b82f6;">
-              <h3 style="margin-top: 0; color: #1f2937;">📅 Event Details</h3>
-              <p style="margin: 8px 0;"><strong>Package:</strong> ${packageNames[bookingData.package_type]}</p>
-              <p style="margin: 8px 0;"><strong>Price:</strong> د.إ ${price.toLocaleString()}</p>
-              <p style="margin: 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
-              <p style="margin: 8px 0;"><strong>Time:</strong> ${bookingData.time_slot}</p>
-              <p style="margin: 8px 0;"><strong>Location:</strong> ${address}</p>
-              ${bookingData.address_details ? `<p style="margin: 8px 0;"><strong>Details:</strong> ${bookingData.address_details}</p>` : ''}
-            </div>
-
-            ${(bookingData.special_requests || bookingData.message) ? `
-              <div style="background: #fef3c7; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #f59e0b;">
-                <h3 style="margin-top: 0; color: #1f2937;">⭐ Special Requests</h3>
-                <p style="white-space: pre-wrap; margin: 0;">${bookingData.special_requests || bookingData.message}</p>
-              </div>
-            ` : ''}
-
-            <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-top: 20px;">
-              <p style="margin: 0; color: #166534;">
-                <strong>Status:</strong> Pending Confirmation<br>
-                <strong>Next Step:</strong> Contact within 24 hours
-              </p>
-            </div>
-          </div>
-        `,
-      });
-
-      console.log('✅ Admin email sent successfully!');
-      console.log('Email ID:', adminEmailResult.id);
-      console.log('Admin email response:', JSON.stringify(adminEmailResult, null, 2));
-
-      // Send customer confirmation email
       await resend.emails.send({
         from: 'Carls Newton Bookings <bookings@resend.dev>',
         to: bookingData.email,
@@ -307,13 +244,197 @@ export default async function handler(req, res) {
         `,
       });
 
-      console.log('Customer email sent successfully');
-    } catch (emailError) {
-      console.error('❌ EMAIL SENDING FAILED:');
-      console.error('Error:', emailError);
-      console.error('Error message:', emailError.message);
-      console.error('Error stack:', emailError.stack);
-      // Don't fail the booking if email fails, but log it prominently
+      console.log('✅ Customer email sent successfully');
+    } catch (customerEmailError) {
+      console.error('❌ CUSTOMER EMAIL FAILED:');
+      console.error('Error:', customerEmailError);
+      console.error('Message:', customerEmailError.message);
+      // Log but don't fail the booking
+    }
+
+    // Send admin notification email after customer email
+    try {
+      console.log('=== SENDING ADMIN NOTIFICATION EMAIL ===');
+      console.log('To: hello@carlsnewton.com');
+      console.log('Booking Number:', displayBookingId);
+
+      const adminEmailResult = await resend.emails.send({
+        from: 'Carls Newton <noreply@carlsnewton.com>',
+        to: 'hello@carlsnewton.com',
+        subject: `New Booking Received - ${bookingData.customer_name} - ${formattedDate}`,
+        html: `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Booking Notification</title>
+          </head>
+          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0a0a0a; color: #ffffff;">
+            <div style="max-width: 650px; margin: 0 auto; padding: 20px;">
+
+              <!-- Header -->
+              <div style="background: linear-gradient(135deg, #d946ef 0%, #06b6d4 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                  🎯 New Booking Received
+                </h1>
+                <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">
+                  Booking ID: <strong>${displayBookingId}</strong>
+                </p>
+              </div>
+
+              <!-- Main Content -->
+              <div style="background: #1a1a2e; padding: 30px; border-radius: 0 0 12px 12px;">
+
+                <!-- Customer Details Section -->
+                <div style="background: linear-gradient(135deg, #3b0764 0%, #581c87 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #d946ef;">
+                  <h2 style="margin: 0 0 15px 0; color: #d946ef; font-size: 20px; font-weight: 600;">
+                    👤 Customer Details
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px; width: 35%;">Full Name:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${bookingData.title} ${bookingData.customer_name}</td>
+                    </tr>
+                    ${bookingData.job_position ? `
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Position:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${bookingData.job_position}</td>
+                    </tr>
+                    ` : ''}
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">School/Organization:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${bookingData.organization_name}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Email:</td>
+                      <td style="padding: 8px 0;"><a href="mailto:${bookingData.email}" style="color: #06b6d4; text-decoration: none; font-size: 14px;">${bookingData.email}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Phone:</td>
+                      <td style="padding: 8px 0;"><a href="tel:${bookingData.phone}" style="color: #06b6d4; text-decoration: none; font-size: 14px;">${bookingData.phone}</a></td>
+                    </tr>
+                  </table>
+
+                  <!-- WhatsApp Quick Action -->
+                  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <a href="https://wa.me/${bookingData.phone.replace(/[^0-9]/g, '')}?text=Hi%20${bookingData.title}%20${encodeURIComponent(bookingData.customer_name)}!%20This%20is%20Carls%20Newton.%20Thank%20you%20for%20booking%20${displayBookingId}.%20Let%27s%20confirm%20your%20details!"
+                       style="display: inline-block; background: #25D366; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 6px rgba(37,211,102,0.3);">
+                      💬 Contact via WhatsApp
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Booking Details Section -->
+                <div style="background: linear-gradient(135deg, #083344 0%, #164e63 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #06b6d4;">
+                  <h2 style="margin: 0 0 15px 0; color: #06b6d4; font-size: 20px; font-weight: 600;">
+                    📅 Booking Details
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px; width: 35%;">Date & Time:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${formattedDate} at ${bookingData.time_slot}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Package:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${packageNames[bookingData.package_type]}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Price:</td>
+                      <td style="padding: 8px 0; color: #10b981; font-size: 16px; font-weight: 700;">AED ${price.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Location:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px; font-weight: 500;">${address}</td>
+                    </tr>
+                    ${bookingData.address_details ? `
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Address Details:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px;">${bookingData.address_details}</td>
+                    </tr>
+                    ` : ''}
+                    ${bookingData.city ? `
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">City:</td>
+                      <td style="padding: 8px 0; color: #ffffff; font-size: 14px;">${bookingData.city}</td>
+                    </tr>
+                    ` : ''}
+                  </table>
+                </div>
+
+                <!-- Payment Status Section -->
+                <div style="background: linear-gradient(135deg, #422006 0%, #78350f 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+                  <h2 style="margin: 0 0 15px 0; color: #fbbf24; font-size: 20px; font-weight: 600;">
+                    💳 Payment Status
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px; width: 35%;">Payment Status:</td>
+                      <td style="padding: 8px 0;">
+                        <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase;">
+                          Pending
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Booking Status:</td>
+                      <td style="padding: 8px 0;">
+                        <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase;">
+                          Pending Confirmation
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #a8a8a8; font-size: 14px;">Amount to Collect:</td>
+                      <td style="padding: 8px 0; color: #fbbf24; font-size: 16px; font-weight: 700;">AED ${price.toLocaleString()}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                ${(bookingData.special_requests || bookingData.message) ? `
+                <!-- Special Requests Section -->
+                <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8b5cf6;">
+                  <h2 style="margin: 0 0 10px 0; color: #a78bfa; font-size: 20px; font-weight: 600;">
+                    ⭐ Special Requests / Notes
+                  </h2>
+                  <p style="margin: 0; color: #e0e0e0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px;">
+                    ${bookingData.special_requests || bookingData.message}
+                  </p>
+                </div>
+                ` : ''}
+
+                <!-- Action Required -->
+                <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); padding: 20px; border-radius: 10px; text-align: center; border: 2px solid #22c55e;">
+                  <h3 style="margin: 0 0 10px 0; color: #22c55e; font-size: 18px; font-weight: 600;">
+                    ✅ Next Steps
+                  </h3>
+                  <p style="margin: 0; color: #dcfce7; font-size: 14px; line-height: 1.6;">
+                    Contact the customer within 24 hours to confirm details and arrange payment.
+                  </p>
+                </div>
+
+              </div>
+
+              <!-- Footer -->
+              <div style="text-align: center; padding: 20px; color: #6b7280; font-size: 12px;">
+                <p style="margin: 5px 0;">Carls Newton - Science Education Services</p>
+                <p style="margin: 5px 0;">This is an automated notification from your booking system</p>
+                <p style="margin: 5px 0;">Booking created on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' })} GST</p>
+              </div>
+
+            </div>
+          </body>
+          </html>
+        `,
+      });
+
+      console.log('✅ Admin notification email sent successfully!');
+      console.log('Email ID:', adminEmailResult.id);
+    } catch (adminEmailError) {
+      console.error('❌ ADMIN NOTIFICATION EMAIL FAILED:');
+      console.error('Error:', adminEmailError);
+      console.error('Message:', adminEmailError.message);
+      // Log but don't fail the booking - admin notification failure shouldn't break the booking flow
     }
 
     console.log('Booking process completed successfully');
