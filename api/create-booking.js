@@ -170,7 +170,7 @@ export default async function handler(req, res) {
       console.log('Booking Number:', displayBookingId);
 
       await resend.emails.send({
-        from: 'Carls Newton Bookings <bookings@resend.dev>',
+        from: 'Carls Newton Bookings <bookings@carlsnewton.com>',
         to: bookingData.email,
         subject: '🎉 Get Ready for an Amazing Science Adventure!',
         html: `
