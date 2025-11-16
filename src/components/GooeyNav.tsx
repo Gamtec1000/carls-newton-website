@@ -19,6 +19,7 @@ interface GooeyNavProps {
   timeVariance?: number;
   colors?: number[];
   onAuthClick?: () => void;
+  onProfileSettingsClick?: () => void;
 }
 
 export default function GooeyNav({
@@ -31,6 +32,7 @@ export default function GooeyNav({
   timeVariance = 300,
   colors = [1, 2, 3, 1, 2, 3, 1, 4],
   onAuthClick,
+  onProfileSettingsClick,
 }: GooeyNavProps) {
   const { user } = useAuth();
   const [activeIndex, setActiveIndex] = useState(initialActiveIndex);
@@ -167,7 +169,7 @@ export default function GooeyNav({
 
             {/* Auth Button or User Menu */}
             {user ? (
-              <UserMenu />
+              <UserMenu onProfileSettingsClick={onProfileSettingsClick} />
             ) : (
               <button
                 onClick={onAuthClick}

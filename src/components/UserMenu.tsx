@@ -1,11 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, BookOpen, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-export default function UserMenu() {
+interface UserMenuProps {
+  onProfileSettingsClick?: () => void;
+}
+
+export default function UserMenu({ onProfileSettingsClick }: UserMenuProps = {}) {
   const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Extract first name from full name
+  const getFirstName = () => {
+    if (!profile?.full_name) return 'there';
+    const firstName = profile.full_name.split(' ')[0];
+    return firstName || 'there';
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,7 +72,7 @@ export default function UserMenu() {
       >
         <User size={18} />
         <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {profile?.full_name || 'User'}
+          Hi {getFirstName()}
         </span>
         <ChevronDown size={16} style={{ transition: 'transform 0.3s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
       </button>
@@ -105,9 +118,8 @@ export default function UserMenu() {
           <div style={{ padding: '8px 0' }}>
             <button
               onClick={() => {
-                // Navigate to bookings
                 setIsOpen(false);
-                alert('My Bookings - Coming Soon!');
+                navigate('/my-bookings');
               }}
               style={{
                 width: '100%',
@@ -138,9 +150,10 @@ export default function UserMenu() {
 
             <button
               onClick={() => {
-                // Navigate to profile settings
                 setIsOpen(false);
-                alert('Profile Settings - Coming Soon!');
+                if (onProfileSettingsClick) {
+                  onProfileSettingsClick();
+                }
               }}
               style={{
                 width: '100%',
