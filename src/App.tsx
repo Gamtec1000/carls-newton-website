@@ -22,6 +22,7 @@ import TelemetryPanels from './components/TelemetryPanels';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import ProfileSettings from './components/ProfileSettings';
+import WelcomeModal from './components/WelcomeModal';
 import { useAuth } from './contexts/AuthContext';
 
 const styles = {
@@ -83,7 +84,7 @@ const styles = {
 };
 
 export default function CarlsNewtonLanding() {
-  const { confirmationMessage, clearConfirmationMessage } = useAuth();
+  const { confirmationMessage, clearConfirmationMessage, showWelcomeModal, closeWelcomeModal, profile } = useAuth();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
@@ -206,8 +207,16 @@ export default function CarlsNewtonLanding() {
           message={confirmationMessage.message}
           type={confirmationMessage.type}
           onClose={clearConfirmationMessage}
+          duration={6000}
         />
       )}
+
+      {/* Welcome Modal */}
+      <WelcomeModal
+        firstName={profile?.full_name?.split(' ')[0] || 'there'}
+        onClose={closeWelcomeModal}
+        show={showWelcomeModal}
+      />
 
       {/* Telemetry Detail Modal */}
       {selectedPanel && (
