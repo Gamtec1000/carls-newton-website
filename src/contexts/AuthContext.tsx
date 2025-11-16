@@ -22,7 +22,9 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   confirmationMessage: { type: 'success' | 'error'; message: string } | null;
+  showWelcomeModal: boolean;
   clearConfirmationMessage: () => void;
+  closeWelcomeModal: () => void;
   signUp: (data: SignUpData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -56,14 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Detect email confirmation
       if (event === 'SIGNED_IN' && session?.user) {
-        // Check if this is from email confirmation (user's email_confirmed_at just changed)
-        const isEmailConfirmation = session.user.email_confirmed_at &&
-                                      !user && // No previous user state
-                                      window.location.hash.includes('type=signup'); // URL contains confirmation params
+        // Check if this is from email confirmation
+        const isEmailConfirmation = (
+          session.user.email_confirmed_at &&
+          !user && // No previous user state
+          (window.location.hash.includes('type=signup') ||
+           window.location.hash.includes('access_token'))
+        );
 
         if (isEmailConfirmation) {
           console.log('Email confirmation detected!');
           console.log('User metadata:', session.user.user_metadata);
+
+          // Check if user has been welcomed before
+          const hasBeenWelcomed = localStorage.getItem(`welcomed_user_${session.user.id}`);
+          const isFirstTimeConfirmation = !hasBeenWelcomed;
 
           // Try to fetch or create profile from user_metadata
           try {
@@ -73,18 +83,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .eq('id', session.user.id)
               .single();
 
+            let currentProfile = existingProfile;
+            const metadata = session.user.user_metadata;
+            const firstName = (existingProfile?.full_name || metadata?.full_name || '').split(' ')[0] || 'there';
+
             if (existingProfile) {
               // Profile exists
               console.log('Profile already exists:', existingProfile);
               setProfile(existingProfile);
-              setConfirmationMessage({
-                type: 'success',
-                message: `Welcome, ${existingProfile.full_name?.split(' ')[0] || 'there'}! Your email is confirmed. You can now book amazing science shows!`
-              });
             } else {
               // Profile doesn't exist - create it from user_metadata
               console.log('Creating profile from user_metadata...');
-              const metadata = session.user.user_metadata;
 
               const { data: newProfile, error: createError } = await supabase
                 .from('profiles')
@@ -102,24 +111,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
               if (createError) {
                 console.error('Error creating profile:', createError);
-                setConfirmationMessage({
-                  type: 'success',
-                  message: 'Email Confirmed! Your account is now active.'
-                });
               } else {
                 console.log('Profile created successfully:', newProfile);
                 setProfile(newProfile);
-                setConfirmationMessage({
-                  type: 'success',
-                  message: `Welcome, ${metadata?.full_name?.split(' ')[0] || 'there'}! Your email is confirmed. You can now book amazing science shows!`
-                });
+                currentProfile = newProfile;
               }
+            }
+
+            // Show toast notification
+            setConfirmationMessage({
+              type: 'success',
+              message: `✅ Email Confirmed Successfully!\nWelcome to Carls Newton, ${firstName}! 🚀`
+            });
+
+            // Show welcome modal only for first-time confirmations
+            if (isFirstTimeConfirmation) {
+              console.log('First-time confirmation - showing welcome modal');
+              // Delay modal to show after toast
+              setTimeout(() => {
+                setShowWelcomeModal(true);
+                // Mark user as welcomed
+                localStorage.setItem(`welcomed_user_${session.user.id}`, 'true');
+              }, 1000);
+            } else {
+              console.log('User already welcomed - skipping modal');
             }
           } catch (error) {
             console.error('Error during profile creation:', error);
             setConfirmationMessage({
               type: 'success',
-              message: 'Email Confirmed! Your account is now active.'
+              message: '✅ Email Confirmed Successfully!\nYour account is now active.'
             });
           }
 
@@ -355,6 +376,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setConfirmationMessage(null);
   };
 
+  const closeWelcomeModal = () => {
+    setShowWelcomeModal(false);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -362,7 +387,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         loading,
         confirmationMessage,
+        showWelcomeModal,
         clearConfirmationMessage,
+        closeWelcomeModal,
         signUp,
         signIn,
         signOut,

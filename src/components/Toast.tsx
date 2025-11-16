@@ -23,6 +23,9 @@ export default function Toast({ message, type, onClose, duration = 5000 }: Toast
 
   const Icon = type === 'success' ? CheckCircle : XCircle;
 
+  // Split message by newlines for multi-line support
+  const messageLines = message.split('\n');
+
   return (
     <div
       style={{
@@ -38,14 +41,18 @@ export default function Toast({ message, type, onClose, duration = 5000 }: Toast
         padding: '16px 20px',
         boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px ${type === 'success' ? 'rgba(6, 182, 212, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         gap: '12px',
         animation: 'slideInRight 0.3s ease-out',
       }}
     >
-      <Icon size={24} color="white" />
+      <Icon size={24} color="white" style={{ marginTop: '2px', flexShrink: 0 }} />
       <div style={{ flex: 1, color: 'white', fontSize: '14px', fontFamily: "'Aloe Vera Sans', sans-serif", lineHeight: '1.5' }}>
-        {message}
+        {messageLines.map((line, index) => (
+          <div key={index} style={{ marginBottom: index < messageLines.length - 1 ? '4px' : '0' }}>
+            {line}
+          </div>
+        ))}
       </div>
       <button
         onClick={onClose}
