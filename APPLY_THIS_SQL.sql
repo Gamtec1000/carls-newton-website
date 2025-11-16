@@ -63,10 +63,7 @@ CREATE TRIGGER on_auth_user_created
   EXECUTE FUNCTION public.handle_new_user();
 
 -- Add comment for documentation
-COMMENT ON FUNCTION public.handle_new_user() IS
-  'Automatically creates a profile record when a new user signs up. ' ||
-  'Extracts user data from user_metadata (raw_user_meta_data) and ' ||
-  'inserts it into the profiles table.';
+COMMENT ON FUNCTION public.handle_new_user() IS 'Automatically creates a profile record when a new user signs up. Extracts user data from user_metadata (raw_user_meta_data) and inserts it into the profiles table.';
 
 -- Grant execute permission
 GRANT EXECUTE ON FUNCTION public.handle_new_user() TO authenticated;

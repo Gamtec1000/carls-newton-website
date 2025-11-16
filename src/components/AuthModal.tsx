@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: Au
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   // Sign In Form State
   const [signInEmail, setSignInEmail] = useState('');
@@ -422,17 +424,21 @@ export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: Au
                 />
                 Remember me
               </label>
-              <a
-                href="#"
+              <span
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsForgotPasswordOpen(true);
+                }}
                 style={{
                   color: '#06B6D4',
                   fontSize: '14px',
                   fontFamily: "'Aloe Vera Sans', sans-serif",
                   textDecoration: 'underline',
+                  cursor: 'pointer',
                 }}
               >
                 Forgot password?
-              </a>
+              </span>
             </div>
 
             {/* Sign In Button */}
@@ -1025,6 +1031,12 @@ export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: Au
           </form>
         )}
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+      />
     </div>
   );
 }
