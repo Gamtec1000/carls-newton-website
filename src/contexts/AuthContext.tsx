@@ -359,6 +359,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // If no session, user needs to confirm email before we can create profile
       if (!authData.session) {
         console.log('Email confirmation required - profile will be created after confirmation');
+
+        // Send confirmation email via Resend API
+        try {
+          // Use Supabase's resend method to trigger email confirmation
+          const { error: resendError } = await supabase.auth.resend({
+            type: 'signup',
+            email: data.email,
+            options: {
+              emailRedirectTo: `${window.location.origin}`,
+            },
+          });
+
+          if (resendError) {
+            console.error('Error triggering confirmation email:', resendError);
+            // Continue anyway - user can manually request resend later
+          } else {
+            console.log('Confirmation email triggered successfully');
+          }
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+          // Continue anyway - the important part is the user was created
+        }
+
         // User metadata is saved, profile will be created after email confirmation
         return; // Exit early - user needs to confirm email
       }

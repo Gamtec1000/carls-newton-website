@@ -56,13 +56,24 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### Email Configuration (Optional but Recommended)
+### Email Configuration (Required for Email Verification)
+
+⚠️ **IMPORTANT:** If users are not receiving confirmation emails, you need to configure SMTP.
 
 For sign-up email verification to work:
 
-1. Go to **Authentication** → **Email Templates** in Supabase
-2. Customize the confirmation email template
-3. Configure SMTP settings under **Settings** → **Auth** → **SMTP Settings**
+1. **Configure Resend SMTP** - See detailed guide: [RESEND_SMTP_SETUP.md](./RESEND_SMTP_SETUP.md)
+2. Go to **Authentication** → **Settings** → **SMTP Settings** in Supabase Dashboard
+3. Enable Custom SMTP and enter Resend credentials
+4. Customize email templates under **Authentication** → **Email Templates**
+
+**Quick Setup:**
+- SMTP Host: `smtp.resend.com`
+- SMTP Port: `465` or `587`
+- Username: `resend`
+- Password: Your Resend API Key
+
+See [RESEND_SMTP_SETUP.md](./RESEND_SMTP_SETUP.md) for complete step-by-step instructions.
 
 ### Test the Authentication
 
