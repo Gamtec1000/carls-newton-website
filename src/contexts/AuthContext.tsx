@@ -107,94 +107,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.log('User ID:', session.user.id);
           console.log('User Email:', session.user.email);
           console.log('User metadata:', session.user.user_metadata);
-          console.log('Metadata full_name:', session.user.user_metadata?.full_name);
-          console.log('Metadata phone:', session.user.user_metadata?.phone);
-          console.log('Metadata school_organization:', session.user.user_metadata?.school_organization);
-          console.log('Metadata job_position:', session.user.user_metadata?.job_position);
           console.log('===================================');
 
           // Check if user has been welcomed before
           const hasBeenWelcomed = localStorage.getItem(`welcomed_user_${session.user.id}`);
           const isFirstTimeConfirmation = !hasBeenWelcomed;
 
-          // Try to fetch or create profile from user_metadata
+          // Profile is automatically created by database trigger
+          // Just fetch it and handle preferences/welcome modal
           try {
-            console.log('=== FETCHING/CREATING PROFILE ===');
+            console.log('=== FETCHING PROFILE (created by trigger) ===');
             const { data: existingProfile, error: fetchError } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .single();
 
-            if (fetchError && fetchError.code !== 'PGRST116') {
-              // PGRST116 = no rows returned, which is expected for new users
+            if (fetchError) {
               console.error('Error fetching profile:', fetchError);
+              console.error('Profile should have been auto-created by database trigger');
+            } else {
+              console.log('✅ Profile loaded:', existingProfile);
+              setProfile(existingProfile);
             }
 
-            let currentProfile = existingProfile;
             const metadata = session.user.user_metadata;
             const firstName = (existingProfile?.full_name || metadata?.full_name || '').split(' ')[0] || 'there';
-
-            console.log('Existing profile:', existingProfile);
-            console.log('Will use metadata for creation:', metadata);
-
-            if (existingProfile) {
-              // Profile exists
-              console.log('✅ Profile already exists in database:', existingProfile);
-              setProfile(existingProfile);
-            } else {
-              // Profile doesn't exist - create it from user_metadata
-              console.log('❌ Profile not found, creating from user_metadata...');
-              console.log('Inserting profile with data:', {
-                id: session.user.id,
-                email: session.user.email,
-                full_name: metadata?.full_name || '',
-                school_organization: metadata?.school_organization || '',
-                phone: metadata?.phone || '',
-                job_position: metadata?.job_position || '',
-                subscribe_newsletter: metadata?.subscribe_newsletter || false,
-              });
-
-              const { data: newProfile, error: createError } = await supabase
-                .from('profiles')
-                .insert({
-                  id: session.user.id,
-                  email: session.user.email,
-                  full_name: metadata?.full_name || '',
-                  school_organization: metadata?.school_organization || '',
-                  phone: metadata?.phone || '',
-                  job_position: metadata?.job_position || '',
-                  subscribe_newsletter: metadata?.subscribe_newsletter || false,
-                })
-                .select()
-                .single();
-
-              if (createError) {
-                console.error('❌ ERROR creating profile:', createError);
-                console.error('Error code:', createError.code);
-                console.error('Error message:', createError.message);
-                console.error('Error details:', createError.details);
-                console.error('Error hint:', createError.hint);
-
-                // Alert user of the error
-                setConfirmationMessage({
-                  type: 'error',
-                  message: `⚠️ Profile Creation Failed\n\nYour email was confirmed but we couldn't create your profile.\nError: ${createError.message}\n\nPlease contact support: hello@carlsnewton.com`
-                });
-              } else {
-                console.log('✅ Profile created successfully:', newProfile);
-                console.log('Profile data:', {
-                  id: newProfile.id,
-                  email: newProfile.email,
-                  full_name: newProfile.full_name,
-                  school_organization: newProfile.school_organization,
-                  phone: newProfile.phone,
-                  job_position: newProfile.job_position,
-                });
-                setProfile(newProfile);
-                currentProfile = newProfile;
-              }
-            }
             console.log('=================================');
 
             // Save user preferences from metadata
@@ -382,66 +320,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Continue anyway - the important part is the user was created
         }
 
-        // User metadata is saved, profile will be created after email confirmation
+        // User metadata is saved
+        // Profile will be automatically created by database trigger
         return; // Exit early - user needs to confirm email
       }
 
-      // 2. User is confirmed (session exists), create profile
-      console.log('Creating profile for confirmed user...');
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          email: data.email,
-          full_name: data.full_name,
-          school_organization: data.school_organization,
-          phone: data.phone,
-          job_position: data.job_position,
-          subscribe_newsletter: data.subscribe_newsletter,
-        });
+      // 2. User is confirmed (session exists)
+      // Profile is automatically created by database trigger
+      // Just save preferences and fetch the profile
+      console.log('User confirmed, profile auto-created by database trigger');
 
-      // If profile already exists (check multiple error codes for unique constraint)
-      if (profileError) {
-        console.log('Profile insert error detected:', profileError);
-        console.log('Error code:', profileError.code);
-        console.log('Error details:', profileError.details);
-        console.log('Error message:', profileError.message);
-
-        // Check for unique constraint violation (code 23505 or message contains "duplicate" or "already exists")
-        const isDuplicateError =
-          profileError.code === '23505' ||
-          profileError.code === 'PGRST116' ||
-          (profileError.message && (
-            profileError.message.includes('duplicate') ||
-            profileError.message.includes('already exists') ||
-            profileError.message.includes('unique constraint')
-          ));
-
-        if (isDuplicateError) {
-          console.log('Profile already exists, updating instead...');
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              email: data.email,
-              full_name: data.full_name,
-              school_organization: data.school_organization,
-              phone: data.phone,
-              job_position: data.job_position,
-              subscribe_newsletter: data.subscribe_newsletter,
-            })
-            .eq('id', authData.user.id);
-
-          if (updateError) {
-            console.error('Profile update error:', updateError);
-            throw updateError;
-          }
-        } else {
-          console.error('Profile creation error (not duplicate):', profileError);
-          throw profileError;
-        }
-      }
-
-      // 3. Save preferences - only if user is confirmed (session exists)
+      // 3. Save preferences if user is confirmed (session exists)
       if (authData.session) {
         console.log('Saving user preferences...');
         // Delete existing ones first to avoid conflicts
