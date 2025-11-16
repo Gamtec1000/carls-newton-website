@@ -15,8 +15,19 @@ export default function UserMenu({ onProfileSettingsClick }: UserMenuProps = {})
 
   // Extract first name from full name
   const getFirstName = () => {
-    if (!profile?.full_name) return 'there';
+    console.log('=== UserMenu getFirstName ===');
+    console.log('Profile object:', profile);
+    console.log('Profile full_name:', profile?.full_name);
+
+    if (!profile?.full_name) {
+      console.log('❌ No full_name in profile, returning "there"');
+      return 'there';
+    }
+
     const firstName = profile.full_name.split(' ')[0];
+    console.log('✅ First name extracted:', firstName);
+    console.log('============================');
+
     return firstName || 'there';
   };
 
