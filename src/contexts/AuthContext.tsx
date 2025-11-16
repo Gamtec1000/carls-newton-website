@@ -63,8 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (isEmailConfirmation) {
           console.log('Email confirmation detected!');
+          console.log('User metadata:', session.user.user_metadata);
 
-          // Try to fetch or create profile
+          // Try to fetch or create profile from user_metadata
           try {
             const { data: existingProfile, error: fetchError } = await supabase
               .from('profiles')
@@ -74,20 +75,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (existingProfile) {
               // Profile exists
+              console.log('Profile already exists:', existingProfile);
               setProfile(existingProfile);
               setConfirmationMessage({
                 type: 'success',
                 message: `Welcome, ${existingProfile.full_name?.split(' ')[0] || 'there'}! Your email is confirmed. You can now book amazing science shows!`
               });
             } else {
-              // Profile doesn't exist yet - show generic welcome
-              setConfirmationMessage({
-                type: 'success',
-                message: 'Email Confirmed! Your account is now active. You can now sign in to book amazing science shows!'
-              });
+              // Profile doesn't exist - create it from user_metadata
+              console.log('Creating profile from user_metadata...');
+              const metadata = session.user.user_metadata;
+
+              const { data: newProfile, error: createError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: session.user.id,
+                  email: session.user.email,
+                  full_name: metadata?.full_name || '',
+                  school_organization: metadata?.school_organization || '',
+                  phone: metadata?.phone || '',
+                  job_position: metadata?.job_position || '',
+                  subscribe_newsletter: metadata?.subscribe_newsletter || false,
+                })
+                .select()
+                .single();
+
+              if (createError) {
+                console.error('Error creating profile:', createError);
+                setConfirmationMessage({
+                  type: 'success',
+                  message: 'Email Confirmed! Your account is now active.'
+                });
+              } else {
+                console.log('Profile created successfully:', newProfile);
+                setProfile(newProfile);
+                setConfirmationMessage({
+                  type: 'success',
+                  message: `Welcome, ${metadata?.full_name?.split(' ')[0] || 'there'}! Your email is confirmed. You can now book amazing science shows!`
+                });
+              }
             }
           } catch (error) {
-            console.error('Error checking profile after confirmation:', error);
+            console.error('Error during profile creation:', error);
             setConfirmationMessage({
               type: 'success',
               message: 'Email Confirmed! Your account is now active.'
@@ -130,10 +159,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (data: SignUpData) => {
     try {
-      // 1. Create auth user
+      // 1. Create auth user with metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        options: {
+          data: {
+            full_name: data.full_name,
+            school_organization: data.school_organization,
+            phone: data.phone,
+            job_position: data.job_position,
+            subscribe_newsletter: data.subscribe_newsletter,
+          },
+        },
       });
 
       if (authError) throw authError;
@@ -142,13 +180,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('Auth user created:', authData.user.id);
       console.log('Session exists:', !!authData.session);
       console.log('Email confirmation required:', !authData.session);
+      console.log('User metadata saved:', authData.user.user_metadata);
 
       // Check if email confirmation is required
       // If no session, user needs to confirm email before we can create profile
       if (!authData.session) {
         console.log('Email confirmation required - profile will be created after confirmation');
-        // Show success message but don't create profile yet
-        // Profile will be created by database trigger or on first login after confirmation
+        // User metadata is saved, profile will be created after email confirmation
         return; // Exit early - user needs to confirm email
       }
 
@@ -283,12 +321,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (!user) throw new Error('No user logged in');
 
+      // Update profiles table
       const { error } = await supabase
         .from('profiles')
         .update(data)
         .eq('id', user.id);
 
       if (error) throw error;
+
+      // Also update user_metadata to keep in sync
+      const metadataUpdate: any = {};
+      if (data.full_name !== undefined) metadataUpdate.full_name = data.full_name;
+      if (data.school_organization !== undefined) metadataUpdate.school_organization = data.school_organization;
+      if (data.phone !== undefined) metadataUpdate.phone = data.phone;
+      if (data.job_position !== undefined) metadataUpdate.job_position = data.job_position;
+
+      if (Object.keys(metadataUpdate).length > 0) {
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: metadataUpdate,
+        });
+        if (metadataError) console.error('Error updating user metadata:', metadataError);
+      }
 
       // Refresh profile
       await fetchProfile(user.id);
