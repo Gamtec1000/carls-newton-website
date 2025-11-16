@@ -31,9 +31,16 @@ This guide will help you set up Supabase for the Carls Newton website, including
 2. Replace the placeholder values with your actual credentials:
 
 ```env
+# Primary (for Vercel/production)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Legacy (for local Vite development)
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
+
+**Note**: The code supports both naming conventions. Use `NEXT_PUBLIC_*` for Vercel deployments and `VITE_*` for local Vite development.
 
 3. Save the file
 

@@ -36,13 +36,21 @@ The 404 error on `/rest/v1/profiles` and 400 error on sign-in indicate that your
 
 Make sure you have these environment variables set:
 
-For **local development** (`.env.local`):
+**Recommended** (works for both local and Vercel):
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+**Alternative** for local Vite development only:
 ```
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-For **Vercel deployment**:
+**Note**: The code supports both. Use `NEXT_PUBLIC_*` for consistency across environments.
+
+For **Vercel deployment** (if not using NEXT_PUBLIC_):
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
