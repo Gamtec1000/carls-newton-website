@@ -33,8 +33,8 @@ cp .env.example .env
 2. Create a new project (or use existing)
 3. Go to Project Settings → API
 4. Copy your:
-   - Project URL → `VITE_SUPABASE_URL`
-   - Anon/Public Key → `VITE_SUPABASE_ANON_KEY`
+   - Project URL → `NEXT_PUBLIC_SUPABASE_URL` (or `VITE_SUPABASE_URL` for local dev)
+   - Anon/Public Key → `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or `VITE_SUPABASE_ANON_KEY` for local dev)
 5. Update your `.env` file with these values
 
 ### Step 3: Configure Resend
@@ -159,8 +159,8 @@ netlify deploy --prod
 
 Add these in Netlify Dashboard → Site settings → Environment variables:
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL` (or `VITE_SUPABASE_URL` for compatibility)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or `VITE_SUPABASE_ANON_KEY` for compatibility)
 - `RESEND_API_KEY`
 
 ## Admin Access
