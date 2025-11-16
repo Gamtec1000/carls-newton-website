@@ -41,6 +41,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
+    // Check for email confirmation errors in URL hash
+    const checkForErrors = () => {
+      const hash = window.location.hash;
+      if (hash.includes('error=')) {
+        const urlParams = new URLSearchParams(hash.substring(1));
+        const error = urlParams.get('error');
+        const errorCode = urlParams.get('error_code');
+        const errorDescription = urlParams.get('error_description');
+
+        console.log('Email confirmation error detected:', { error, errorCode, errorDescription });
+
+        let errorMessage = '❌ Email confirmation failed';
+
+        if (errorCode === 'otp_expired' || errorDescription?.includes('expired')) {
+          errorMessage = '❌ Email Confirmation Link Expired\n\nYour confirmation link has expired. Please sign in and request a new confirmation email.\n\nNeed help? Contact: hello@carlsnewton.com';
+        } else if (error === 'access_denied') {
+          errorMessage = '❌ Email Confirmation Failed\n\nThe confirmation link is invalid or has already been used.\n\nPlease try signing in or contact: hello@carlsnewton.com';
+        } else {
+          errorMessage = `❌ Email Confirmation Failed\n\n${errorDescription?.replace(/\+/g, ' ') || 'Please try again or contact support.'}\n\nContact: hello@carlsnewton.com`;
+        }
+
+        setConfirmationMessage({
+          type: 'error',
+          message: errorMessage
+        });
+
+        // Clear URL hash
+        setTimeout(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100);
+      }
+    };
+
+    checkForErrors();
+
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);

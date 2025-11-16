@@ -207,7 +207,7 @@ export default function CarlsNewtonLanding() {
           message={confirmationMessage.message}
           type={confirmationMessage.type}
           onClose={clearConfirmationMessage}
-          duration={6000}
+          duration={confirmationMessage.type === 'error' ? 8000 : 6000}
         />
       )}
 
