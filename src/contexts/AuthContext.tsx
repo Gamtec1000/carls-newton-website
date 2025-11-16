@@ -21,6 +21,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  confirmationMessage: { type: 'success' | 'error'; message: string } | null;
+  clearConfirmationMessage: () => void;
   signUp: (data: SignUpData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -46,11 +49,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
+
       setUser(session?.user ?? null);
-      if (session?.user) {
+
+      // Detect email confirmation
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Check if this is from email confirmation (user's email_confirmed_at just changed)
+        const isEmailConfirmation = session.user.email_confirmed_at &&
+                                      !user && // No previous user state
+                                      window.location.hash.includes('type=signup'); // URL contains confirmation params
+
+        if (isEmailConfirmation) {
+          console.log('Email confirmation detected!');
+
+          // Try to fetch or create profile
+          try {
+            const { data: existingProfile, error: fetchError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+
+            if (existingProfile) {
+              // Profile exists
+              setProfile(existingProfile);
+              setConfirmationMessage({
+                type: 'success',
+                message: `Welcome, ${existingProfile.full_name?.split(' ')[0] || 'there'}! Your email is confirmed. You can now book amazing science shows!`
+              });
+            } else {
+              // Profile doesn't exist yet - show generic welcome
+              setConfirmationMessage({
+                type: 'success',
+                message: 'Email Confirmed! Your account is now active. You can now sign in to book amazing science shows!'
+              });
+            }
+          } catch (error) {
+            console.error('Error checking profile after confirmation:', error);
+            setConfirmationMessage({
+              type: 'success',
+              message: 'Email Confirmed! Your account is now active.'
+            });
+          }
+
+          // Clear URL hash to clean up
+          setTimeout(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }, 100);
+        }
+
+        // Fetch profile for any sign in
         fetchProfile(session.user.id);
-      } else {
+      } else if (!session) {
         setProfile(null);
         setLoading(false);
       }
@@ -246,12 +298,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearConfirmationMessage = () => {
+    setConfirmationMessage(null);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         profile,
         loading,
+        confirmationMessage,
+        clearConfirmationMessage,
         signUp,
         signIn,
         signOut,

@@ -20,6 +20,9 @@ import GooeyNav from './components/GooeyNav';
 import AIStotleModal from './components/AIStotleModal';
 import TelemetryPanels from './components/TelemetryPanels';
 import AuthModal from './components/AuthModal';
+import Toast from './components/Toast';
+import ProfileSettings from './components/ProfileSettings';
+import { useAuth } from './contexts/AuthContext';
 
 const styles = {
   gradient: {
@@ -80,8 +83,10 @@ const styles = {
 };
 
 export default function CarlsNewtonLanding() {
+  const { confirmationMessage, clearConfirmationMessage } = useAuth();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [selectedPanel, setSelectedPanel] = useState<{title: string, content: string, color: string} | null>(null);
 
@@ -183,6 +188,7 @@ export default function CarlsNewtonLanding() {
         timeVariance={300}
         colors={[1, 2, 3, 1, 2, 3, 1, 4]}
         onAuthClick={() => setIsAuthModalOpen(true)}
+        onProfileSettingsClick={() => setIsProfileSettingsOpen(true)}
       />
 
       {/* AI-STOTLE Modal */}
@@ -190,6 +196,18 @@ export default function CarlsNewtonLanding() {
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* Profile Settings Modal */}
+      <ProfileSettings isOpen={isProfileSettingsOpen} onClose={() => setIsProfileSettingsOpen(false)} />
+
+      {/* Confirmation Toast */}
+      {confirmationMessage && (
+        <Toast
+          message={confirmationMessage.message}
+          type={confirmationMessage.type}
+          onClose={clearConfirmationMessage}
+        />
+      )}
 
       {/* Telemetry Detail Modal */}
       {selectedPanel && (
@@ -1499,7 +1517,10 @@ export default function CarlsNewtonLanding() {
           >
             Select a date and time that works best for your school
           </p>
-          <EnhancedBookingCalendar />
+          <EnhancedBookingCalendar
+            onAuthRequired={() => setIsAuthModalOpen(true)}
+            onProfileSettingsClick={() => setIsProfileSettingsOpen(true)}
+          />
         </div>
       </section>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Clock, X, AlertCircle, CheckCircle, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, X, AlertCircle, CheckCircle, MapPin, Lock, Edit } from 'lucide-react';
 import type { CalendarDay, Booking } from '../types/booking';
 import {
   generateTimeSlots,
@@ -10,8 +10,15 @@ import {
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
+import { useAuth } from '../contexts/AuthContext';
 
-const EnhancedBookingCalendar: React.FC = () => {
+interface EnhancedBookingCalendarProps {
+  onAuthRequired?: () => void;
+  onProfileSettingsClick?: () => void;
+}
+
+const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAuthRequired, onProfileSettingsClick }) => {
+  const { user, profile } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -25,6 +32,7 @@ const EnhancedBookingCalendar: React.FC = () => {
   const [bookingDetails, setBookingDetails] = useState<{ bookingId: string; packageType: string; date: string; organizationName: string; email: string } | null>(null);
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [isProfileDataLocked, setIsProfileDataLocked] = useState(false);
 
   // Persistent customer data across bookings
   const [persistentCustomerData, setPersistentCustomerData] = useState({
@@ -435,6 +443,15 @@ const EnhancedBookingCalendar: React.FC = () => {
 
   const handleDateClick = (day: CalendarDay) => {
     if (day.isAvailable && day.isCurrentMonth) {
+      // Check if user is logged in
+      if (!user) {
+        // User not logged in - show auth modal
+        if (onAuthRequired) {
+          onAuthRequired();
+        }
+        return;
+      }
+
       setSelectedDate(day.date);
       setShowBookingModal(true);
       setSelectedTimeSlot(null);
@@ -443,16 +460,36 @@ const EnhancedBookingCalendar: React.FC = () => {
       setShowSuccessView(false); // Always show form when opening modal
       setBookingDetails(null);
 
-      // Pre-fill customer data from previous booking, but clear location fields
-      setFormData({
-        ...persistentCustomerData,
-        address: '',
-        addressDetails: '',
-        city: '',
-        latitude: null,
-        longitude: null,
-        specialRequests: '',
-      });
+      // Pre-fill with profile data if available, otherwise use persistent data
+      if (profile) {
+        setFormData({
+          title: 'Mr', // Default title
+          name: profile.full_name || '',
+          jobPosition: profile.job_position || '',
+          organizationName: profile.school_organization || '',
+          email: profile.email || '',
+          phone: profile.phone || '',
+          address: '',
+          addressDetails: '',
+          city: '',
+          latitude: null,
+          longitude: null,
+          specialRequests: '',
+        });
+        setIsProfileDataLocked(true); // Lock fields when using profile data
+      } else {
+        // Fallback to persistent customer data
+        setFormData({
+          ...persistentCustomerData,
+          address: '',
+          addressDetails: '',
+          city: '',
+          latitude: null,
+          longitude: null,
+          specialRequests: '',
+        });
+        setIsProfileDataLocked(false);
+      }
 
       // Clear the address input field
       if (addressInputRef.current) {
@@ -1456,7 +1493,31 @@ const EnhancedBookingCalendar: React.FC = () => {
                   }}>
                     Contact Information
                   </h3>
-                  {(persistentCustomerData.name || persistentCustomerData.email) && (
+                  {isProfileDataLocked ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onProfileSettingsClick) {
+                          onProfileSettingsClick();
+                        }
+                      }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#06B6D4',
+                        textDecoration: 'underline',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Edit size={14} />
+                      Update My Information
+                    </button>
+                  ) : (persistentCustomerData.name || persistentCustomerData.email) && (
                     <button
                       type="button"
                       onClick={() => {
@@ -1493,12 +1554,32 @@ const EnhancedBookingCalendar: React.FC = () => {
                   )}
                 </div>
 
+                {/* Info banner when using profile data */}
+                {isProfileDataLocked && (
+                  <div style={{
+                    background: 'rgba(6, 182, 212, 0.1)',
+                    border: '1px solid rgba(6, 182, 212, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '13px',
+                    color: '#C4B5FD',
+                  }}>
+                    <Lock size={14} style={{ color: '#06B6D4' }} />
+                    Your saved contact information (read-only)
+                  </div>
+                )}
+
                 {/* Title and Name in a row */}
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                   <select
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value as 'Mr' | 'Ms' | 'Dr' | 'Mrs' | 'Prof' })}
                     required
+                    disabled={isProfileDataLocked}
                     style={{
                       width: '120px',
                       padding: '14px 16px',
@@ -1553,10 +1634,13 @@ const EnhancedBookingCalendar: React.FC = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    readOnly={isProfileDataLocked}
                     style={{
                       ...styles.input,
                       flex: 1,
-                      marginBottom: 0
+                      marginBottom: 0,
+                      opacity: isProfileDataLocked ? 0.7 : 1,
+                      cursor: isProfileDataLocked ? 'not-allowed' : 'text'
                     }}
                   />
                 </div>
@@ -1567,7 +1651,12 @@ const EnhancedBookingCalendar: React.FC = () => {
                   required
                   value={formData.jobPosition}
                   onChange={(e) => setFormData({ ...formData, jobPosition: e.target.value })}
-                  style={styles.input}
+                  readOnly={isProfileDataLocked}
+                  style={{
+                    ...styles.input,
+                    opacity: isProfileDataLocked ? 0.7 : 1,
+                    cursor: isProfileDataLocked ? 'not-allowed' : 'text'
+                  }}
                 />
 
                 <input
@@ -1576,7 +1665,12 @@ const EnhancedBookingCalendar: React.FC = () => {
                   required
                   value={formData.organizationName}
                   onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                  style={styles.input}
+                  readOnly={isProfileDataLocked}
+                  style={{
+                    ...styles.input,
+                    opacity: isProfileDataLocked ? 0.7 : 1,
+                    cursor: isProfileDataLocked ? 'not-allowed' : 'text'
+                  }}
                 />
                 <input
                   type="email"
@@ -1584,9 +1678,18 @@ const EnhancedBookingCalendar: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  style={styles.input}
+                  readOnly={isProfileDataLocked}
+                  style={{
+                    ...styles.input,
+                    opacity: isProfileDataLocked ? 0.7 : 1,
+                    cursor: isProfileDataLocked ? 'not-allowed' : 'text'
+                  }}
                 />
-                <div style={styles.phoneInputContainer}>
+                <div style={{
+                  ...styles.phoneInputContainer,
+                  opacity: isProfileDataLocked ? 0.7 : 1,
+                  pointerEvents: isProfileDataLocked ? 'none' : 'auto'
+                }}>
                   <PhoneInput
                     international
                     countryCallingCodeEditable={false}
@@ -1596,6 +1699,7 @@ const EnhancedBookingCalendar: React.FC = () => {
                     onChange={(value) => setFormData({ ...formData, phone: value || '' })}
                     placeholder="Phone Number *"
                     required
+                    disabled={isProfileDataLocked}
                     style={{ position: 'relative' }}
                   />
                 </div>
