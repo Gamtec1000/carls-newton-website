@@ -4,14 +4,14 @@ import { useAuth } from '../contexts/AuthContext';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
-import CheckEmailModal from './CheckEmailModal';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onRegistrationSuccess?: (email: string, firstName: string) => void;
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: AuthModalProps) {
   const { signIn, signUp } = useAuth();
   const [activeTab, setActiveTab] = useState<'signin' | 'register'>('signin');
   const [loading, setLoading] = useState(false);
@@ -19,11 +19,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Check Email Modal State
-  const [showCheckEmailModal, setShowCheckEmailModal] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
-  const [registeredFirstName, setRegisteredFirstName] = useState('');
 
   // Sign In Form State
   const [signInEmail, setSignInEmail] = useState('');
@@ -132,15 +127,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         subscribe_newsletter: subscribeNewsletter,
       });
 
-      // Store registration info for check email modal
-      setRegisteredEmail(email);
-      setRegisteredFirstName(fullName.split(' ')[0] || '');
-
-      // Close the auth modal
+      // Close the auth modal first
       onClose();
 
-      // Show check email modal
-      setShowCheckEmailModal(true);
+      // Trigger the check email modal via callback
+      if (onRegistrationSuccess) {
+        const firstName = fullName.split(' ')[0] || '';
+        onRegistrationSuccess(email, firstName);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
     } finally {
@@ -1031,14 +1025,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </form>
         )}
       </div>
-
-      {/* Check Email Modal */}
-      <CheckEmailModal
-        isOpen={showCheckEmailModal}
-        onClose={() => setShowCheckEmailModal(false)}
-        email={registeredEmail}
-        firstName={registeredFirstName}
-      />
     </div>
   );
 }
