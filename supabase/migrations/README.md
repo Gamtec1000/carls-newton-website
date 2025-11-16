@@ -1,4 +1,43 @@
-# Database Migration: Add Booking Number System
+# Database Migrations
+
+This directory contains SQL migrations for the Carls Newton application.
+
+---
+
+## 🔥 CRITICAL: Auto Profile Creation (NEW - MUST RUN IMMEDIATELY)
+
+**Problem:** Profiles table is empty after user registration. Users register successfully and receive confirmation emails, but no profile record exists in the database.
+
+**Root Cause:** The application was relying on JavaScript code to create profiles during email confirmation, which was unreliable and had detection bugs.
+
+**Solution:** Database trigger that automatically creates profile records when users sign up.
+
+### Files:
+- `create_auto_profile_trigger.sql` - Creates the auto-profile trigger
+- `backfill_existing_users.sql` - Creates profiles for existing users
+
+### How to Apply (URGENT):
+
+1. **Create Auto Profile Trigger** (REQUIRED)
+   - Go to: Supabase Dashboard → SQL Editor → New Query
+   - Copy contents of `create_auto_profile_trigger.sql`
+   - Click Run
+
+2. **Backfill Existing Users** (RECOMMENDED)
+   - Go to: Supabase Dashboard → SQL Editor → New Query
+   - Copy contents of `backfill_existing_users.sql`
+   - Click Run
+
+### What This Fixes:
+- ✅ Profiles automatically created when user signs up
+- ✅ No more empty profiles table
+- ✅ Header shows "Hi [FirstName]" instead of "Hi there"
+- ✅ Profile Settings pre-fills user data correctly
+- ✅ Reliable, database-level solution (not JavaScript)
+
+---
+
+## Database Migration: Add Booking Number System
 
 ## Overview
 This migration adds a simplified booking ID system using human-readable booking numbers instead of UUIDs.
