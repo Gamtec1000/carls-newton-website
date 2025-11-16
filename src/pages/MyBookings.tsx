@@ -5,6 +5,7 @@ import { Calendar, Clock, MapPin, DollarSign, Package, FileText, ChevronLeft, Fi
 import type { Booking } from '../types/booking';
 import { PACKAGES } from '../types/booking';
 import GooeyNav from '../components/GooeyNav';
+import { supabase } from '../lib/supabase';
 
 export default function MyBookings() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -26,38 +27,42 @@ export default function MyBookings() {
   // Fetch bookings for the logged-in user
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!profile?.email) return;
+      if (!user?.id) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch all bookings and filter by email on client side
-        const response = await fetch('/api/get-bookings');
+        // Fetch bookings from Supabase for the current user
+        const { data, error: fetchError } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('email', profile?.email || user.email)
+          .order('date', { ascending: false });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch bookings');
+        if (fetchError) {
+          console.error('Supabase error:', fetchError);
+          throw new Error(fetchError.message || 'Failed to fetch bookings');
         }
 
-        const data = await response.json();
+        console.log('Fetched bookings:', data);
 
-        // Filter bookings by user's email
-        const userBookings = data.filter((booking: Booking) =>
-          booking.email.toLowerCase() === profile.email.toLowerCase()
-        );
-
-        setBookings(userBookings);
+        // ✅ CRITICAL FIX: Ensure data is always an array before setting state
+        setBookings(Array.isArray(data) ? data : []);
       } catch (err) {
+        console.error('Error fetching bookings:', err);
         setError(err instanceof Error ? err.message : 'Failed to load bookings');
+        // ✅ CRITICAL FIX: Set empty array on error
+        setBookings([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (profile?.email) {
+    if (user?.id) {
       fetchBookings();
     }
-  }, [profile?.email]);
+  }, [user?.id, profile?.email, user?.email]);
 
   // Get package name from package type
   const getPackageName = (packageType: string) => {
@@ -120,7 +125,8 @@ export default function MyBookings() {
   };
 
   // Filter and sort bookings
-  const filteredBookings = bookings
+  // ✅ CRITICAL FIX: Ensure bookings is an array before filtering
+  const filteredBookings = (Array.isArray(bookings) ? bookings : [])
     .filter(booking => {
       if (filterStatus !== 'all' && booking.status !== filterStatus) return false;
       if (searchQuery && !booking.booking_number?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
