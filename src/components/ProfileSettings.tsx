@@ -14,6 +14,7 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
   const { user, profile, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
     full_name: '',
+    email: '',
     phone: '',
     school_organization: '',
     job_position: '',
@@ -35,10 +36,12 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
       const metadata = user?.user_metadata || {};
 
       console.log('Loading profile data into form:');
+      console.log('  user.email:', user?.email);
       console.log('  user_metadata.full_name:', metadata.full_name);
       console.log('  user_metadata.phone:', metadata.phone);
       console.log('  user_metadata.school_organization:', metadata.school_organization);
       console.log('  user_metadata.job_position:', metadata.job_position);
+      console.log('  profile.email:', profile?.email);
       console.log('  profile.full_name:', profile?.full_name);
       console.log('  profile.phone:', profile?.phone);
       console.log('  profile.school_organization:', profile?.school_organization);
@@ -47,6 +50,7 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
       // Prioritize user_metadata, fallback to profile table
       setFormData({
         full_name: metadata.full_name || profile?.full_name || '',
+        email: user?.email || profile?.email || '',
         phone: metadata.phone || profile?.phone || '',
         school_organization: metadata.school_organization || profile?.school_organization || '',
         job_position: metadata.job_position || profile?.job_position || '',
@@ -299,7 +303,7 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
             </label>
             <input
               type="email"
-              value={profile?.email || ''}
+              value={formData.email}
               readOnly
               style={{
                 width: '100%',
