@@ -153,6 +153,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               }
             }
 
+            // Save user preferences from metadata
+            const interests = metadata?.interests || [];
+            const resources = metadata?.resources || [];
+            const methodologies = metadata?.methodologies || [];
+
+            if (interests.length > 0 || resources.length > 0 || methodologies.length > 0) {
+              console.log('Saving user preferences from metadata...');
+
+              // Delete existing preferences first to avoid conflicts
+              await supabase
+                .from('user_preferences')
+                .delete()
+                .eq('user_id', session.user.id);
+
+              const preferences = [
+                ...interests.map((i: string) => ({
+                  user_id: session.user.id,
+                  interest_type: 'science_topic' as const,
+                  interest_value: i,
+                })),
+                ...resources.map((r: string) => ({
+                  user_id: session.user.id,
+                  interest_type: 'resource_type' as const,
+                  interest_value: r,
+                })),
+                ...methodologies.map((m: string) => ({
+                  user_id: session.user.id,
+                  interest_type: 'methodology' as const,
+                  interest_value: m,
+                })),
+              ];
+
+              if (preferences.length > 0) {
+                const { error: prefsError } = await supabase
+                  .from('user_preferences')
+                  .insert(preferences);
+
+                if (prefsError) {
+                  console.error('Preferences save error:', prefsError);
+                } else {
+                  console.log('Preferences saved successfully:', preferences.length);
+                }
+              }
+            }
+
             // Show toast notification
             setConfirmationMessage({
               type: 'success',
@@ -215,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (data: SignUpData) => {
     try {
-      // 1. Create auth user with metadata
+      // 1. Create auth user with metadata (including preferences for email confirmation flow)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -226,6 +271,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             phone: data.phone,
             job_position: data.job_position,
             subscribe_newsletter: data.subscribe_newsletter,
+            // Store preferences in metadata so they're available after email confirmation
+            interests: data.interests,
+            resources: data.resources,
+            methodologies: data.methodologies,
           },
         },
       });
