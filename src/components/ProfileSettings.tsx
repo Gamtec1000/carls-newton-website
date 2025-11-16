@@ -24,7 +24,17 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
 
   // Load profile data when modal opens
   useEffect(() => {
+    console.log('=== ProfileSettings useEffect ===');
+    console.log('isOpen:', isOpen);
+    console.log('profile:', profile);
+
     if (isOpen && profile) {
+      console.log('Loading profile data into form:');
+      console.log('  full_name:', profile.full_name);
+      console.log('  phone:', profile.phone);
+      console.log('  school_organization:', profile.school_organization);
+      console.log('  job_position:', profile.job_position);
+
       setFormData({
         full_name: profile.full_name || '',
         phone: profile.phone || '',
@@ -33,7 +43,12 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
       });
       setError(null);
       setSuccess(false);
+
+      console.log('✅ Form data set');
+    } else if (isOpen && !profile) {
+      console.log('❌ Modal is open but profile is NULL or undefined!');
     }
+    console.log('================================');
   }, [isOpen, profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
