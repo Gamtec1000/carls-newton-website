@@ -8,7 +8,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ onProfileSettingsClick }: UserMenuProps = {}) {
-  const { profile, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -16,19 +16,31 @@ export default function UserMenu({ onProfileSettingsClick }: UserMenuProps = {})
   // Extract first name from full name
   const getFirstName = () => {
     console.log('=== UserMenu getFirstName ===');
+    console.log('User object:', user);
+    console.log('User metadata:', user?.user_metadata);
+    console.log('User metadata full_name:', user?.user_metadata?.full_name);
     console.log('Profile object:', profile);
     console.log('Profile full_name:', profile?.full_name);
 
-    if (!profile?.full_name) {
-      console.log('❌ No full_name in profile, returning "there"');
-      return 'there';
+    // Try user_metadata first (this is where registration saves data)
+    if (user?.user_metadata?.full_name) {
+      const firstName = user.user_metadata.full_name.split(' ')[0];
+      console.log('✅ First name extracted from user_metadata:', firstName);
+      console.log('============================');
+      return firstName || 'there';
     }
 
-    const firstName = profile.full_name.split(' ')[0];
-    console.log('✅ First name extracted:', firstName);
-    console.log('============================');
+    // Fallback to profile table
+    if (profile?.full_name) {
+      const firstName = profile.full_name.split(' ')[0];
+      console.log('✅ First name extracted from profile table:', firstName);
+      console.log('============================');
+      return firstName || 'there';
+    }
 
-    return firstName || 'there';
+    console.log('❌ No full_name in user_metadata or profile, returning "there"');
+    console.log('============================');
+    return 'there';
   };
 
   useEffect(() => {
@@ -113,14 +125,14 @@ export default function UserMenu({ onProfileSettingsClick }: UserMenuProps = {})
             }}
           >
             <div style={{ color: '#06B6D4', fontSize: '14px', fontWeight: 'bold', fontFamily: "'Aloe Vera Sans', sans-serif", marginBottom: '4px' }}>
-              {profile?.full_name}
+              {user?.user_metadata?.full_name || profile?.full_name || 'User'}
             </div>
             <div style={{ color: '#C4B5FD', fontSize: '11px', fontFamily: "'Aloe Vera Sans', sans-serif" }}>
-              {profile?.email}
+              {user?.email || profile?.email}
             </div>
-            {profile?.school_organization && (
+            {(user?.user_metadata?.school_organization || profile?.school_organization) && (
               <div style={{ color: '#A855F7', fontSize: '11px', fontFamily: "'Aloe Vera Sans', sans-serif", marginTop: '4px' }}>
-                🏫 {profile.school_organization}
+                🏫 {user?.user_metadata?.school_organization || profile?.school_organization}
               </div>
             )}
           </div>
