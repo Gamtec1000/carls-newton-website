@@ -11,7 +11,7 @@ interface ProfileSettingsProps {
 }
 
 export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProps) {
-  const { profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -26,30 +26,40 @@ export default function ProfileSettings({ isOpen, onClose }: ProfileSettingsProp
   useEffect(() => {
     console.log('=== ProfileSettings useEffect ===');
     console.log('isOpen:', isOpen);
+    console.log('user:', user);
+    console.log('user_metadata:', user?.user_metadata);
     console.log('profile:', profile);
 
-    if (isOpen && profile) {
-      console.log('Loading profile data into form:');
-      console.log('  full_name:', profile.full_name);
-      console.log('  phone:', profile.phone);
-      console.log('  school_organization:', profile.school_organization);
-      console.log('  job_position:', profile.job_position);
+    if (isOpen && (user || profile)) {
+      // Try to get data from user_metadata first (registration saves here)
+      const metadata = user?.user_metadata || {};
 
+      console.log('Loading profile data into form:');
+      console.log('  user_metadata.full_name:', metadata.full_name);
+      console.log('  user_metadata.phone:', metadata.phone);
+      console.log('  user_metadata.school_organization:', metadata.school_organization);
+      console.log('  user_metadata.job_position:', metadata.job_position);
+      console.log('  profile.full_name:', profile?.full_name);
+      console.log('  profile.phone:', profile?.phone);
+      console.log('  profile.school_organization:', profile?.school_organization);
+      console.log('  profile.job_position:', profile?.job_position);
+
+      // Prioritize user_metadata, fallback to profile table
       setFormData({
-        full_name: profile.full_name || '',
-        phone: profile.phone || '',
-        school_organization: profile.school_organization || '',
-        job_position: profile.job_position || '',
+        full_name: metadata.full_name || profile?.full_name || '',
+        phone: metadata.phone || profile?.phone || '',
+        school_organization: metadata.school_organization || profile?.school_organization || '',
+        job_position: metadata.job_position || profile?.job_position || '',
       });
       setError(null);
       setSuccess(false);
 
-      console.log('✅ Form data set');
-    } else if (isOpen && !profile) {
-      console.log('❌ Modal is open but profile is NULL or undefined!');
+      console.log('✅ Form data set from user_metadata or profile table');
+    } else if (isOpen && !user && !profile) {
+      console.log('❌ Modal is open but both user and profile are NULL or undefined!');
     }
     console.log('================================');
-  }, [isOpen, profile]);
+  }, [isOpen, user, profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
