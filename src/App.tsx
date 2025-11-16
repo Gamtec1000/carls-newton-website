@@ -23,6 +23,7 @@ import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import ProfileSettings from './components/ProfileSettings';
 import WelcomeModal from './components/WelcomeModal';
+import CheckEmailModal from './components/CheckEmailModal';
 import { useAuth } from './contexts/AuthContext';
 
 const styles = {
@@ -90,6 +91,17 @@ export default function CarlsNewtonLanding() {
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [selectedPanel, setSelectedPanel] = useState<{title: string, content: string, color: string} | null>(null);
+
+  // Check Email Modal State
+  const [showCheckEmailModal, setShowCheckEmailModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [registeredFirstName, setRegisteredFirstName] = useState('');
+
+  const handleRegistrationSuccess = (email: string, firstName: string) => {
+    setRegisteredEmail(email);
+    setRegisteredFirstName(firstName);
+    setShowCheckEmailModal(true);
+  };
 
   const openPanel = (detail: {title: string, content: string, color: string}) => {
     setSelectedPanel(detail);
@@ -196,7 +208,11 @@ export default function CarlsNewtonLanding() {
       <AIStotleModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
 
       {/* Auth Modal */}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onRegistrationSuccess={handleRegistrationSuccess}
+      />
 
       {/* Profile Settings Modal */}
       <ProfileSettings isOpen={isProfileSettingsOpen} onClose={() => setIsProfileSettingsOpen(false)} />
@@ -211,7 +227,15 @@ export default function CarlsNewtonLanding() {
         />
       )}
 
-      {/* Welcome Modal */}
+      {/* Check Email Modal - Shows immediately after registration */}
+      <CheckEmailModal
+        isOpen={showCheckEmailModal}
+        onClose={() => setShowCheckEmailModal(false)}
+        email={registeredEmail}
+        firstName={registeredFirstName}
+      />
+
+      {/* Welcome Modal - Shows after email confirmation */}
       <WelcomeModal
         firstName={profile?.full_name?.split(' ')[0] || 'there'}
         onClose={closeWelcomeModal}
