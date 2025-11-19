@@ -140,6 +140,39 @@ export default async function handler(req, res) {
                 <p style="margin: 5px 0;"><strong>✓ Space Requirements:</strong> Make sure there's room for experiments and power outlets nearby</p>
               </div>
 
+              ${booking.payment_link && booking.payment_status !== 'paid' ? `
+              <!-- PAYMENT LINK SECTION -->
+              <div style="background: linear-gradient(135deg, rgba(217, 70, 239, 0.1), rgba(6, 182, 212, 0.1)); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid rgba(217, 70, 239, 0.3);">
+                <h3 style="color: #d946ef; margin-top: 0;">💳 Secure Your Slot - Complete Payment</h3>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                  Your booking is confirmed! To secure your slot, please complete the payment using the secure link below.
+                </p>
+                <div style="text-align: center;">
+                  <a href="${booking.payment_link}"
+                     style="display: inline-block;
+                            background: linear-gradient(135deg, #d946ef 0%, #06b6d4 100%);
+                            color: white;
+                            padding: 18px 40px;
+                            text-decoration: none;
+                            border-radius: 50px;
+                            font-weight: bold;
+                            font-size: 18px;
+                            box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4);">
+                    💳 Pay AED ${booking.price?.toLocaleString()} Now
+                  </a>
+                </div>
+                <p style="margin-top: 15px; font-size: 14px; color: #666; text-align: center;">
+                  🔒 Secure payment powered by Stripe
+                </p>
+                ${booking.admin_notes ? `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.5); border-radius: 8px;">
+                  <p style="margin: 0; font-size: 14px; color: #1f2937;"><strong>Note from our team:</strong></p>
+                  <p style="margin: 8px 0 0 0; font-size: 14px; color: #1f2937;">${booking.admin_notes}</p>
+                </div>
+                ` : ''}
+              </div>
+              ` : ''}
+
               <h3 style="color: #10b981;">🔬 What to Expect - The Science Magic!</h3>
               <p style="font-size: 16px; line-height: 1.6;">
                 Get ready for an unforgettable experience! Your students will experience:
