@@ -439,13 +439,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (!user) throw new Error('No user logged in');
 
-      // Update profiles table
+      console.log('=== UPDATE PROFILE ===');
+      console.log('User ID:', user.id);
+      console.log('User Email:', user.email);
+      console.log('Data to save:', data);
+
+      // Use upsert to create profile if it doesn't exist, or update if it does
       const { error } = await supabase
         .from('profiles')
-        .update(data)
-        .eq('id', user.id);
+        .upsert({
+          id: user.id,
+          email: user.email,
+          ...data,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'id'
+        });
+
+      console.log('Upsert completed');
+      console.log('Error:', error);
 
       if (error) throw error;
+
+      console.log('✅ Profile saved successfully!');
 
       // Also update user_metadata to keep in sync
       const metadataUpdate: any = {};
