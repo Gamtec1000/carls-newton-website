@@ -131,6 +131,16 @@ export const generateGoogleCalendarLink = (booking: Booking): string => {
   const startDate = new Date(`${booking.date}T${booking.time_slot}`);
   const endDate = new Date(startDate.getTime() + 3600000); // Add 1 hour
 
+  // Validate dates before formatting
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    console.warn('Invalid date in generateGoogleCalendarLink:', {
+      date: booking.date,
+      time_slot: booking.time_slot
+    });
+    // Return empty link or fallback
+    return '#';
+  }
+
   const formatGCalDate = (date: Date) => {
     return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   };
@@ -260,7 +270,9 @@ export const exportBookingsToCSV = (bookings: Booking[]): string => {
     booking.payment_status,
     booking.full_address || booking.address,
     booking.special_requests || '',
-    booking.created_at ? new Date(booking.created_at).toISOString() : '',
+    booking.created_at && !isNaN(new Date(booking.created_at).getTime())
+      ? new Date(booking.created_at).toISOString()
+      : '',
   ]);
 
   const csvContent = [

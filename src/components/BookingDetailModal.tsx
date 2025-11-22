@@ -21,6 +21,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isGeneratingPaymentLink, setIsGeneratingPaymentLink] = useState(false);
 
   if (!booking) return null;
 
@@ -116,6 +117,54 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
       alert('Failed to save notes. Please try again.');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleGeneratePaymentLink = async () => {
+    if (userRole === 'viewer') {
+      alert('You do not have permission to generate payment links');
+      return;
+    }
+
+    if (paymentLink) {
+      const confirm = window.confirm(
+        'A payment link already exists. Do you want to generate a new one? This will replace the existing link.'
+      );
+      if (!confirm) return;
+    }
+
+    setIsGeneratingPaymentLink(true);
+    try {
+      console.log('Generating payment link for booking:', booking.id);
+
+      const response = await fetch('/api/generate-payment-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: booking.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || 'Failed to generate payment link');
+      }
+
+      const data = await response.json();
+      console.log('Payment link generated:', data.payment_link);
+
+      setPaymentLink(data.payment_link);
+      alert('✅ Payment link generated successfully! The link has been saved to the booking.');
+    } catch (error) {
+      console.error('Error generating payment link:', error);
+      alert(
+        `Failed to generate payment link: ${error instanceof Error ? error.message : 'Unknown error'}\n\n` +
+        'Please make sure Stripe is configured with STRIPE_SECRET_KEY in your environment variables.'
+      );
+    } finally {
+      setIsGeneratingPaymentLink(false);
     }
   };
 
@@ -340,14 +389,36 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           </section>
 
           {/* Payment Link Section */}
-          {booking.status === 'pending' && (
+          {(booking.status === 'pending' || booking.payment_status !== 'paid') && (
             <section style={{ marginBottom: '30px' }}>
-              <h3 style={{ color: '#d946ef', marginBottom: '15px' }}>Payment Link</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ color: '#d946ef', margin: 0 }}>Payment Link</h3>
+                <button
+                  onClick={handleGeneratePaymentLink}
+                  disabled={userRole === 'viewer' || isGeneratingPaymentLink}
+                  style={{
+                    padding: '8px 16px',
+                    background: isGeneratingPaymentLink
+                      ? '#4b5563'
+                      : 'linear-gradient(135deg, #d946ef 0%, #06b6d4 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '13px',
+                    cursor: isGeneratingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
+                    opacity: isGeneratingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {isGeneratingPaymentLink ? '⏳ Generating...' : '🔗 Generate Stripe Link'}
+                </button>
+              </div>
               <input
                 type="url"
                 value={paymentLink}
                 onChange={(e) => setPaymentLink(e.target.value)}
-                placeholder="https://buy.stripe.com/..."
+                placeholder="https://buy.stripe.com/... (or click Generate button)"
                 disabled={userRole === 'viewer'}
                 style={{
                   width: '100%',
@@ -360,7 +431,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                 }}
               />
               <p style={{ color: '#9ca3af', fontSize: '12px', marginTop: '8px' }}>
-                Enter the Stripe payment link for this booking. Customer will receive this in confirmation email.
+                💡 Click "Generate Stripe Link" to automatically create a payment link, or paste your own Stripe link.
               </p>
             </section>
           )}
