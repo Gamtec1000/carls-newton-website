@@ -48,6 +48,21 @@ export default async function handler(req, res) {
     if (updateData.payment_status) {
       updates.payment_status = updateData.payment_status;
     }
+    if (updateData.payment_link) {
+      updates.payment_link = updateData.payment_link;
+      updates.payment_link_sent_at = new Date().toISOString();
+    }
+    if (updateData.admin_notes) {
+      updates.admin_notes = updateData.admin_notes;
+    }
+    if (updateData.internal_notes) {
+      updates.internal_notes = updateData.internal_notes;
+    }
+    if (updateData.confirmed_by) {
+      updates.confirmed_by = updateData.confirmed_by;
+      updates.confirmed_at = new Date().toISOString();
+      updates.customer_notified = true;
+    }
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No valid fields to update' });

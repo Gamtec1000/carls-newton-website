@@ -5,9 +5,9 @@ import { Booking } from '../types/booking';
  * Replace these with your actual Stripe payment links
  */
 export const STRIPE_PAYMENT_LINKS = {
-  preschool: 'https://buy.stripe.com/test_YOUR_PRESCHOOL_LINK',
-  classic: 'https://buy.stripe.com/test_YOUR_CLASSIC_LINK',
-  halfday: 'https://buy.stripe.com/test_YOUR_HALFDAY_LINK',
+  preschool: 'https://buy.stripe.com/bJe8wObb06McgzD2HO3F603',
+  classic: 'https://buy.stripe.com/4gM6oG3IygmM97bbek3F602',
+  halfday: 'https://buy.stripe.com/4gM6oG3IygmM97bbek3F602',
 };
 
 /**

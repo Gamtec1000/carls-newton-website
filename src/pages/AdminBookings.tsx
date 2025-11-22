@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   CheckCircle,
@@ -14,13 +15,45 @@ import {
 } from 'lucide-react';
 import type { Booking } from '../types/booking';
 import { PACKAGES } from '../types/booking';
+import BookingDetailModal from '../components/BookingDetailModal';
+import CalendarView from '../components/CalendarView';
+import { exportBookingsToCSV, downloadCSV, checkAdminPermission } from '../utils/adminHelpers';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 const AdminBookings: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all');
   const [updating, setUpdating] = useState<string | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [userRole, setUserRole] = useState<'super_admin' | 'admin' | 'viewer' | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+
+  // Check admin permissions
+  useEffect(() => {
+    const checkPermissions = async () => {
+      if (!authLoading && !user) {
+        navigate('/');
+        return;
+      }
+
+      if (user?.id) {
+        const role = await checkAdminPermission(supabase, user.id);
+        if (!role) {
+          alert('You do not have admin access');
+          navigate('/');
+          return;
+        }
+        setUserRole(role);
+      }
+    };
+
+    checkPermissions();
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     fetchBookings();
@@ -78,6 +111,36 @@ const AdminBookings: React.FC = () => {
     } finally {
       setUpdating(null);
     }
+  };
+
+  const handleUpdateBooking = async (bookingId: string, updates: any) => {
+    try {
+      const response = await fetch('/api/update-booking', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: bookingId,
+          ...updates,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update booking');
+      }
+
+      // Refresh bookings
+      await fetchBookings();
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to update booking');
+    }
+  };
+
+  const handleExportCSV = () => {
+    const csv = exportBookingsToCSV(bookings);
+    const filename = `bookings-${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csv, filename);
   };
 
   const getPackageName = (packageType: string): string => {
@@ -301,6 +364,18 @@ const AdminBookings: React.FC = () => {
     },
   };
 
+  // Show loading while checking permissions
+  if (authLoading || userRole === null) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.emptyState}>
+          <RefreshCw size={48} style={{ ...styles.emptyIcon, animation: 'spin 1s linear infinite' }} />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -351,6 +426,25 @@ const AdminBookings: React.FC = () => {
           <RefreshCw size={16} />
           Refresh
         </button>
+        <button
+          style={styles.filterButton(viewMode === 'list')}
+          onClick={() => setViewMode('list')}
+        >
+          📋 List View
+        </button>
+        <button
+          style={styles.filterButton(viewMode === 'calendar')}
+          onClick={() => setViewMode('calendar')}
+        >
+          📅 Calendar View
+        </button>
+        <button
+          style={styles.refreshButton}
+          onClick={handleExportCSV}
+          disabled={bookings.length === 0}
+        >
+          📊 Export CSV
+        </button>
       </div>
 
       {loading && (
@@ -374,12 +468,20 @@ const AdminBookings: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && bookings.length > 0 && (
+      {!loading && !error && bookings.length > 0 && viewMode === 'calendar' && (
+        <CalendarView
+          bookings={bookings}
+          onBookingClick={(booking) => setSelectedBooking(booking)}
+        />
+      )}
+
+      {!loading && !error && bookings.length > 0 && viewMode === 'list' && (
         <div style={styles.bookingsGrid}>
           {bookings.map((booking) => (
             <div
               key={booking.id}
               style={styles.bookingCard}
+              onClick={() => setSelectedBooking(booking)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
                 e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.3)';
@@ -531,6 +633,14 @@ const AdminBookings: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Booking Detail Modal */}
+      <BookingDetailModal
+        booking={selectedBooking}
+        onClose={() => setSelectedBooking(null)}
+        onUpdate={handleUpdateBooking}
+        userRole={userRole}
+      />
     </div>
   );
 };
