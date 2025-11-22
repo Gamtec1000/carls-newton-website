@@ -19,6 +19,34 @@ interface EnhancedBookingCalendarProps {
 
 const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAuthRequired, onProfileSettingsClick }) => {
   const { user, profile } = useAuth();
+
+  // Component mount logging
+  useEffect(() => {
+    console.log('🎯 ===== ENHANCED BOOKING CALENDAR MOUNTED =====');
+    console.log('🎯 Component initialized');
+    console.log('🎯 User from useAuth:', user);
+    console.log('🎯 Profile from useAuth:', profile);
+    console.log('🎯 ==========================================');
+  }, []);
+
+  // Track user and profile changes
+  useEffect(() => {
+    console.log('👤 ===== USER/PROFILE STATE CHANGED =====');
+    console.log('👤 User exists:', !!user);
+    console.log('👤 User email:', user?.email);
+    console.log('👤 User ID:', user?.id);
+    console.log('📊 Profile exists:', !!profile);
+    console.log('📊 Profile object:', profile);
+    if (profile) {
+      console.log('📊 Profile.full_name:', profile.full_name);
+      console.log('📊 Profile.email:', profile.email);
+      console.log('📊 Profile.phone:', profile.phone);
+      console.log('📊 Profile.school_organization:', profile.school_organization);
+      console.log('📊 Profile.job_position:', profile.job_position);
+    }
+    console.log('👤 ======================================');
+  }, [user, profile]);
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -60,6 +88,18 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
     specialRequests: '',
   });
 
+  // Track form data changes
+  useEffect(() => {
+    console.log('📝 ===== FORM DATA CHANGED =====');
+    console.log('📝 Form name:', formData.name);
+    console.log('📝 Form email:', formData.email);
+    console.log('📝 Form phone:', formData.phone);
+    console.log('📝 Form organizationName:', formData.organizationName);
+    console.log('📝 Form jobPosition:', formData.jobPosition);
+    console.log('📝 isProfileDataLocked:', isProfileDataLocked);
+    console.log('📝 ==============================');
+  }, [formData, isProfileDataLocked]);
+
   // Google Maps refs
   const mapRef = useRef<HTMLDivElement>(null);
   const addressInputRef = useRef<HTMLInputElement>(null);
@@ -74,40 +114,74 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
 
   // Auto-fill form with profile data when profile loads or modal opens
   useEffect(() => {
-    if (!showBookingModal) return; // Only auto-fill when modal is open
+    console.log('🔍 ===== AUTO-FILL EFFECT TRIGGERED =====');
+    console.log('🔍 showBookingModal:', showBookingModal);
+    console.log('🔍 user:', user);
+    console.log('🔍 profile:', profile);
+
+    if (!showBookingModal) {
+      console.log('🔍 Modal not open - skipping auto-fill');
+      console.log('🔍 ======================================');
+      return; // Only auto-fill when modal is open
+    }
 
     console.log('🔍 ===== BOOKING FORM AUTO-FILL CHECK =====');
     console.log('📋 Modal open:', showBookingModal);
     console.log('👤 User exists:', !!user);
+    console.log('👤 User object type:', typeof user);
+    console.log('👤 User email:', user?.email);
+    console.log('👤 User ID:', user?.id);
     console.log('📊 Profile exists:', !!profile);
-    console.log('📊 Profile data:', JSON.stringify(profile, null, 2));
+    console.log('📊 Profile object type:', typeof profile);
+    console.log('📊 Profile data (stringified):', JSON.stringify(profile, null, 2));
 
     if (profile && user) {
-      console.log('✅ Profile data available - auto-filling form');
-      console.log('Profile full_name:', profile.full_name);
-      console.log('Profile email:', profile.email);
-      console.log('Profile phone:', profile.phone);
-      console.log('Profile school_organization:', profile.school_organization);
-      console.log('Profile job_position:', profile.job_position);
+      console.log('✅ BOTH profile AND user exist - proceeding with auto-fill');
+      console.log('✅ Extracting profile fields:');
+      console.log('  - full_name:', profile.full_name);
+      console.log('  - email:', profile.email);
+      console.log('  - phone:', profile.phone);
+      console.log('  - school_organization:', profile.school_organization);
+      console.log('  - job_position:', profile.job_position);
 
-      setFormData(prev => ({
-        ...prev,
-        title: 'Mr', // Default title
+      console.log('🔄 Calling setFormData...');
+      const newFormData = {
+        title: 'Mr' as const, // Default title
         name: profile.full_name || '',
         jobPosition: profile.job_position || '',
         organizationName: profile.school_organization || '',
         email: profile.email || '',
         phone: profile.phone || '',
-      }));
+      };
+      console.log('🔄 New form data to set:', newFormData);
+
+      setFormData(prev => {
+        console.log('🔄 Previous form data:', prev);
+        const updated = {
+          ...prev,
+          ...newFormData,
+        };
+        console.log('🔄 Updated form data:', updated);
+        return updated;
+      });
+
       setIsProfileDataLocked(true);
       console.log('✅ Form auto-filled with profile data');
+      console.log('✅ Profile data locked: true');
     } else if (!profile && user) {
-      console.log('⚠️ User logged in but profile not loaded yet');
+      console.log('⚠️ User logged in but profile is NULL or undefined');
       console.log('⚠️ User ID:', user.id);
       console.log('⚠️ User email:', user.email);
+      console.log('⚠️ This means AuthContext did not load the profile');
+      console.log('⚠️ Check AuthContext logs for profile fetch errors');
     } else if (!user) {
-      console.log('❌ No user logged in - using persistent customer data');
+      console.log('❌ No user logged in');
+      console.log('❌ Using persistent customer data');
       setIsProfileDataLocked(false);
+    } else {
+      console.log('⚠️ Unexpected state:');
+      console.log('⚠️ user:', user);
+      console.log('⚠️ profile:', profile);
     }
     console.log('🔍 ===== END AUTO-FILL CHECK =====');
   }, [showBookingModal, profile, user]); // Re-run when modal opens or profile loads
