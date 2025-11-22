@@ -36,30 +36,64 @@ const AdminBookings: React.FC = () => {
   // Check admin permissions
   useEffect(() => {
     const checkPermissions = async () => {
-      console.log('🔐 Admin permission check - authLoading:', authLoading, 'user:', user);
+      console.log('🔐 ===== ADMIN BOOKINGS PAGE PERMISSION CHECK =====');
+      console.log('🔐 authLoading:', authLoading);
+      console.log('🔐 user exists:', !!user);
+      console.log('🔐 user object:', JSON.stringify(user, null, 2));
+      console.log('🔐 supabase client exists:', !!supabase);
+      console.log('🔐 supabase client type:', typeof supabase);
 
       if (!authLoading && !user) {
-        console.log('❌ No user found, redirecting to home');
+        console.log('❌ Auth loaded but no user found');
+        console.log('❌ Redirecting to home page');
         navigate('/');
         return;
       }
 
-      if (user?.id) {
-        console.log('👤 Current user ID:', user.id);
-        console.log('📧 Current user email:', user.email);
+      if (authLoading) {
+        console.log('⏳ Auth still loading, waiting...');
+        return;
+      }
 
+      if (user?.id) {
+        console.log('👤 ===== USER DETAILS =====');
+        console.log('👤 User ID:', user.id);
+        console.log('👤 User ID type:', typeof user.id);
+        console.log('👤 User ID length:', user.id?.length);
+        console.log('👤 User email:', user.email);
+        console.log('👤 User metadata:', JSON.stringify(user.user_metadata, null, 2));
+        console.log('👤 Full user object:', JSON.stringify(user, null, 2));
+        console.log('👤 ===== END USER DETAILS =====');
+
+        console.log('🔍 Calling checkAdminPermission...');
         const role = await checkAdminPermission(supabase, user.id);
+        console.log('🔍 checkAdminPermission returned:', role);
 
         if (!role) {
-          console.error('🚫 Admin access denied for user:', user.email);
+          console.error('🚫 ===== ACCESS DENIED =====');
+          console.error('🚫 No admin role found for user:', user.email);
+          console.error('🚫 User ID:', user.id);
+          console.error('🚫 This means either:');
+          console.error('🚫   1. User is not in admin_users table');
+          console.error('🚫   2. RLS policy is blocking the query');
+          console.error('🚫   3. There was a database error');
+          console.error('🚫 Showing alert and redirecting...');
           alert('You do not have admin access');
           navigate('/');
           return;
         }
 
-        console.log('🎉 Admin access granted with role:', role);
+        console.log('🎉 ===== ACCESS GRANTED =====');
+        console.log('🎉 Admin role:', role);
+        console.log('🎉 Setting userRole state to:', role);
         setUserRole(role);
+        console.log('🎉 ===== END ACCESS GRANTED =====');
+      } else {
+        console.log('⚠️ User exists but user.id is missing');
+        console.log('⚠️ User object:', user);
       }
+
+      console.log('🔐 ===== END PERMISSION CHECK =====');
     };
 
     checkPermissions();
