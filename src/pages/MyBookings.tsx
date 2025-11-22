@@ -5,7 +5,6 @@ import { Calendar, Clock, MapPin, DollarSign, Package, FileText, ChevronLeft, Fi
 import type { Booking } from '../types/booking';
 import { PACKAGES } from '../types/booking';
 import GooeyNav from '../components/GooeyNav';
-import { supabase } from '../lib/supabase';
 
 export default function MyBookings() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -27,42 +26,47 @@ export default function MyBookings() {
   // Fetch bookings for the logged-in user
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!user?.id) return;
+      if (!user?.email && !profile?.email) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch bookings from Supabase for the current user
-        const { data, error: fetchError } = await supabase
-          .from('bookings')
-          .select('*')
-          .eq('email', profile?.email || user.email)
-          .order('date', { ascending: false });
+        console.log('=== FETCHING USER BOOKINGS ===');
+        console.log('User email:', user?.email);
+        console.log('Profile email:', profile?.email);
 
-        if (fetchError) {
-          console.error('Supabase error:', fetchError);
-          throw new Error(fetchError.message || 'Failed to fetch bookings');
+        // Use API endpoint instead of direct Supabase query (avoids RLS issues)
+        const response = await fetch('/api/get-bookings');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
         }
 
-        console.log('Fetched bookings:', data);
+        const { bookings: allBookings } = await response.json();
+        console.log('All bookings from API:', allBookings?.length || 0);
 
-        // ✅ CRITICAL FIX: Ensure data is always an array before setting state
-        setBookings(Array.isArray(data) ? data : []);
+        // Filter bookings by user's email (since API returns all bookings)
+        const userEmail = profile?.email || user?.email;
+        const userBookings = allBookings?.filter((b: Booking) => b.email === userEmail) || [];
+
+        console.log('User bookings filtered:', userBookings.length);
+        console.log('User bookings:', userBookings);
+
+        setBookings(userBookings);
       } catch (err) {
         console.error('Error fetching bookings:', err);
         setError(err instanceof Error ? err.message : 'Failed to load bookings');
-        // ✅ CRITICAL FIX: Set empty array on error
         setBookings([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (user?.id) {
+    if (user?.email || profile?.email) {
       fetchBookings();
     }
-  }, [user?.id, profile?.email, user?.email]);
+  }, [user?.email, profile?.email]);
 
   // Get package name from package type
   const getPackageName = (packageType: string) => {
