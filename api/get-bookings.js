@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Use service role key for server-side operations (bypasses RLS)
+// This is secure because this code only runs on the server, never in the browser
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
   {
     auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false
     }
   }
 );
