@@ -192,13 +192,31 @@ const AdminBookings: React.FC = () => {
     return pkg ? `${pkg.name} (${pkg.duration})` : packageType;
   };
 
-  const formatDate = (dateStr: string): string => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const formatDate = (dateStr: string | null | undefined): string => {
+    if (!dateStr) {
+      console.warn('formatDate: No date provided');
+      return 'No date';
+    }
+
+    try {
+      const date = new Date(dateStr);
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('formatDate: Invalid date:', dateStr);
+        return 'Invalid date';
+      }
+
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('formatDate error:', error, 'for date:', dateStr);
+      return 'Invalid date';
+    }
   };
 
   const getStatusColor = (status: string): string => {
@@ -544,7 +562,9 @@ const AdminBookings: React.FC = () => {
                     {booking.organization_name}
                   </p>
                   <p style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>
-                    {new Date(booking.created_at).toLocaleDateString()}
+                    {booking.created_at
+                      ? new Date(booking.created_at).toLocaleDateString()
+                      : 'No date'}
                   </p>
                 </div>
                 <div style={styles.statusBadge(booking.status)}>{booking.status}</div>
