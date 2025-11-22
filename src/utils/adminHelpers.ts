@@ -296,19 +296,30 @@ export const checkAdminPermission = async (
   userId: string
 ): Promise<'super_admin' | 'admin' | 'viewer' | null> => {
   try {
+    console.log('🔍 Checking admin permission for user ID:', userId);
+
     const { data, error } = await supabase
       .from('admin_users')
       .select('role')
       .eq('id', userId)
       .single();
 
-    if (error || !data) {
+    console.log('📊 Admin users query result:', { data, error });
+
+    if (error) {
+      console.error('❌ Error querying admin_users:', error);
       return null;
     }
 
+    if (!data) {
+      console.warn('⚠️ No admin user found for ID:', userId);
+      return null;
+    }
+
+    console.log('✅ Admin role found:', data.role);
     return data.role;
   } catch (error) {
-    console.error('Error checking admin permission:', error);
+    console.error('💥 Exception checking admin permission:', error);
     return null;
   }
 };

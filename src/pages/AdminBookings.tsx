@@ -36,18 +36,28 @@ const AdminBookings: React.FC = () => {
   // Check admin permissions
   useEffect(() => {
     const checkPermissions = async () => {
+      console.log('🔐 Admin permission check - authLoading:', authLoading, 'user:', user);
+
       if (!authLoading && !user) {
+        console.log('❌ No user found, redirecting to home');
         navigate('/');
         return;
       }
 
       if (user?.id) {
+        console.log('👤 Current user ID:', user.id);
+        console.log('📧 Current user email:', user.email);
+
         const role = await checkAdminPermission(supabase, user.id);
+
         if (!role) {
+          console.error('🚫 Admin access denied for user:', user.email);
           alert('You do not have admin access');
           navigate('/');
           return;
         }
+
+        console.log('🎉 Admin access granted with role:', role);
         setUserRole(role);
       }
     };
