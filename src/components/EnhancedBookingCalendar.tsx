@@ -72,6 +72,46 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
     fetchBookings();
   }, [currentDate]);
 
+  // Auto-fill form with profile data when profile loads or modal opens
+  useEffect(() => {
+    if (!showBookingModal) return; // Only auto-fill when modal is open
+
+    console.log('🔍 ===== BOOKING FORM AUTO-FILL CHECK =====');
+    console.log('📋 Modal open:', showBookingModal);
+    console.log('👤 User exists:', !!user);
+    console.log('📊 Profile exists:', !!profile);
+    console.log('📊 Profile data:', JSON.stringify(profile, null, 2));
+
+    if (profile && user) {
+      console.log('✅ Profile data available - auto-filling form');
+      console.log('Profile full_name:', profile.full_name);
+      console.log('Profile email:', profile.email);
+      console.log('Profile phone:', profile.phone);
+      console.log('Profile school_organization:', profile.school_organization);
+      console.log('Profile job_position:', profile.job_position);
+
+      setFormData(prev => ({
+        ...prev,
+        title: 'Mr', // Default title
+        name: profile.full_name || '',
+        jobPosition: profile.job_position || '',
+        organizationName: profile.school_organization || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+      }));
+      setIsProfileDataLocked(true);
+      console.log('✅ Form auto-filled with profile data');
+    } else if (!profile && user) {
+      console.log('⚠️ User logged in but profile not loaded yet');
+      console.log('⚠️ User ID:', user.id);
+      console.log('⚠️ User email:', user.email);
+    } else if (!user) {
+      console.log('❌ No user logged in - using persistent customer data');
+      setIsProfileDataLocked(false);
+    }
+    console.log('🔍 ===== END AUTO-FILL CHECK =====');
+  }, [showBookingModal, profile, user]); // Re-run when modal opens or profile loads
+
   // Load Google Maps script
   const loadGoogleMaps = (): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -443,8 +483,12 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
 
   const handleDateClick = (day: CalendarDay) => {
     if (day.isAvailable && day.isCurrentMonth) {
+      console.log('📅 ===== DATE CLICKED =====');
+      console.log('📅 Selected date:', day.date);
+
       // Check if user is logged in
       if (!user) {
+        console.log('❌ User not logged in - showing auth modal');
         // User not logged in - show auth modal
         if (onAuthRequired) {
           onAuthRequired();
@@ -452,8 +496,11 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
         return;
       }
 
+      console.log('👤 User is logged in:', user.email);
+      console.log('📊 Profile available:', !!profile);
+
       setSelectedDate(day.date);
-      setShowBookingModal(true);
+      setShowBookingModal(true); // This will trigger the auto-fill useEffect
       setSelectedTimeSlot(null);
       setError(null);
       setSuccess(false);
@@ -461,7 +508,9 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
       setBookingDetails(null);
 
       // Pre-fill with profile data if available, otherwise use persistent data
+      // NOTE: This is now also handled by the useEffect, but we keep it here for immediate feedback
       if (profile) {
+        console.log('✅ Pre-filling form with profile data on click');
         setFormData({
           title: 'Mr', // Default title
           name: profile.full_name || '',
@@ -478,6 +527,8 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
         });
         setIsProfileDataLocked(true); // Lock fields when using profile data
       } else {
+        console.log('⚠️ No profile available on click - using persistent data');
+        console.log('⚠️ useEffect will auto-fill when profile loads');
         // Fallback to persistent customer data
         setFormData({
           ...persistentCustomerData,
@@ -495,6 +546,8 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
       if (addressInputRef.current) {
         addressInputRef.current.value = '';
       }
+
+      console.log('📅 ===== END DATE CLICK =====');
     }
   };
 
