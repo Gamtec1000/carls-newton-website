@@ -422,6 +422,104 @@ export default function MyBookings() {
                   )}
                 </div>
 
+                {/* Payment Link Section */}
+                {booking.status === 'confirmed' && booking.payment_link && booking.payment_status !== 'paid' && (
+                  <div style={{
+                    marginTop: '16px',
+                    padding: '16px',
+                    background: 'linear-gradient(135deg, rgba(217, 70, 239, 0.1), rgba(6, 182, 212, 0.1))',
+                    borderRadius: '12px',
+                    border: '2px solid rgba(217, 70, 239, 0.3)',
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '12px',
+                    }}>
+                      <span style={{ fontSize: '20px' }}>✅</span>
+                      <span style={{
+                        color: '#22C55E',
+                        fontWeight: 'bold',
+                        fontSize: '16px',
+                        fontFamily: "'Aloe Vera Sans', sans-serif",
+                      }}>
+                        Booking Confirmed!
+                      </span>
+                    </div>
+
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#C4B5FD',
+                      marginBottom: '16px',
+                      lineHeight: '1.6',
+                      fontFamily: "'Aloe Vera Sans', sans-serif",
+                    }}>
+                      Your booking has been confirmed. Please complete payment to secure your slot.
+                    </p>
+
+                    <a
+                      href={booking.payment_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '14px 24px',
+                        background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+                        borderRadius: '10px',
+                        color: 'white',
+                        textDecoration: 'none',
+                        fontWeight: 'bold',
+                        fontSize: '16px',
+                        fontFamily: "'Aloe Vera Sans', sans-serif",
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(6, 182, 212, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <span style={{ fontSize: '20px' }}>💳</span>
+                      <span>Complete Payment (AED {booking.price})</span>
+                    </a>
+
+                    {booking.admin_notes && (
+                      <div style={{
+                        marginTop: '12px',
+                        padding: '12px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '8px',
+                      }}>
+                        <p style={{
+                          margin: '0',
+                          fontSize: '12px',
+                          color: '#A78BFA',
+                          fontFamily: "'Aloe Vera Sans', sans-serif",
+                        }}>
+                          <strong style={{ color: '#C4B5FD' }}>Note from our team:</strong> {booking.admin_notes}
+                        </p>
+                      </div>
+                    )}
+
+                    <p style={{
+                      fontSize: '11px',
+                      color: '#9CA3AF',
+                      marginTop: '8px',
+                      textAlign: 'center',
+                      fontFamily: "'Aloe Vera Sans', sans-serif",
+                    }}>
+                      🔒 Secure payment powered by Stripe
+                    </p>
+                  </div>
+                )}
+
                 {/* Booking Footer */}
                 <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(6, 182, 212, 0.2)', fontSize: '11px', color: '#9333EA' }}>
                   Booked on {new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
