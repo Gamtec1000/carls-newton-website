@@ -227,30 +227,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('=== FETCHING PROFILE ===');
       console.log('User ID:', userId);
+      console.log('User ID type:', typeof userId);
+      console.log('User ID length:', userId?.length);
 
+      // Use maybeSingle() instead of single() to handle edge cases better
+      // maybeSingle() returns null if no rows, data if one row, error if multiple rows
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
+
+      console.log('Query completed');
+      console.log('Data received:', data);
+      console.log('Error received:', error);
 
       if (error) {
-        console.error('❌ Error fetching profile:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
+        console.error('❌ Error fetching profile:');
+        console.error('  Error code:', error.code);
+        console.error('  Error message:', error.message);
+        console.error('  Error details:', error.details);
+        console.error('  Error hint:', error.hint);
+        console.error('  Full error:', JSON.stringify(error, null, 2));
+
+        // If error is PGRST116 (multiple rows), log warning about duplicates
+        if (error.code === 'PGRST116') {
+          console.error('⚠️ DUPLICATE PROFILES DETECTED!');
+          console.error('⚠️ Multiple profile records exist for user:', userId);
+          console.error('⚠️ This should not happen - run SQL to find and remove duplicates');
+        }
+
         throw error;
       }
 
-      console.log('✅ Profile fetched successfully:', data);
-      console.log('Profile full_name:', data.full_name);
-      console.log('Profile phone:', data.phone);
-      console.log('Profile school_organization:', data.school_organization);
-      console.log('Profile job_position:', data.job_position);
+      if (!data) {
+        console.warn('⚠️ No profile found for user:', userId);
+        console.warn('⚠️ Profile should have been created by database trigger');
+        console.warn('⚠️ User will need to complete their profile');
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      console.log('✅ Profile fetched successfully!');
+      console.log('  Profile ID:', data.id);
+      console.log('  Profile email:', data.email);
+      console.log('  Profile full_name:', data.full_name);
+      console.log('  Profile phone:', data.phone);
+      console.log('  Profile school_organization:', data.school_organization);
+      console.log('  Profile job_position:', data.job_position);
+      console.log('  Profile created_at:', data.created_at);
+      console.log('  Profile updated_at:', data.updated_at);
       console.log('========================');
 
       setProfile(data);
     } catch (error) {
       console.error('❌ CRITICAL: Error fetching profile:', error);
+      console.error('Setting profile to null');
       setProfile(null);
     } finally {
       setLoading(false);
