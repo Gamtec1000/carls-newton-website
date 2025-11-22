@@ -109,7 +109,7 @@ export default async function handler(req, res) {
       after_completion: {
         type: 'redirect',
         redirect: {
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://carlsnewton.com'}/booking-success?booking_id=${displayBookingId}`,
+          url: `${process.env.APP_URL || 'https://carlsnewton.com'}/booking-success?booking_id=${displayBookingId}`,
         },
       },
       automatic_tax: { enabled: false },
