@@ -6,7 +6,7 @@ import { Booking } from '../types/booking';
  */
 export const STRIPE_PAYMENT_LINKS = {
   preschool: 'https://buy.stripe.com/bJe8wObb06McgzD2HO3F603',
-  classic: 'https://buy.stripe.com/4gM6oG3IygmM97bbek3F602',
+  classic: 'https://buy.stripe.com/00w3cugvkdaAabf2HO3F604',
   halfday: 'https://buy.stripe.com/4gM6oG3IygmM97bbek3F602',
 };
 
