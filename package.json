@@ -17,7 +17,8 @@
     "react-dom": "^18.3.1",
     "react-phone-number-input": "^3.4.13",
     "react-router-dom": "^7.9.5",
-    "resend": "^6.4.0"
+    "resend": "^6.4.0",
+    "stripe": "^17.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
