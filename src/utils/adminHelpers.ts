@@ -296,7 +296,14 @@ export const checkAdminPermission = async (
   userId: string
 ): Promise<'super_admin' | 'admin' | 'viewer' | null> => {
   try {
+    console.log('🔍 ===== ADMIN PERMISSION CHECK START =====');
     console.log('🔍 Checking admin permission for user ID:', userId);
+    console.log('🔍 User ID type:', typeof userId);
+    console.log('🔍 User ID length:', userId?.length);
+    console.log('🔍 Supabase client exists:', !!supabase);
+    console.log('🔍 Supabase client type:', typeof supabase);
+
+    console.log('📤 Executing query: admin_users.select(role).eq(id, ' + userId + ').single()');
 
     const { data, error } = await supabase
       .from('admin_users')
@@ -304,22 +311,41 @@ export const checkAdminPermission = async (
       .eq('id', userId)
       .single();
 
-    console.log('📊 Admin users query result:', { data, error });
+    console.log('📊 Query completed');
+    console.log('📊 Response data:', JSON.stringify(data, null, 2));
+    console.log('📊 Response error:', JSON.stringify(error, null, 2));
+    console.log('📊 Data exists:', !!data);
+    console.log('📊 Error exists:', !!error);
 
     if (error) {
-      console.error('❌ Error querying admin_users:', error);
+      console.error('❌ Error querying admin_users table');
+      console.error('❌ Error code:', error.code);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error details:', error.details);
+      console.error('❌ Error hint:', error.hint);
+      console.error('❌ Full error object:', JSON.stringify(error, null, 2));
       return null;
     }
 
     if (!data) {
-      console.warn('⚠️ No admin user found for ID:', userId);
+      console.warn('⚠️ Query succeeded but returned no data');
+      console.warn('⚠️ No admin user record found for ID:', userId);
+      console.warn('⚠️ This means user is NOT in admin_users table');
       return null;
     }
 
-    console.log('✅ Admin role found:', data.role);
+    console.log('✅ Admin record found!');
+    console.log('✅ Admin role:', data.role);
+    console.log('✅ Full data object:', JSON.stringify(data, null, 2));
+    console.log('🔍 ===== ADMIN PERMISSION CHECK END =====');
     return data.role;
   } catch (error) {
-    console.error('💥 Exception checking admin permission:', error);
+    console.error('💥 ===== EXCEPTION IN PERMISSION CHECK =====');
+    console.error('💥 Exception type:', error?.constructor?.name);
+    console.error('💥 Exception message:', error instanceof Error ? error.message : String(error));
+    console.error('💥 Exception stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('💥 Full exception:', JSON.stringify(error, null, 2));
+    console.error('💥 ===== END EXCEPTION =====');
     return null;
   }
 };
