@@ -96,11 +96,6 @@ export default async function handler(req, res) {
 
     if (updateData.status === 'confirmed') {
       try {
-        // Check if RESEND_API_KEY is configured
-        if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_resend_api_key') {
-          throw new Error('RESEND_API_KEY environment variable is not configured. Please add it to your .env file or Vercel environment variables.');
-        }
-
         // Use booking_number for display, fallback to id if not generated yet
         const displayBookingId = booking.booking_number || booking.id;
 
