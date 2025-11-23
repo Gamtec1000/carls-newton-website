@@ -174,8 +174,13 @@ const AdminBookings: React.FC = () => {
         throw new Error('Failed to update booking');
       }
 
+      const data = await response.json();
+
       // Refresh bookings
       await fetchBookings();
+
+      // Return the response data so modal can check email status
+      return data;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Failed to update booking');
     }

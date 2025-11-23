@@ -91,8 +91,16 @@ export default async function handler(req, res) {
     }
 
     // Send confirmation email when status changes to 'confirmed'
+    let emailSent = false;
+    let emailError = null;
+
     if (updateData.status === 'confirmed') {
       try {
+        // Check if RESEND_API_KEY is configured
+        if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_resend_api_key') {
+          throw new Error('RESEND_API_KEY environment variable is not configured. Please add it to your .env file or Vercel environment variables.');
+        }
+
         // Use booking_number for display, fallback to id if not generated yet
         const displayBookingId = booking.booking_number || booking.id;
 
@@ -109,7 +117,8 @@ export default async function handler(req, res) {
           day: 'numeric',
         });
 
-        console.log('Sending confirmation email for booking:', displayBookingId);
+        console.log('📧 Sending confirmation email for booking:', displayBookingId);
+        console.log('📧 Recipient email:', booking.email);
 
         await resend.emails.send({
           from: 'Carls Newton Bookings <bookings@resend.dev>',
@@ -228,10 +237,13 @@ export default async function handler(req, res) {
           `,
         });
 
-        console.log('Confirmation email sent successfully');
-      } catch (emailError) {
-        console.error('Email error:', emailError);
-        // Don't fail the update if email fails
+        emailSent = true;
+        console.log('✅ Confirmation email sent successfully to:', booking.email);
+      } catch (error) {
+        emailError = error instanceof Error ? error.message : 'Unknown email error';
+        console.error('❌ Email sending failed:', emailError);
+        console.error('❌ Full error:', error);
+        // Don't fail the booking update if email fails
       }
     }
 
@@ -239,6 +251,8 @@ export default async function handler(req, res) {
       success: true,
       booking: booking,
       message: 'Booking updated successfully',
+      emailSent: emailSent,
+      emailError: emailError,
     });
   } catch (error) {
     console.error('Error:', error);
