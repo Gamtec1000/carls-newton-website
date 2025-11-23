@@ -16,6 +16,7 @@ import {
   Navigation,
 } from 'lucide-react';
 import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
+import DomeGallery from './components/DomeGallery';
 import GooeyNav from './components/GooeyNav';
 import AIStotleModal from './components/AIStotleModal';
 import TelemetryPanels from './components/TelemetryPanels';
@@ -1269,6 +1270,98 @@ export default function CarlsNewtonLanding() {
                 <p style={{ color: '#C4B5FD' }}>{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section
+        style={{
+          padding: '80px 0',
+          background: 'linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            padding: '0 20px',
+          }}
+        >
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+            <h2
+              style={{
+                fontSize: '48px',
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '20px',
+              }}
+            >
+              Experience the Magic
+            </h2>
+            <p
+              style={{
+                fontSize: '20px',
+                color: '#9CA3AF',
+                maxWidth: '700px',
+                margin: '0 auto 40px',
+              }}
+            >
+              Explore our gallery of unforgettable science moments
+            </p>
+          </div>
+
+          {/* Dome Gallery Component */}
+          <DomeGallery
+            images={[
+              {
+                src: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&h=800&fit=crop',
+                alt: 'Students watching explosive science demonstration',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1581093458791-9f3c3250a3b0?w=800&h=800&fit=crop',
+                alt: 'Hands-on chemistry experiment with colorful reactions',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1567360425618-1594206637d2?w=800&h=800&fit=crop',
+                alt: 'Interactive physics demonstration with students',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=800&fit=crop',
+                alt: 'Workshop with guided science experiments',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=800&h=800&fit=crop',
+                alt: 'Students learning with STEM activities',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1576319155264-99536e0be1ee?w=800&h=800&fit=crop',
+                alt: 'Science fair support and consultation session',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=800&h=800&fit=crop',
+                alt: 'Outdoor lab adventure with experiments',
+              },
+              {
+                src: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800&h=800&fit=crop',
+                alt: 'Group science workshop collaboration',
+              },
+            ]}
+          />
+
+          {/* Instructions */}
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: '40px',
+              color: '#9CA3AF',
+              fontSize: '14px',
+            }}
+          >
+            <p>🖱️ Drag to rotate • 👆 Click images to enlarge</p>
           </div>
         </div>
       </section>
