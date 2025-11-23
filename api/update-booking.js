@@ -116,7 +116,7 @@ export default async function handler(req, res) {
         console.log('📧 Recipient email:', booking.email);
 
         await resend.emails.send({
-          from: 'Carls Newton Bookings <bookings@resend.dev>',
+          from: 'Carls Newton Bookings <bookings@carlsnewton.com>',
           to: booking.email,
           subject: '🎊 CONFIRMED! Your Science Adventure Awaits!',
           html: `
