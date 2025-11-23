@@ -76,21 +76,21 @@ export const PACKAGES: PackageInfo[] = [
     id: 'preschool',
     name: 'Preschool Special',
     duration: '30-45 mins',
-    price: 1200,
+    price: 2800,
     description: 'Perfect for young learners with interactive science demonstrations'
   },
   {
     id: 'classic',
     name: 'Classic Show',
     duration: '45-60 mins',
-    price: 1800,
+    price: 3600,
     description: 'Engaging science show with hands-on experiments'
   },
   {
     id: 'halfday',
     name: 'Half-Day Experience',
     duration: '4 hours',
-    price: 2500,
+    price: 5200,
     description: 'Comprehensive science adventure with multiple activities'
   }
 ];
