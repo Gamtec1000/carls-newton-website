@@ -1541,7 +1541,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
                   >
                     <div style={styles.packageName}>Preschool Special</div>
                     <div style={styles.packageDuration}>30-45 mins</div>
-                    <div style={styles.packagePrice}>₫2,800</div>
+                    <div style={styles.packagePrice}>Dhs 2,800</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'classic')}
@@ -1552,7 +1552,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
                   >
                     <div style={styles.packageName}>Classic Show</div>
                     <div style={styles.packageDuration}>45-60 mins</div>
-                    <div style={styles.packagePrice}>₫3,600</div>
+                    <div style={styles.packagePrice}>Dhs 3,600</div>
                   </div>
                   <div
                     style={styles.packageCard(selectedPackage === 'halfday')}
@@ -1563,7 +1563,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
                   >
                     <div style={styles.packageName}>Half-Day Experience</div>
                     <div style={styles.packageDuration}>4 hours</div>
-                    <div style={styles.packagePrice}>₫5,200</div>
+                    <div style={styles.packagePrice}>Dhs 5,200</div>
                   </div>
                 </div>
               </div>
