@@ -684,20 +684,6 @@ const AdminBookings: React.FC = () => {
                   </button>
                 </div>
               )}
-
-              {booking.status === 'confirmed' && booking.payment_status === 'pending' && (
-                <button
-                  style={{
-                    ...styles.actionButton('paid'),
-                    gridColumn: '1 / -1',
-                  }}
-                  onClick={() => updateBookingStatus(booking.id, 'confirmed', 'paid')}
-                  disabled={updating === booking.id}
-                >
-                  <DollarSign size={16} />
-                  {updating === booking.id ? 'Updating...' : 'Mark as Paid'}
-                </button>
-              )}
             </div>
           ))}
         </div>
