@@ -7,13 +7,42 @@ interface GalleryImage {
 
 interface DomeGalleryProps {
   images: GalleryImage[];
+  fit?: number;
+  minRadius?: number;
+  maxRadius?: number;
+  maxVerticalRotationDeg?: number;
+  segments?: number;
+  dragDampening?: number;
+  dragSensitivity?: number;
+  grayscale?: boolean;
+  imageBorderRadius?: string;
+  openedImageWidth?: string;
+  openedImageHeight?: string;
+  openedImageBorderRadius?: string;
 }
 
-const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
+const DomeGallery: React.FC<DomeGalleryProps> = ({
+  images,
+  fit = 0.8,
+  minRadius = 600,
+  maxRadius = Infinity,
+  maxVerticalRotationDeg = 0,
+  segments = 34,
+  dragDampening = 2,
+  dragSensitivity = 20,
+  grayscale = true,
+  imageBorderRadius = '30px',
+  openedImageWidth = '400px',
+  openedImageHeight = '400px',
+  openedImageBorderRadius = '30px',
+}) => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+
+  // Calculate effective radius based on fit and constraints
+  const radius = Math.min(Math.max(minRadius * fit, minRadius), maxRadius);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -23,7 +52,9 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
     const diff = e.clientX - startX;
-    setRotation((prev) => prev + diff * 0.3);
+    // Apply drag dampening (higher value = less sensitive)
+    const sensitivity = 1 / dragDampening;
+    setRotation((prev) => prev + diff * sensitivity);
     setStartX(e.clientX);
   };
 
@@ -47,7 +78,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
       position: 'relative' as const,
       cursor: isDragging ? 'grabbing' : 'grab',
       overflow: 'hidden',
-      perspective: '1200px',
+      perspective: '1500px',
       userSelect: 'none' as const,
     },
     domeContainer: {
@@ -55,12 +86,11 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
       height: '100%',
       position: 'relative' as const,
       transformStyle: 'preserve-3d' as const,
-      transform: `rotateY(${rotation}deg)`,
+      transform: `rotateY(${rotation}deg) rotateX(${maxVerticalRotationDeg}deg)`,
       transition: isDragging ? 'none' : 'transform 0.5s ease-out',
     },
     imageWrapper: (index: number) => {
       const angle = (360 / images.length) * index;
-      const radius = 450;
       return {
         position: 'absolute' as const,
         top: '50%',
@@ -81,18 +111,12 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
       width: '100%',
       height: '100%',
       objectFit: 'cover' as const,
-      borderRadius: '20px',
-      filter: 'grayscale(100%)',
+      borderRadius: imageBorderRadius,
+      filter: grayscale ? 'grayscale(100%)' : 'none',
       border: '2px solid rgba(255, 255, 255, 0.1)',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-    } as React.CSSProperties,
-    imageHover: {
-      filter: 'grayscale(0%)',
-      transform: 'scale(1.05)',
-      border: '2px solid rgba(6, 182, 212, 0.5)',
-      boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)',
     } as React.CSSProperties,
     modal: {
       position: 'fixed' as const,
@@ -109,9 +133,10 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
       cursor: 'pointer',
     },
     modalImage: {
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      borderRadius: '20px',
+      width: openedImageWidth,
+      height: openedImageHeight,
+      objectFit: 'contain' as const,
+      borderRadius: openedImageBorderRadius,
       boxShadow: '0 20px 80px rgba(0, 0, 0, 0.8)',
       cursor: 'default',
     } as React.CSSProperties,
@@ -151,13 +176,17 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({ images }) => {
                 alt={image.alt}
                 style={styles.image}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.filter = 'grayscale(0%)';
+                  if (grayscale) {
+                    e.currentTarget.style.filter = 'grayscale(0%)';
+                  }
                   e.currentTarget.style.transform = 'scale(1.05)';
                   e.currentTarget.style.border = '2px solid rgba(6, 182, 212, 0.5)';
                   e.currentTarget.style.boxShadow = '0 20px 60px rgba(6, 182, 212, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.filter = 'grayscale(100%)';
+                  if (grayscale) {
+                    e.currentTarget.style.filter = 'grayscale(100%)';
+                  }
                   e.currentTarget.style.transform = 'scale(1)';
                   e.currentTarget.style.border = '2px solid rgba(255, 255, 255, 0.1)';
                   e.currentTarget.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.5)';

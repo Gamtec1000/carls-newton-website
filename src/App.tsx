@@ -1350,6 +1350,16 @@ export default function CarlsNewtonLanding() {
                 alt: 'Group science workshop collaboration',
               },
             ]}
+            fit={0.8}
+            minRadius={600}
+            maxVerticalRotationDeg={0}
+            segments={34}
+            dragDampening={2}
+            grayscale={true}
+            imageBorderRadius="30px"
+            openedImageWidth="400px"
+            openedImageHeight="400px"
+            openedImageBorderRadius="30px"
           />
 
           {/* Instructions */}
