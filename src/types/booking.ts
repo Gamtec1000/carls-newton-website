@@ -46,11 +46,20 @@ export interface Booking {
   package_type: 'preschool' | 'classic' | 'halfday';
   date: string; // ISO date string
   time_slot: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  payment_status: 'pending' | 'paid' | 'refunded';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'rejected';
+  payment_status: 'pending' | 'paid' | 'refunded' | 'failed';
   price: number;
   message?: string;
   special_requests?: string;
+  payment_link?: string;
+  payment_link_sent_at?: string;
+  payment_intent_id?: string;
+  paid_at?: string;
+  payment_failure_reason?: string;
+  admin_notes?: string;
+  internal_notes?: string;
+  rejected_reason?: string;
+  confirmed_at?: string;
   created_at: string;
 }
 
