@@ -1400,7 +1400,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
                 <p style={{
                   fontSize: '16px',
                   lineHeight: '1.6',
-                  color: '#1f2937',
+                  color: '#ffffff',
                   margin: '20px 0',
                   maxWidth: '500px'
                 }}>
@@ -1434,7 +1434,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
 
                 <p style={{
                   fontSize: '14px',
-                  color: '#6b7280',
+                  color: 'rgba(255, 255, 255, 0.8)',
                   margin: '20px 0'
                 }}>
                   We'll confirm within 24 hours! 🎉
@@ -1493,20 +1493,22 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
                     marginTop: '10px',
                     padding: '10px 20px',
                     background: 'transparent',
-                    color: '#6b7280',
-                    border: '1px solid #d1d5db',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
                     borderRadius: '8px',
                     fontSize: '14px',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.background = '#f3f4f6';
-                    e.currentTarget.style.borderColor = '#9ca3af';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                    e.currentTarget.style.color = '#ffffff';
                   }}
                   onMouseOut={(e) => {
                     e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
                   }}
                 >
                   Close
