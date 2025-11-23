@@ -658,7 +658,7 @@ const AdminBookings: React.FC = () => {
               <div style={styles.divider} />
 
               <div style={styles.priceRow}>
-                <span style={styles.price}>₯{booking.price.toLocaleString()}</span>
+                <span style={styles.price}>₫{booking.price.toLocaleString()}</span>
                 <div style={styles.paymentBadge(booking.payment_status)}>
                   {booking.payment_status}
                 </div>
