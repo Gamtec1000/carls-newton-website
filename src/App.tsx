@@ -1465,7 +1465,7 @@ export default function CarlsNewtonLanding() {
                 )}
                 <div style={{ marginBottom: '24px' }}>
                   <p style={{
-                    fontSize: '14px',
+                    fontSize: '17px',
                     color: 'rgba(255, 255, 255, 0.7)',
                     marginBottom: '6px',
                     fontWeight: 'normal',
