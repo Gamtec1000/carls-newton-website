@@ -22,6 +22,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isGeneratingPaymentLink, setIsGeneratingPaymentLink] = useState(false);
+  const [isSendingPaymentLink, setIsSendingPaymentLink] = useState(false);
 
   if (!booking) return null;
 
@@ -174,6 +175,83 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
       );
     } finally {
       setIsGeneratingPaymentLink(false);
+    }
+  };
+
+  const handleSendPaymentLink = async () => {
+    if (userRole === 'viewer') {
+      alert('You do not have permission to send payment links');
+      return;
+    }
+
+    setIsSendingPaymentLink(true);
+    try {
+      console.log('Sending payment link email for booking:', booking.id);
+
+      const response = await fetch('/api/send-payment-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: booking.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || 'Failed to send payment link');
+      }
+
+      const data = await response.json();
+      console.log('Payment link email sent:', data.payment_link);
+
+      // Update local payment link if it was generated
+      if (data.payment_link) {
+        setPaymentLink(data.payment_link);
+      }
+
+      alert('✅ Payment link email sent successfully to ' + booking.email);
+    } catch (error) {
+      console.error('Error sending payment link:', error);
+      alert(
+        `Failed to send payment link: ${error instanceof Error ? error.message : 'Unknown error'}\n\n` +
+        'Please make sure Stripe and Resend are configured properly.'
+      );
+    } finally {
+      setIsSendingPaymentLink(false);
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    if (userRole === 'viewer') {
+      alert('You do not have permission to cancel bookings');
+      return;
+    }
+
+    const confirmCancel = window.confirm(
+      `Are you sure you want to cancel this booking?\n\n` +
+      `Booking: ${booking.booking_number || booking.id}\n` +
+      `Customer: ${booking.customer_name}\n` +
+      `Date: ${formatDate(booking.date)} at ${booking.time_slot}\n\n` +
+      `This action will notify the customer and free up the time slot.`
+    );
+
+    if (!confirmCancel) return;
+
+    setIsUpdating(true);
+    try {
+      await onUpdate(booking.id, {
+        status: 'cancelled',
+        internal_notes: internalNotes,
+      });
+      alert('Booking cancelled successfully. Customer will be notified.');
+      onClose();
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      alert('Failed to cancel booking. Please try again.');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -405,28 +483,50 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           {/* Payment Link Section */}
           {(booking.status === 'pending' || booking.payment_status !== 'paid') && (
             <section style={{ marginBottom: '30px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
                 <h3 style={{ color: '#d946ef', margin: 0 }}>Payment Link</h3>
-                <button
-                  onClick={handleGeneratePaymentLink}
-                  disabled={userRole === 'viewer' || isGeneratingPaymentLink}
-                  style={{
-                    padding: '8px 16px',
-                    background: isGeneratingPaymentLink
-                      ? '#4b5563'
-                      : 'linear-gradient(135deg, #d946ef 0%, #06b6d4 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    fontSize: '13px',
-                    cursor: isGeneratingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
-                    opacity: isGeneratingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  {isGeneratingPaymentLink ? '⏳ Generating...' : '🔗 Generate Stripe Link'}
-                </button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={handleGeneratePaymentLink}
+                    disabled={userRole === 'viewer' || isGeneratingPaymentLink}
+                    style={{
+                      padding: '8px 16px',
+                      background: isGeneratingPaymentLink
+                        ? '#4b5563'
+                        : 'linear-gradient(135deg, #d946ef 0%, #06b6d4 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      cursor: isGeneratingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
+                      opacity: isGeneratingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {isGeneratingPaymentLink ? '⏳ Generating...' : '🔗 Generate Stripe Link'}
+                  </button>
+                  <button
+                    onClick={handleSendPaymentLink}
+                    disabled={userRole === 'viewer' || isSendingPaymentLink}
+                    style={{
+                      padding: '8px 16px',
+                      background: isSendingPaymentLink
+                        ? '#4b5563'
+                        : 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      cursor: isSendingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
+                      opacity: isSendingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {isSendingPaymentLink ? '📧 Sending...' : '📧 Send Payment Link'}
+                  </button>
+                </div>
               </div>
               <input
                 type="url"
@@ -445,7 +545,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                 }}
               />
               <p style={{ color: '#9ca3af', fontSize: '12px', marginTop: '8px' }}>
-                💡 Click "Generate Stripe Link" to automatically create a payment link, or paste your own Stripe link.
+                💡 Click "Send Payment Link" to automatically generate a Stripe link and email it to the customer, or click "Generate Stripe Link" to create it without sending.
               </p>
             </section>
           )}
@@ -578,6 +678,27 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   ❌ Reject Booking
                 </button>
               </>
+            )}
+            {(booking.status === 'confirmed' || booking.status === 'pending') && userRole !== 'viewer' && (
+              <button
+                onClick={handleCancelBooking}
+                disabled={isUpdating}
+                style={{
+                  flex: 1,
+                  minWidth: '200px',
+                  padding: '15px 30px',
+                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  fontSize: '16px',
+                  cursor: isUpdating ? 'not-allowed' : 'pointer',
+                  opacity: isUpdating ? 0.7 : 1,
+                }}
+              >
+                🚫 Cancel Booking
+              </button>
             )}
             {userRole !== 'viewer' && (
               <button
