@@ -23,6 +23,8 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isGeneratingPaymentLink, setIsGeneratingPaymentLink] = useState(false);
   const [isSendingPaymentLink, setIsSendingPaymentLink] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   if (!booking) return null;
 
@@ -52,28 +54,43 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
 
   const handleConfirm = async () => {
     if (userRole === 'viewer') {
-      alert('You do not have permission to confirm bookings');
+      alert('⚠️ You do not have permission to confirm bookings');
       return;
     }
 
-    if (!paymentLink) {
-      alert('Please enter a Stripe payment link before confirming');
+    if (!paymentLink.trim()) {
+      alert('⚠️ Please enter a Stripe payment link before confirming the booking');
       return;
     }
 
     setIsUpdating(true);
     try {
+      console.log('🔄 Confirming booking and sending payment link email...');
+      console.log('Booking ID:', booking.id);
+      console.log('Payment Link:', paymentLink);
+
+      // Update booking with confirmed status and payment link
       await onUpdate(booking.id, {
         status: 'confirmed',
-        payment_link: paymentLink,
-        admin_notes: adminNotes,
-        internal_notes: internalNotes,
+        payment_link: paymentLink.trim(),
+        admin_notes: adminNotes.trim() || null,
+        internal_notes: internalNotes.trim() || null,
       });
-      alert('Booking confirmed! Confirmation email sent to customer.');
-      onClose();
+
+      console.log('✅ Booking confirmed successfully');
+
+      // Show success message
+      setSuccessMessage('✅ Booking confirmed! Confirmation email with payment link sent to customer.');
+      setShowSuccessMessage(true);
+
+      // Auto-close modal after 2 seconds
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+
     } catch (error) {
-      console.error('Error confirming booking:', error);
-      alert('Failed to confirm booking. Please try again.');
+      console.error('❌ Error confirming booking:', error);
+      alert(`❌ Failed to confirm booking: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease try again or contact support.`);
     } finally {
       setIsUpdating(false);
     }
@@ -300,6 +317,38 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
     }
   };
 
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
+      pending: { color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.2)', icon: '⏳', label: 'Pending' },
+      confirmed: { color: '#10B981', bg: 'rgba(16, 185, 129, 0.2)', icon: '✅', label: 'Confirmed' },
+      completed: { color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.2)', icon: '🎉', label: 'Completed' },
+      rejected: { color: '#EF4444', bg: 'rgba(239, 68, 68, 0.2)', icon: '❌', label: 'Rejected' },
+      cancelled: { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.2)', icon: '🚫', label: 'Cancelled' },
+    };
+
+    const config = statusConfig[status] || statusConfig.pending;
+
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '8px 16px',
+          background: config.bg,
+          border: `2px solid ${config.color}`,
+          borderRadius: '20px',
+          color: config.color,
+          fontWeight: 'bold',
+          fontSize: '14px',
+        }}
+      >
+        <span>{config.icon}</span>
+        <span>{config.label.toUpperCase()}</span>
+      </span>
+    );
+  };
+
   return (
     <div
       style={{
@@ -362,7 +411,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           </button>
 
           <h2 style={{ color: 'white', margin: '0 0 10px 0' }}>Booking Details</h2>
-          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
             <span
               style={{
                 background: 'rgba(255, 255, 255, 0.9)',
@@ -375,18 +424,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
             >
               #{booking.booking_number || booking.id}
             </span>
-            <span
-              style={{
-                background: getStatusColor(booking.status),
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontWeight: 'bold',
-                fontSize: '14px',
-              }}
-            >
-              {booking.status.toUpperCase()}
-            </span>
+            {getStatusBadge(booking.status)}
             <span
               style={{
                 background: booking.payment_status === 'paid' ? '#22C55E' : '#F59E0B',
@@ -404,6 +442,27 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
 
         {/* Content */}
         <div style={{ padding: '30px' }}>
+          {/* Success Message */}
+          {showSuccessMessage && successMessage && (
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2))',
+                border: '2px solid #10B981',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <span style={{ fontSize: '24px' }}>✅</span>
+              <p style={{ color: '#10B981', fontWeight: 'bold', margin: 0, fontSize: '15px' }}>
+                {successMessage}
+              </p>
+            </div>
+          )}
+
           {/* Customer Information */}
           <section style={{ marginBottom: '30px' }}>
             <h3 style={{ color: '#d946ef', marginBottom: '15px' }}>Customer Information</h3>
@@ -480,90 +539,94 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
             )}
           </section>
 
-          {/* Payment Link Section */}
-          {(booking.status === 'pending' || booking.payment_status !== 'paid') && (
+          {/* Payment Link Section - Only for Pending Bookings */}
+          {booking.status === 'pending' && (
             <section style={{ marginBottom: '30px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <h3 style={{ color: '#d946ef', margin: 0 }}>Payment Link</h3>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={handleGeneratePaymentLink}
-                    disabled={userRole === 'viewer' || isGeneratingPaymentLink}
-                    style={{
-                      padding: '8px 16px',
-                      background: isGeneratingPaymentLink
-                        ? '#4b5563'
-                        : 'linear-gradient(135deg, #d946ef 0%, #06b6d4 100%)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      cursor: isGeneratingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
-                      opacity: isGeneratingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {isGeneratingPaymentLink ? '⏳ Generating...' : '🔗 Generate Stripe Link'}
-                  </button>
-                  <button
-                    onClick={handleSendPaymentLink}
-                    disabled={userRole === 'viewer' || isSendingPaymentLink}
-                    style={{
-                      padding: '8px 16px',
-                      background: isSendingPaymentLink
-                        ? '#4b5563'
-                        : 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      cursor: isSendingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
-                      opacity: isSendingPaymentLink || userRole === 'viewer' ? 0.6 : 1,
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {isSendingPaymentLink ? '📧 Sending...' : '📧 Send Payment Link'}
-                  </button>
-                </div>
+                <button
+                  onClick={handleGeneratePaymentLink}
+                  disabled={userRole === 'viewer' || isGeneratingPaymentLink}
+                  style={{
+                    padding: '6px 14px',
+                    background: isGeneratingPaymentLink
+                      ? '#4b5563'
+                      : 'rgba(217, 70, 239, 0.2)',
+                    color: isGeneratingPaymentLink ? '#9ca3af' : '#d946ef',
+                    border: '1px solid #d946ef',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    cursor: isGeneratingPaymentLink || userRole === 'viewer' ? 'not-allowed' : 'pointer',
+                    opacity: isGeneratingPaymentLink || userRole === 'viewer' ? 0.5 : 1,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {isGeneratingPaymentLink ? '⏳ Generating...' : '🔗 Auto-Generate'}
+                </button>
               </div>
               <input
                 type="url"
                 value={paymentLink}
                 onChange={(e) => setPaymentLink(e.target.value)}
-                placeholder="https://buy.stripe.com/... (or click Generate button)"
+                placeholder="Paste Stripe payment link or click Auto-Generate button above"
                 disabled={userRole === 'viewer'}
                 style={{
                   width: '100%',
-                  padding: '12px',
+                  padding: '14px',
                   backgroundColor: '#2d2d44',
-                  border: '2px solid #3d3d5c',
+                  border: paymentLink.trim() ? '2px solid #10B981' : '2px solid #3d3d5c',
                   borderRadius: '8px',
                   color: 'white',
                   fontSize: '14px',
+                  outline: 'none',
                 }}
               />
-              <p style={{ color: '#9ca3af', fontSize: '12px', marginTop: '8px' }}>
-                💡 Click "Send Payment Link" to automatically generate a Stripe link and email it to the customer, or click "Generate Stripe Link" to create it without sending.
+              <p style={{ color: paymentLink.trim() ? '#10B981' : '#9ca3af', fontSize: '12px', marginTop: '8px', fontWeight: paymentLink.trim() ? 'bold' : 'normal' }}>
+                {paymentLink.trim()
+                  ? '✅ Payment link ready! Click "Confirm & Send Payment Link" button below to finalize the booking.'
+                  : '💡 Enter or generate a Stripe payment link, then click the confirmation button below to send it to the customer.'}
               </p>
             </section>
           )}
 
-          {booking.payment_link && (
+          {/* Confirmed Booking Display */}
+          {booking.status === 'confirmed' && booking.payment_link && (
             <section style={{ marginBottom: '30px' }}>
-              <h3 style={{ color: '#d946ef', marginBottom: '15px' }}>Payment Link</h3>
-              <a
-                href={booking.payment_link}
-                target="_blank"
-                rel="noopener noreferrer"
+              <div
                 style={{
-                  color: '#06b6d4',
-                  wordBreak: 'break-all',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15))',
+                  border: '2px solid #10B981',
+                  borderRadius: '12px',
+                  padding: '20px',
                 }}
               >
-                {booking.payment_link}
-              </a>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '24px' }}>✅</span>
+                  <h3 style={{ color: '#10B981', margin: 0 }}>Booking Confirmed</h3>
+                </div>
+                <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '12px' }}>
+                  Payment link sent to customer
+                </p>
+                <div style={{ marginTop: '15px' }}>
+                  <label style={{ color: '#10B981', fontSize: '13px', fontWeight: 'bold' }}>Payment Link:</label>
+                  <a
+                    href={booking.payment_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'block',
+                      color: '#06b6d4',
+                      wordBreak: 'break-all',
+                      marginTop: '6px',
+                      fontSize: '13px',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {booking.payment_link}
+                  </a>
+                </div>
+              </div>
             </section>
           )}
 
@@ -634,51 +697,69 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           </section>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '30px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '30px' }}>
+            {/* Primary Action: Confirm & Send Payment Link */}
             {booking.status === 'pending' && userRole !== 'viewer' && (
-              <>
-                <button
-                  onClick={handleConfirm}
-                  disabled={isUpdating || !paymentLink}
-                  style={{
-                    flex: 1,
-                    minWidth: '200px',
-                    padding: '15px 30px',
-                    background: paymentLink
-                      ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
-                      : '#4b5563',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    cursor: paymentLink && !isUpdating ? 'pointer' : 'not-allowed',
-                    opacity: isUpdating ? 0.7 : 1,
-                  }}
-                >
-                  {isUpdating ? 'Processing...' : '✅ Confirm & Send Email'}
-                </button>
-                <button
-                  onClick={() => setShowRejectModal(true)}
-                  disabled={isUpdating}
-                  style={{
-                    flex: 1,
-                    minWidth: '200px',
-                    padding: '15px 30px',
-                    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    cursor: isUpdating ? 'not-allowed' : 'pointer',
-                    opacity: isUpdating ? 0.7 : 1,
-                  }}
-                >
-                  ❌ Reject Booking
-                </button>
-              </>
+              <button
+                onClick={handleConfirm}
+                disabled={isUpdating || !paymentLink.trim() || showSuccessMessage}
+                style={{
+                  flex: 1,
+                  minWidth: '250px',
+                  padding: '16px 32px',
+                  background: paymentLink.trim() && !showSuccessMessage
+                    ? 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)'
+                    : showSuccessMessage
+                    ? 'rgba(16, 185, 129, 0.3)'
+                    : 'rgba(107, 114, 128, 0.3)',
+                  color: 'white',
+                  border: showSuccessMessage ? '2px solid #10B981' : 'none',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  fontSize: '16px',
+                  cursor: (paymentLink.trim() && !isUpdating && !showSuccessMessage) ? 'pointer' : 'not-allowed',
+                  opacity: isUpdating ? 0.7 : 1,
+                  transition: 'all 0.3s',
+                  boxShadow: paymentLink.trim() && !showSuccessMessage ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none',
+                }}
+              >
+                {isUpdating
+                  ? '⏳ Processing...'
+                  : showSuccessMessage
+                  ? '✅ Booking Confirmed'
+                  : '✅ Confirm & Send Payment Link'}
+              </button>
             )}
+            {/* Secondary Action: Reject */}
+            {booking.status === 'pending' && userRole !== 'viewer' && !showSuccessMessage && (
+              <button
+                onClick={() => setShowRejectModal(true)}
+                disabled={isUpdating}
+                style={{
+                  padding: '16px 28px',
+                  background: 'transparent',
+                  color: '#EF4444',
+                  border: '2px solid #EF4444',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  fontSize: '16px',
+                  cursor: isUpdating ? 'not-allowed' : 'pointer',
+                  opacity: isUpdating ? 0.5 : 1,
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isUpdating) {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                ❌ Reject
+              </button>
+            )}
+            {/* Show Cancel button for confirmed or pending bookings */}
             {(booking.status === 'confirmed' || booking.status === 'pending') && userRole !== 'viewer' && (
               <button
                 onClick={handleCancelBooking}
@@ -700,6 +781,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                 🚫 Cancel Booking
               </button>
             )}
+            {/* Save Notes button - always visible for admins */}
             {userRole !== 'viewer' && (
               <button
                 onClick={handleSaveNotes}
