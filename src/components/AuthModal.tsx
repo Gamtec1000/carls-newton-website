@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import PhoneInput from 'react-phone-number-input';
@@ -69,6 +69,33 @@ export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: Au
     'Project-Based Learning',
     'Inquiry-Based Learning',
   ];
+
+  // SOLUTION 1 & 3: Clear messages on mount and tab change
+  useEffect(() => {
+    setSuccess('');
+    setError('');
+  }, [activeTab]); // Re-run when tab changes
+
+  // SOLUTION 2: Clear messages when modal state changes
+  useEffect(() => {
+    if (!isOpen) {
+      // Clear messages when modal closes
+      setSuccess('');
+      setError('');
+      setSignInEmail('');
+      setSignInPassword('');
+    }
+  }, [isOpen]);
+
+  // SOLUTION 5: Auto-clear success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
