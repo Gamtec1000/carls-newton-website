@@ -4,7 +4,7 @@ import { Booking } from '../types/booking';
 interface BookingDetailModalProps {
   booking: Booking | null;
   onClose: () => void;
-  onUpdate: (bookingId: string, updates: any) => Promise<void>;
+  onUpdate: (bookingId: string, updates: any) => Promise<any>;
   userRole?: 'super_admin' | 'admin' | 'viewer';
 }
 
@@ -70,7 +70,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
       console.log('Payment Link:', paymentLink);
 
       // Update booking with confirmed status and payment link
-      await onUpdate(booking.id, {
+      const result = await onUpdate(booking.id, {
         status: 'confirmed',
         payment_link: paymentLink.trim(),
         admin_notes: adminNotes.trim() || null,
@@ -78,15 +78,33 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
       });
 
       console.log('✅ Booking confirmed successfully');
+      console.log('📧 Email sent:', result?.emailSent);
+      console.log('📧 Email error:', result?.emailError);
 
-      // Show success message
-      setSuccessMessage('✅ Booking confirmed! Confirmation email with payment link sent to customer.');
-      setShowSuccessMessage(true);
+      // Check email status and show appropriate message
+      if (result?.emailSent === true) {
+        setSuccessMessage('✅ Booking confirmed! Confirmation email with payment link sent to customer.');
+        setShowSuccessMessage(true);
 
-      // Auto-close modal after 2 seconds
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+        // Auto-close modal after 2 seconds
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else if (result?.emailError) {
+        // Booking confirmed but email failed
+        setSuccessMessage(`⚠️ Booking confirmed, but email failed to send.\n\nError: ${result.emailError}\n\nPlease manually notify the customer.`);
+        setShowSuccessMessage(true);
+
+        // Don't auto-close so admin can see the error
+      } else {
+        // Booking confirmed but no email status info (shouldn't happen with new API)
+        setSuccessMessage('✅ Booking confirmed! Please verify customer was notified.');
+        setShowSuccessMessage(true);
+
+        setTimeout(() => {
+          onClose();
+        }, 3000);
+      }
 
     } catch (error) {
       console.error('❌ Error confirming booking:', error);
