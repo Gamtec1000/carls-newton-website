@@ -1315,21 +1315,23 @@ export default function CarlsNewtonLanding() {
               {
                 name: 'Preschool Special',
                 duration: '30-45 mins',
-                price: '1,200',
+                price: '2,800',
                 features: [
                   'Age-appropriate experiments',
                   'Interactive storytelling',
                   'Sensory activities',
                   'Fun takeaways',
+                  'Max 30 students',
                 ],
               },
               {
                 name: 'Classic Show',
+                gradeLevel: 'Y1 - Y8',
                 duration: '45-60 mins',
-                price: '1,800',
+                price: '3,600',
                 features: [
                   'Curriculum-aligned topics',
-                  'Explosive demos',
+                  'Spectacular experiments',
                   'Q&A session',
                   'Student participation',
                 ],
@@ -1337,13 +1339,18 @@ export default function CarlsNewtonLanding() {
               },
               {
                 name: 'Half-Day Experience',
+                gradeLevel: 'Y1 - Y8',
                 duration: 'Show + Workshop',
-                price: '2,500',
+                price: '5,200',
                 features: [
                   'Live show included',
                   'Hands-on group session',
                   'Max 30 students',
                   'Take-home materials',
+                  'Interactive demonstrations',
+                  'Guided experiments',
+                  'STEM learning activities',
+                  'Collaborative projects',
                 ],
               },
               {
@@ -1436,6 +1443,11 @@ export default function CarlsNewtonLanding() {
                 >
                   {pkg.name}
                 </h3>
+                {pkg.gradeLevel && (
+                  <p style={{ color: '#06B6D4', marginBottom: '4px', fontWeight: '600', fontSize: '14px' }}>
+                    {pkg.gradeLevel}
+                  </p>
+                )}
                 <p style={{ color: '#C4B5FD', marginBottom: pkg.description ? '8px' : '16px' }}>
                   {pkg.duration}
                 </p>
@@ -1446,7 +1458,7 @@ export default function CarlsNewtonLanding() {
                 )}
                 <div style={{ marginBottom: '24px' }}>
                   <span style={{ fontSize: '36px', fontWeight: 'bold' }}>
-                    {pkg.premium ? 'From د.إ ' : 'د.إ '}{pkg.price}
+                    {pkg.premium ? 'From ₯' : '₯'}{pkg.price}
                   </span>
                   {pkg.price !== 'Custom' && !pkg.premium && (
                     <span style={{ color: '#C4B5FD' }}> +</span>
