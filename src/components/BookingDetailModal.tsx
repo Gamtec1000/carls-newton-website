@@ -31,13 +31,22 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
     halfday: 'Half-Day Experience (4 hours)',
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'No date';
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return 'Invalid date';
+    }
   };
 
   const handleConfirm = async () => {
@@ -185,6 +194,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
     // Parse date and time
     const startDate = new Date(`${booking.date}T${booking.time_slot}`);
     const endDate = new Date(startDate.getTime() + 3600000); // Add 1 hour
+
+    // Validate dates
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return '#'; // Return empty link if dates are invalid
+    }
 
     const formatGCalDate = (date: Date) => {
       return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
@@ -592,11 +606,29 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           {booking.created_at && (
             <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #3d3d5c' }}>
               <p style={{ color: '#9ca3af', fontSize: '12px', margin: '5px 0' }}>
-                Created: {new Date(booking.created_at).toLocaleString()}
+                Created: {
+                  (() => {
+                    try {
+                      const date = new Date(booking.created_at);
+                      return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleString();
+                    } catch {
+                      return 'Invalid date';
+                    }
+                  })()
+                }
               </p>
               {booking.confirmed_at && (
                 <p style={{ color: '#9ca3af', fontSize: '12px', margin: '5px 0' }}>
-                  Confirmed: {new Date(booking.confirmed_at).toLocaleString()}
+                  Confirmed: {
+                    (() => {
+                      try {
+                        const date = new Date(booking.confirmed_at);
+                        return isNaN(date.getTime()) ? 'Invalid date' : date.toLocaleString();
+                      } catch {
+                        return 'Invalid date';
+                      }
+                    })()
+                  }
                 </p>
               )}
             </div>
