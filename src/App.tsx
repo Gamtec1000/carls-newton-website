@@ -1387,8 +1387,14 @@ export default function CarlsNewtonLanding() {
               },
             ]}
             fit={0.8}
+            fitBasis="auto"
             minRadius={600}
+            maxRadius={Infinity}
+            padFactor={0.25}
+            overlayBlurColor="#060010"
             maxVerticalRotationDeg={0}
+            dragSensitivity={20}
+            enlargeTransitionMs={300}
             segments={34}
             dragDampening={2}
             grayscale={true}
