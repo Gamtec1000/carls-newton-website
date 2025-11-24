@@ -1397,7 +1397,7 @@ export default function CarlsNewtonLanding() {
             enlargeTransitionMs={300}
             segments={34}
             dragDampening={2}
-            grayscale={true}
+            grayscale={false}
             imageBorderRadius="30px"
             openedImageWidth="400px"
             openedImageHeight="400px"

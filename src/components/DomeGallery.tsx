@@ -98,7 +98,20 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
       transition: isDragging ? 'none' : 'transform 0.5s ease-out',
     },
     imageWrapper: (index: number) => {
-      const angle = (360 / images.length) * index;
+      // Create dome/globe layout with multiple rows
+      const totalImages = images.length;
+      const rows = 3; // 3 rows for dome effect
+      const imagesPerRow = Math.ceil(totalImages / rows);
+      const currentRow = Math.floor(index / imagesPerRow);
+      const indexInRow = index % imagesPerRow;
+      const imagesInThisRow = Math.min(imagesPerRow, totalImages - currentRow * imagesPerRow);
+
+      // Horizontal angle (azimuth)
+      const horizontalAngle = (360 / imagesInThisRow) * indexInRow;
+
+      // Vertical angle (elevation) - distribute rows from top to bottom
+      const verticalAngle = (currentRow - 1) * 25; // -25°, 0°, +25°
+
       return {
         position: 'absolute' as const,
         top: '50%',
@@ -108,7 +121,8 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
         transform: `
           translateX(-50%)
           translateY(-50%)
-          rotateY(${angle}deg)
+          rotateY(${horizontalAngle}deg)
+          rotateX(${verticalAngle}deg)
           translateZ(${radius}px)
         `,
         transformStyle: 'preserve-3d' as const,
@@ -120,7 +134,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
       height: '100%',
       objectFit: 'cover' as const,
       borderRadius: imageBorderRadius,
-      filter: grayscale ? 'grayscale(100%)' : 'none',
+      filter: 'none', // No grayscale - full color
       border: '2px solid rgba(255, 255, 255, 0.1)',
       cursor: 'pointer',
       transition: `all ${enlargeTransitionMs}ms ease`,
@@ -185,17 +199,11 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
                 alt={image.alt}
                 style={styles.image}
                 onMouseEnter={(e) => {
-                  if (grayscale) {
-                    e.currentTarget.style.filter = 'grayscale(0%)';
-                  }
                   e.currentTarget.style.transform = 'scale(1.05)';
                   e.currentTarget.style.border = '2px solid rgba(6, 182, 212, 0.5)';
                   e.currentTarget.style.boxShadow = '0 20px 60px rgba(6, 182, 212, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  if (grayscale) {
-                    e.currentTarget.style.filter = 'grayscale(100%)';
-                  }
                   e.currentTarget.style.transform = 'scale(1)';
                   e.currentTarget.style.border = '2px solid rgba(255, 255, 255, 0.1)';
                   e.currentTarget.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.5)';
