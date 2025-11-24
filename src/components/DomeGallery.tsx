@@ -98,20 +98,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
       transition: isDragging ? 'none' : 'transform 0.5s ease-out',
     },
     imageWrapper: (index: number) => {
-      // Create dome/globe layout with multiple rows
-      const totalImages = images.length;
-      const rows = 3; // 3 rows for dome effect
-      const imagesPerRow = Math.ceil(totalImages / rows);
-      const currentRow = Math.floor(index / imagesPerRow);
-      const indexInRow = index % imagesPerRow;
-      const imagesInThisRow = Math.min(imagesPerRow, totalImages - currentRow * imagesPerRow);
-
-      // Horizontal angle (azimuth)
-      const horizontalAngle = (360 / imagesInThisRow) * indexInRow;
-
-      // Vertical angle (elevation) - distribute rows from top to bottom
-      const verticalAngle = (currentRow - 1) * 25; // -25°, 0°, +25°
-
+      const angle = (360 / images.length) * index;
       return {
         position: 'absolute' as const,
         top: '50%',
@@ -121,8 +108,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
         transform: `
           translateX(-50%)
           translateY(-50%)
-          rotateY(${horizontalAngle}deg)
-          rotateX(${verticalAngle}deg)
+          rotateY(${angle}deg)
           translateZ(${radius}px)
         `,
         transformStyle: 'preserve-3d' as const,
