@@ -1161,7 +1161,7 @@ const EnhancedBookingCalendar: React.FC<EnhancedBookingCalendarProps> = ({ onAut
           <span>Booked</span>
         </div>
         <div style={styles.legendItem}>
-          <div style={styles.legendBox('rgba(6, 182, 212, 0.2)')} />
+          <div style={styles.legendBox('rgba(251, 191, 36, 0.2)')} />
           <span>Today</span>
         </div>
       </div>
