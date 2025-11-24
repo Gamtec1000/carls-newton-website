@@ -8,12 +8,16 @@ interface GalleryImage {
 interface DomeGalleryProps {
   images: GalleryImage[];
   fit?: number;
+  fitBasis?: 'auto' | 'min' | 'max' | 'width' | 'height';
   minRadius?: number;
   maxRadius?: number;
+  padFactor?: number;
+  overlayBlurColor?: string;
   maxVerticalRotationDeg?: number;
   segments?: number;
   dragDampening?: number;
   dragSensitivity?: number;
+  enlargeTransitionMs?: number;
   grayscale?: boolean;
   imageBorderRadius?: string;
   openedImageWidth?: string;
@@ -24,12 +28,16 @@ interface DomeGalleryProps {
 const DomeGallery: React.FC<DomeGalleryProps> = ({
   images,
   fit = 0.8,
+  fitBasis = 'auto',
   minRadius = 600,
   maxRadius = Infinity,
+  padFactor = 0.25,
+  overlayBlurColor = '#060010',
   maxVerticalRotationDeg = 0,
   segments = 34,
   dragDampening = 2,
   dragSensitivity = 20,
+  enlargeTransitionMs = 300,
   grayscale = true,
   imageBorderRadius = '30px',
   openedImageWidth = '400px',
@@ -104,7 +112,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
           translateZ(${radius}px)
         `,
         transformStyle: 'preserve-3d' as const,
-        transition: 'all 0.3s ease',
+        transition: `all ${enlargeTransitionMs}ms ease`,
       };
     },
     image: {
@@ -115,7 +123,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
       filter: grayscale ? 'grayscale(100%)' : 'none',
       border: '2px solid rgba(255, 255, 255, 0.1)',
       cursor: 'pointer',
-      transition: 'all 0.3s ease',
+      transition: `all ${enlargeTransitionMs}ms ease`,
       boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
     } as React.CSSProperties,
     modal: {
@@ -139,6 +147,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
       borderRadius: openedImageBorderRadius,
       boxShadow: '0 20px 80px rgba(0, 0, 0, 0.8)',
       cursor: 'default',
+      transition: `all ${enlargeTransitionMs}ms ease`,
     } as React.CSSProperties,
     closeButton: {
       position: 'absolute' as const,
