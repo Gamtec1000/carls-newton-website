@@ -29,7 +29,7 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
   images,
   fit = 0.8,
   fitBasis = 'auto',
-  minRadius = 600,
+  minRadius = 900,
   maxRadius = Infinity,
   padFactor = 0.25,
   overlayBlurColor = '#060010',
@@ -103,8 +103,8 @@ const DomeGallery: React.FC<DomeGalleryProps> = ({
         position: 'absolute' as const,
         top: '50%',
         left: '50%',
-        width: '280px',
-        height: '280px',
+        width: '200px',
+        height: '200px',
         transform: `
           translateX(-50%)
           translateY(-50%)
