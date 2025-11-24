@@ -1660,6 +1660,19 @@ export default function CarlsNewtonLanding() {
                 </ul>
 
                 <button
+                  onClick={() => {
+                    const messages = {
+                      'Preschool Special': 'Hello%2C%20I%27m%20interested%20in%20the%20Preschool%20Special%20package',
+                      'Classic Show': 'Hello%2C%20I%27m%20interested%20in%20the%20Classic%20Show%20package',
+                      'Half-Day Experience': 'Hello%2C%20I%27m%20interested%20in%20the%20Half-Day%20Experience%20package',
+                      'Custom Project': 'Hello%2C%20I%27d%20like%20to%20request%20a%20custom%20quote%20for%20a%20school-wide%20event',
+                    };
+                    const message = messages[pkg.name as keyof typeof messages];
+                    window.open(
+                      `https://wa.me/971524098148?text=${message}`,
+                      '_blank'
+                    );
+                  }}
                   style={{
                     ...(pkg.popular ? styles.button : pkg.premium ? {
                       background: 'linear-gradient(135deg, #FBBF24, #F97316)',
