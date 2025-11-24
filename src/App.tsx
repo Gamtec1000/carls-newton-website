@@ -1388,7 +1388,7 @@ export default function CarlsNewtonLanding() {
             ]}
             fit={0.8}
             fitBasis="auto"
-            minRadius={900}
+            minRadius={600}
             maxRadius={Infinity}
             padFactor={0.25}
             overlayBlurColor="#060010"
