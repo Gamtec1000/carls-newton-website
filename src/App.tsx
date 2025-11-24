@@ -1488,6 +1488,7 @@ export default function CarlsNewtonLanding() {
                 name: 'Half-Day Experience',
                 gradeLevel: 'Y1 - Y8',
                 duration: 'Show + Workshop',
+                duration2: '4 hr show',
                 maxStudents: 'Max 30 students',
                 price: '5,200',
                 features: [
@@ -1503,6 +1504,7 @@ export default function CarlsNewtonLanding() {
               {
                 name: 'Custom Project',
                 duration: 'School-Wide Events',
+                maxStudents: '100+ students',
                 price: '8,000+',
                 features: [
                   'Science Fair Support',
@@ -1598,6 +1600,11 @@ export default function CarlsNewtonLanding() {
                 <p style={{ color: '#C4B5FD', marginBottom: '4px', fontSize: '14px' }}>
                   {pkg.duration}
                 </p>
+                {pkg.duration2 && (
+                  <p style={{ color: '#C4B5FD', marginBottom: '4px', fontSize: '14px' }}>
+                    {pkg.duration2}
+                  </p>
+                )}
                 {pkg.maxStudents && (
                   <p style={{ color: 'rgba(255, 255, 255, 0.8)', marginBottom: pkg.description ? '8px' : '16px', fontSize: '14px' }}>
                     {pkg.maxStudents}
