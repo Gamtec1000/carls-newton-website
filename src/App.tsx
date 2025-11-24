@@ -1318,36 +1318,72 @@ export default function CarlsNewtonLanding() {
           <DomeGallery
             images={[
               {
-                src: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&h=800&fit=crop',
-                alt: 'Students watching explosive science demonstration',
+                src: '/images/gallery/show-1.jpg',
+                alt: 'Carls Newton Science Show - Moment 1',
               },
               {
-                src: 'https://images.unsplash.com/photo-1581093458791-9f3c3250a3b0?w=800&h=800&fit=crop',
-                alt: 'Hands-on chemistry experiment with colorful reactions',
+                src: '/images/gallery/show-2.jpg',
+                alt: 'Carls Newton Science Show - Moment 2',
               },
               {
-                src: 'https://images.unsplash.com/photo-1567360425618-1594206637d2?w=800&h=800&fit=crop',
-                alt: 'Interactive physics demonstration with students',
+                src: '/images/gallery/show-3.jpg',
+                alt: 'Carls Newton Science Show - Moment 3',
               },
               {
-                src: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=800&fit=crop',
-                alt: 'Workshop with guided science experiments',
+                src: '/images/gallery/show-4.jpg',
+                alt: 'Carls Newton Science Show - Moment 4',
               },
               {
-                src: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=800&h=800&fit=crop',
-                alt: 'Students learning with STEM activities',
+                src: '/images/gallery/show-5.jpg',
+                alt: 'Carls Newton Science Show - Moment 5',
               },
               {
-                src: 'https://images.unsplash.com/photo-1576319155264-99536e0be1ee?w=800&h=800&fit=crop',
-                alt: 'Science fair support and consultation session',
+                src: '/images/gallery/show-6.jpg',
+                alt: 'Carls Newton Science Show - Moment 6',
               },
               {
-                src: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=800&h=800&fit=crop',
-                alt: 'Outdoor lab adventure with experiments',
+                src: '/images/gallery/show-7.jpg',
+                alt: 'Carls Newton Science Show - Moment 7',
               },
               {
-                src: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800&h=800&fit=crop',
-                alt: 'Group science workshop collaboration',
+                src: '/images/gallery/show-8.jpg',
+                alt: 'Carls Newton Science Show - Moment 8',
+              },
+              {
+                src: '/images/gallery/show-9.jpg',
+                alt: 'Carls Newton Science Show - Moment 9',
+              },
+              {
+                src: '/images/gallery/show-10.jpg',
+                alt: 'Carls Newton Science Show - Moment 10',
+              },
+              {
+                src: '/images/gallery/show-11.jpg',
+                alt: 'Carls Newton Science Show - Moment 11',
+              },
+              {
+                src: '/images/gallery/show-12.jpg',
+                alt: 'Carls Newton Science Show - Moment 12',
+              },
+              {
+                src: '/images/gallery/show-13.jpg',
+                alt: 'Carls Newton Science Show - Moment 13',
+              },
+              {
+                src: '/images/gallery/show-14.jpg',
+                alt: 'Carls Newton Science Show - Moment 14',
+              },
+              {
+                src: '/images/gallery/show-15.jpg',
+                alt: 'Carls Newton Science Show - Moment 15',
+              },
+              {
+                src: '/images/gallery/show-16.jpg',
+                alt: 'Carls Newton Science Show - Moment 16',
+              },
+              {
+                src: '/images/gallery/show-17.jpg',
+                alt: 'Carls Newton Science Show - Moment 17',
               },
             ]}
             fit={0.8}
