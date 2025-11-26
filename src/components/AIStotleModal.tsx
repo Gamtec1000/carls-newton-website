@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, Zap, Rocket, Beaker } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AIStotleModalProps {
   isOpen: boolean;
@@ -11,9 +12,13 @@ interface Message {
   text: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  intent?: string;
 }
 
+const AISTOTLE_API_URL = process.env.NEXT_PUBLIC_AISTOTLE_API_URL || 'https://aistotle.carlsnewton.com';
+
 export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -27,10 +32,10 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickQuestions = [
-    { icon: <Rocket size={16} />, text: 'What experiments do you offer?' },
-    { icon: <Beaker size={16} />, text: 'How do I book a show?' },
-    { icon: <Sparkles size={16} />, text: 'What ages are your shows for?' },
-    { icon: <Zap size={16} />, text: 'What topics do you cover?' },
+    { icon: <Rocket size={16} />, text: 'Why does elephant toothpaste foam?' },
+    { icon: <Beaker size={16} />, text: 'How does dry ice make fog?' },
+    { icon: <Sparkles size={16} />, text: 'Check my booking status' },
+    { icon: <Zap size={16} />, text: 'What is static electricity?' },
   ];
 
   useEffect(() => {
@@ -52,35 +57,42 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
     setInputText('');
     setIsTyping(true);
 
-    // Simulate AI response (replace with actual LLM API call)
-    setTimeout(() => {
-      const aiResponse = generateResponse(messageText);
+    try {
+      const response = await fetch(`${AISTOTLE_API_URL}/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: messageText,
+          student_age: 10,
+          user_email: user?.email || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI-STOTLE');
+      }
+
+      const data = await response.json();
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: aiResponse,
+        text: data.answer,
+        sender: 'ai',
+        timestamp: new Date(),
+        intent: data.intent,
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI-STOTLE API Error:', error);
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Sorry, I had trouble connecting to my knowledge base. Please try again!',
         sender: 'ai',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
-
-  const generateResponse = (query: string): string => {
-    const q = query.toLowerCase();
-
-    if (q.includes('experiment') || q.includes('show') || q.includes('offer')) {
-      return 'We offer three amazing experiences: Live Interactive Shows (45-60 mins of explosive demos), Hands-On Workshops (where students become scientists), and our Blast-off! Lab Experience (120-150 mins of outdoor science adventures). Each is designed to make complex science simple and fun!';
-    } else if (q.includes('book') || q.includes('booking')) {
-      return 'Booking is easy! Simply scroll down to our booking section or click the "BOOKINGS" button on the console. Select your preferred date and time, and our team will reach out to confirm. We bring all equipment and materials to your school!';
-    } else if (q.includes('age') || q.includes('old')) {
-      return 'We tailor our shows for all ages! We have special Preschool programs (30-45 mins, age-appropriate), Classic Shows for primary students, and advanced experiments for older students. Each show is curriculum-aligned and adjusts to your students\' understanding level.';
-    } else if (q.includes('topic') || q.includes('subject') || q.includes('science')) {
-      return 'Our shows cover a universe of topics! Physics (rockets, forces, energy), Chemistry (reactions, elements, mixtures), Biology (life systems), Earth Science (weather, geology), and more. We align with UAE curriculum and can customize based on what you\'re studying!';
-    } else if (q.includes('price') || q.includes('cost')) {
-      return 'Our packages start at د.إ 1,200 for Preschool Specials, د.إ 1,800 for Classic Shows, and د.إ 2,500+ for Half-Day Experiences. Check our Packages section for full details. Every dirham goes into making science unforgettable for your students!';
-    } else {
-      return 'That\'s a fascinating question! As AI-STOTLE, I\'m here to help with information about our science shows, booking, packages, and experiments. Could you ask me something specific about our programs? Or explore our console for quick answers!';
     }
   };
 
