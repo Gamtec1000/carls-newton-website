@@ -58,9 +58,14 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
     setIsTyping(true);
 
     try {
+      console.log('AI-STOTLE: Sending request to:', `${AISTOTLE_API_URL}/ask`);
+      console.log('AI-STOTLE: Request data:', { question: messageText, student_age: 10, user_email: user?.email });
+
       const response = await fetch(`${AISTOTLE_API_URL}/ask`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           question: messageText,
           student_age: 10,
@@ -68,15 +73,20 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
         }),
       });
 
+      console.log('AI-STOTLE: Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to get response from AI-STOTLE');
+        const errorText = await response.text();
+        console.error('AI-STOTLE: Error response:', errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('AI-STOTLE: Success response:', data);
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.answer,
+        text: data.answer || data.message || 'I received your question but had trouble formulating a response.',
         sender: 'ai',
         timestamp: new Date(),
         intent: data.intent,
@@ -84,9 +94,24 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('AI-STOTLE API Error:', error);
+
+      // More detailed error message
+      let errorMessage = 'Sorry, I had trouble connecting to my knowledge base. ';
+
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage += 'Please check if the AI-STOTLE API is running and accessible. ';
+          errorMessage += 'API URL: ' + AISTOTLE_API_URL;
+        } else if (error.message.includes('CORS')) {
+          errorMessage += 'There seems to be a CORS configuration issue. Please check the API CORS settings.';
+        } else {
+          errorMessage += error.message;
+        }
+      }
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'Sorry, I had trouble connecting to my knowledge base. Please try again!',
+        text: errorMessage,
         sender: 'ai',
         timestamp: new Date(),
       };
