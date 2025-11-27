@@ -18,7 +18,7 @@ import {
 import EnhancedBookingCalendar from './components/EnhancedBookingCalendar';
 import DomeGallery from './components/DomeGallery';
 import GooeyNav from './components/GooeyNav';
-import AIStotleModal from './components/AIStotleModal';
+import ChatWidget from './components/ChatWidget';
 import TelemetryPanels from './components/TelemetryPanels';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
@@ -87,7 +87,6 @@ const styles = {
 
 export default function CarlsNewtonLanding() {
   const { confirmationMessage, clearConfirmationMessage, showWelcomeModal, closeWelcomeModal, profile } = useAuth();
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -192,7 +191,6 @@ export default function CarlsNewtonLanding() {
           { label: 'Packages', href: '#packages' },
           { label: 'Booking', href: '#booking' },
           { label: 'Reviews', href: '#testimonials' },
-          { label: 'AI-Stotle', href: '#ai-stotle', onClick: () => setIsAIModalOpen(true) },
         ]}
         particleCount={20}
         particleDistances={[90, 10]}
@@ -204,9 +202,6 @@ export default function CarlsNewtonLanding() {
         onAuthClick={() => setIsAuthModalOpen(true)}
         onProfileSettingsClick={() => setIsProfileSettingsOpen(true)}
       />
-
-      {/* AI-STOTLE Modal */}
-      <AIStotleModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
 
       {/* Auth Modal */}
       <AuthModal
@@ -1976,6 +1971,9 @@ export default function CarlsNewtonLanding() {
           </p>
         </div>
       </footer>
+
+      {/* Floating Chat Widget */}
+      <ChatWidget />
     </div>
   );
 }
