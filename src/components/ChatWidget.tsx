@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
@@ -38,11 +39,20 @@ export default function ChatWidget() {
 
   useEffect(() => {
     console.log("💬 ChatWidget rendered, isOpen:", isOpen);
+    // Alert to confirm component is running
+    console.log("🚨 ALERT: If you see this in console, component IS mounting!");
   }, [isOpen]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Force an alert on mount to debug
+  useEffect(() => {
+    setTimeout(() => {
+      alert("ChatWidget is MOUNTED! If you see this alert, the component is working. Check bottom-right for chat button.");
+    }, 2000);
+  }, []);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -92,8 +102,28 @@ export default function ChatWidget() {
     sendMessage(question);
   };
 
-  return (
+  const widgetContent = (
     <>
+      {/* DEBUG: Simple test element */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '100px',
+          right: '20px',
+          width: '200px',
+          height: '100px',
+          backgroundColor: 'red',
+          color: 'white',
+          zIndex: 99999,
+          padding: '20px',
+          border: '5px solid yellow',
+          fontSize: '16px',
+          fontWeight: 'bold'
+        }}
+      >
+        TEST WIDGET - Can you see this?
+      </div>
+
       {/* Chat Bubble Trigger */}
       <button
         onClick={() => {
@@ -229,4 +259,7 @@ export default function ChatWidget() {
       </AnimatePresence>
     </>
   );
+
+  // Render using portal to escape parent container constraints
+  return createPortal(widgetContent, document.body);
 }
