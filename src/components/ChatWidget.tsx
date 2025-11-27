@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,9 +15,10 @@ const QUICK_QUESTIONS = [
   "Check my booking status",
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_AISTOTLE_API_URL || "https://aistotle.carlsnewton.com";
+const API_URL = import.meta.env.VITE_AISTOTLE_API_URL || "https://aistotle.carlsnewton.com";
 
 export default function ChatWidget() {
+  console.log("💬 ChatWidget mounted");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -36,6 +35,10 @@ export default function ChatWidget() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    console.log("💬 ChatWidget rendered, isOpen:", isOpen);
+  }, [isOpen]);
 
   useEffect(() => {
     scrollToBottom();
