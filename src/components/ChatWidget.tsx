@@ -94,6 +94,26 @@ export default function ChatWidget() {
 
   return (
     <>
+      {/* DEBUG: Simple test element */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '100px',
+          right: '20px',
+          width: '200px',
+          height: '100px',
+          backgroundColor: 'red',
+          color: 'white',
+          zIndex: 99999,
+          padding: '20px',
+          border: '5px solid yellow',
+          fontSize: '16px',
+          fontWeight: 'bold'
+        }}
+      >
+        TEST WIDGET - Can you see this?
+      </div>
+
       {/* Chat Bubble Trigger */}
       <button
         onClick={() => {
