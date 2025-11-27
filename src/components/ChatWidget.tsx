@@ -49,9 +49,7 @@ export default function ChatWidget() {
 
   // Force an alert on mount to debug
   useEffect(() => {
-    setTimeout(() => {
-      alert("ChatWidget is MOUNTED! If you see this alert, the component is working. Check bottom-right for chat button.");
-    }, 2000);
+    console.log("✅ ChatWidget mounted successfully with Portal!");
   }, []);
 
   const sendMessage = async (text: string) => {
@@ -104,37 +102,28 @@ export default function ChatWidget() {
 
   const widgetContent = (
     <>
-      {/* DEBUG: Simple test element */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '100px',
-          right: '20px',
-          width: '200px',
-          height: '100px',
-          backgroundColor: 'red',
-          color: 'white',
-          zIndex: 99999,
-          padding: '20px',
-          border: '5px solid yellow',
-          fontSize: '16px',
-          fontWeight: 'bold'
-        }}
-      >
-        TEST WIDGET - Can you see this?
-      </div>
-
       {/* Chat Bubble Trigger */}
       <button
         onClick={() => {
           console.log("💬 Chat bubble clicked! isOpen was:", isOpen);
           setIsOpen(!isOpen);
         }}
-        className="fixed bottom-6 right-6 max-sm:bottom-4 max-sm:right-4 z-[9999] w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center cursor-pointer"
         style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
           backgroundColor: '#06b6d4',
           border: '2px solid white',
-          color: 'white'
+          color: 'white',
+          zIndex: 99999,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
         {isOpen ? (
@@ -156,7 +145,22 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-[9999] w-[380px] h-[500px] max-sm:w-[calc(100%-3rem)] max-sm:right-3 max-sm:left-3 max-sm:h-[60vh] max-sm:bottom-20 bg-[#1a1a2e] rounded-2xl shadow-2xl border border-cyan-500/20 flex flex-col overflow-hidden"
+            style={{
+              position: 'fixed',
+              bottom: '96px',
+              right: '24px',
+              zIndex: 99999,
+              width: '380px',
+              height: '500px',
+              backgroundColor: '#1a1a2e',
+              borderRadius: '16px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(6, 182, 212, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+            className="max-sm:w-[calc(100%-3rem)] max-sm:right-3 max-sm:left-3 max-sm:h-[60vh] max-sm:bottom-20"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#2d2440] to-[#1a1a2e] p-4 border-b border-cyan-500/20">
