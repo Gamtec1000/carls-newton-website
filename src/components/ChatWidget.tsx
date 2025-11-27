@@ -94,7 +94,7 @@ export default function ChatWidget() {
       {/* Chat Bubble Trigger */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center"
+        className="fixed bottom-6 right-6 max-sm:bottom-4 max-sm:right-4 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -117,7 +117,7 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-50 w-[380px] h-[500px] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-cyan-500/20 flex flex-col overflow-hidden"
+            className="fixed bottom-24 right-6 z-50 w-[380px] h-[500px] max-sm:w-[calc(100%-3rem)] max-sm:right-3 max-sm:left-3 max-sm:h-[60vh] max-sm:bottom-20 bg-[#1a1a2e] rounded-2xl shadow-2xl border border-cyan-500/20 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#2d2440] to-[#1a1a2e] p-4 border-b border-cyan-500/20">
