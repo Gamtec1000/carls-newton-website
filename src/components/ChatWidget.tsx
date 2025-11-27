@@ -95,12 +95,17 @@ export default function ChatWidget() {
   return (
     <>
       {/* Chat Bubble Trigger */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 max-sm:bottom-4 max-sm:right-4 z-[9999] w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center"
-        style={{ backgroundColor: '#06b6d4' }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+      <button
+        onClick={() => {
+          console.log("💬 Chat bubble clicked! isOpen was:", isOpen);
+          setIsOpen(!isOpen);
+        }}
+        className="fixed bottom-6 right-6 max-sm:bottom-4 max-sm:right-4 z-[9999] w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center cursor-pointer"
+        style={{
+          backgroundColor: '#06b6d4',
+          border: '2px solid white',
+          color: 'white'
+        }}
       >
         {isOpen ? (
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +116,7 @@ export default function ChatWidget() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         )}
-      </motion.button>
+      </button>
 
       {/* Chat Popup */}
       <AnimatePresence>
