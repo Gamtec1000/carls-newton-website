@@ -1,0 +1,225 @@
+{
+  "company": {
+    "name": "Carls Newton",
+    "tagline": "Where Science Meets Imagination!",
+    "locations": ["Dubai", "Abu Dhabi"],
+    "base": "Al Raha, Abu Dhabi, UAE",
+    "email": "hello@carlsnewton.com",
+    "phone": "+971 52 409 8148",
+    "whatsapp": "+971 52 409 8148",
+    "instagram": "@carls.newton",
+    "website": "carlsnewton.com",
+    "founded": "2021 (Science Camp), 2025 (Live Shows)"
+  },
+
+  "founder": {
+    "name": "Carla Carvajal",
+    "title": "Founder & Lead Science Educator",
+    "nickname": "Carls Newton",
+    "education": "Bachelor's degree in Chemical Engineering (Veracruz Technological Institute, graduated with honors)",
+    "experience_years": "10+",
+    "languages": ["English", "Spanish", "Arabic (learning)"],
+    "background": "Passionate science educator with over a decade of experience making science accessible and exciting. Former bilingual Physics and Chemistry teacher at Green Oaks School for 7 years, where students consistently won Physics and Chemistry Olympics at state and national levels.",
+    "roles": [
+      "Chemical Engineer",
+      "Science Educator & Communicator",
+      "Former Physics & Chemistry Teacher (7 years)",
+      "Former Science Academic Coordinator",
+      "Creator & Host of 'A Pinch of Science' on Televisa Veracruz",
+      "Founder of Carls Newton Science Camp (2021)",
+      "Creator of Carls Newton Science Rocks! Live Shows (2025)"
+    ],
+    "certifications": [
+      "TOEFL iBT - English proficiency",
+      "Apple Teacher & Educaplayer Teacher",
+      "MIT 'Becoming an Entrepreneur' certificate",
+      "Positive Discipline in Classrooms",
+      "First Aid | CPR AED certification",
+      "STEM Educator Certification by STEM.org (in progress)"
+    ],
+    "philosophy": "Every child has an innate curiosity about how the world works. My role isn't to fill students with facts, but to nurture that curiosity, teach them how to ask questions, and give them the tools to discover answers themselves.",
+    "media": "Creator and host of 'A Pinch of Science' on Televisa Veracruz's morning show, bringing scientific concepts to thousands of viewers weekly. Active Instagram community sharing daily scientific facts and experiments."
+  },
+
+  "packages": [
+    {
+      "name": "Preschool Special",
+      "duration": "30-45 minutes",
+      "price": 2800,
+      "currency": "AED",
+      "suitable_for": "Preschool",
+      "max_students": 30,
+      "description": "Age-appropriate science fun designed specifically for our youngest scientists with safe, engaging demonstrations"
+    },
+    {
+      "name": "Classic Show",
+      "duration": "45-60 minutes",
+      "price": 3600,
+      "currency": "AED",
+      "suitable_for": "Y1-Y8",
+      "max_students": 30,
+      "description": "Interactive science show with spectacular experiments covering curriculum-aligned topics",
+      "popular": true
+    },
+    {
+      "name": "Half-Day Experience",
+      "duration": "Show + Workshop (4 hr show)",
+      "price": 5200,
+      "currency": "AED",
+      "suitable_for": "Y1-Y8",
+      "max_students": 30,
+      "description": "Complete STEM experience combining live demonstrations with hands-on activities where students become scientists"
+    },
+    {
+      "name": "Custom Project",
+      "duration": "School-Wide Events",
+      "price_from": 8000,
+      "currency": "AED",
+      "suitable_for": "100+ students",
+      "description": "Perfect for school-wide science fairs, STEM weeks, and large events. Fully customizable."
+    }
+  ],
+
+  "topics_covered": [
+    "Air Pressure",
+    "Chemistry",
+    "Space & Astronomy",
+    "Energy & Forces",
+    "Sound & Waves",
+    "Acids & Bases",
+    "Combustion",
+    "Static Electricity",
+    "States of Matter",
+    "Biology & Life Sciences",
+    "Ecology & Environment"
+  ],
+
+  "signature_experiments": [
+    {
+      "name": "Elephant Toothpaste",
+      "category": "Chemistry",
+      "wow_factor": "High",
+      "description": "Dramatic foam explosion demonstrating catalysis and decomposition. The foam is created by rapid decomposition of hydrogen peroxide catalyzed by potassium iodide."
+    },
+    {
+      "name": "Dry Ice Fog",
+      "category": "Physics",
+      "wow_factor": "High",
+      "description": "Spectacular fog effects demonstrating sublimation - dry ice (frozen CO2) transforms directly from solid to gas, creating dramatic fog."
+    },
+    {
+      "name": "Static Electricity",
+      "category": "Physics",
+      "wow_factor": "Medium",
+      "description": "Hair-raising demonstrations of electron transfer and electric charge buildup."
+    },
+    {
+      "name": "Baking Soda Volcano",
+      "category": "Chemistry",
+      "wow_factor": "High",
+      "description": "Classic acid-base reaction between baking soda (base) and vinegar (acid) creating an erupting volcano with CO2 gas."
+    }
+  ],
+
+  "safety": {
+    "insurance": true,
+    "trained_staff": true,
+    "equipment_provided": true,
+    "first_aid_certified": true,
+    "safety_protocols": "All experiments follow strict safety guidelines. Carla is First Aid & CPR AED certified. We use age-appropriate experiments and maintain full insurance coverage.",
+    "allergies": "Please inform us of any allergies during booking. We can adjust experiments accordingly."
+  },
+
+  "logistics": {
+    "equipment": "We bring ALL equipment and materials needed",
+    "space_required": "A classroom or hall works great",
+    "utilities_needed": "Access to water and electricity for some experiments",
+    "setup_time": "We arrive 30 minutes early to set up",
+    "cleanup": "We handle all cleanup after the show",
+    "service_areas": ["Dubai", "Abu Dhabi", "Sharjah", "UAE-wide"]
+  },
+
+  "booking": {
+    "advance_notice": "We recommend booking 1-2 weeks in advance",
+    "process": "Fill the booking form on carlsnewton.com, contact via WhatsApp +971 52 409 8148, or email hello@carlsnewton.com",
+    "customization": "Shows can be customized to match your curriculum or focus on specific topics",
+    "payment": "Payment confirmed upon booking via Stripe payment link",
+    "cancellation": "Please contact us at least 48 hours in advance for rescheduling"
+  },
+
+  "target_audiences": [
+    {
+      "type": "Schools",
+      "use_cases": ["Curriculum enrichment", "ADEK-accredited programs", "Science week events", "End of term celebrations"]
+    },
+    {
+      "type": "Parents",
+      "use_cases": ["Birthday parties", "Afternoon activities", "Summer camps", "Weekend workshops"]
+    },
+    {
+      "type": "Institutions",
+      "use_cases": ["Museums", "Malls", "Edutainment centers", "Corporate family days"]
+    }
+  ],
+
+  "differentiators": [
+    "Led by qualified Chemical Engineer with 10+ years teaching experience",
+    "Curriculum-aligned content for UAE schools",
+    "Bilingual delivery (English/Spanish, learning Arabic)",
+    "Full insurance and safety certifications",
+    "Customizable shows to match your topics",
+    "We bring everything - zero preparation needed from schools",
+    "Award-winning teaching methodology (students won national science Olympics)"
+  ],
+
+  "faqs": [
+    {
+      "q": "Who is Carls Newton?",
+      "a": "Carls Newton is founded and led by Carla Carvajal, a Chemical Engineer and passionate science educator with over 10 years of experience. Carla graduated with honors from Veracruz Technological Institute and spent 7 years as a bilingual Physics and Chemistry teacher, where her students consistently won at national Science Olympics. She's also been a TV science presenter on 'A Pinch of Science' on Televisa Veracruz and now brings that expertise to schools across the UAE!"
+    },
+    {
+      "q": "Do you bring all the equipment?",
+      "a": "Yes! We bring everything needed for the show - all materials, equipment, props, and safety gear. You just provide the space and excited students!"
+    },
+    {
+      "q": "What space do you need?",
+      "a": "A classroom or hall works great. We need access to water and electricity for some experiments. We arrive 30 minutes early to set up and handle all cleanup."
+    },
+    {
+      "q": "Are the experiments safe?",
+      "a": "Absolutely! Safety is our top priority. All experiments follow strict safety protocols. Carla is First Aid & CPR AED certified, and we carry full insurance. We use age-appropriate experiments for each group."
+    },
+    {
+      "q": "Can you customize the show?",
+      "a": "Yes! We can tailor our shows to match your curriculum or focus on specific topics you're studying, like volcanoes, space, or chemical reactions."
+    },
+    {
+      "q": "What ages are your shows suitable for?",
+      "a": "We cater to all ages! From preschoolers (30-45 min shows with age-appropriate content) to high schoolers (Y1-Y8). We adjust complexity, language, and experiments based on the age group."
+    },
+    {
+      "q": "How far in advance should I book?",
+      "a": "We recommend booking 1-2 weeks in advance, especially during busy periods like Science Week. However, contact us even for last-minute requests - we'll do our best to accommodate!"
+    },
+    {
+      "q": "Do you come to Dubai?",
+      "a": "Yes! We serve Dubai, Abu Dhabi, Sharjah, and UAE-wide. Pricing may vary slightly based on location."
+    },
+    {
+      "q": "What if a student has allergies?",
+      "a": "Please inform us of any allergies during booking. We can adjust or substitute experiments to ensure everyone's safety."
+    },
+    {
+      "q": "Can you do birthday parties?",
+      "a": "Absolutely! Science birthday parties are one of our specialties. It's an unforgettable experience that combines fun with learning!"
+    },
+    {
+      "q": "What packages do you offer?",
+      "a": "We offer 4 packages: Preschool Special (Dhs 2,800), Classic Show (Dhs 3,600 - most popular!), Half-Day Experience (Dhs 5,200), and Custom Project for school-wide events (starting from Dhs 8,000). All prices are in UAE Dirhams."
+    },
+    {
+      "q": "How do I book a show?",
+      "a": "Easy! You can book through our website carlsnewton.com, WhatsApp us at +971 52 409 8148, or email hello@carlsnewton.com. We'll send you a payment link to confirm your booking!"
+    }
+  ]
+}

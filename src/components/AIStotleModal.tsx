@@ -22,7 +22,7 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Greetings, young scientist! I am AI-STOTLE, your digital mentor for all things science. How may I illuminate your curiosity today?',
+      text: 'Hello! I\'m here to help you learn about Carls Newton science shows and answer any questions you have. I can help with packages, pricing, bookings, and more! How can I assist you today?',
       sender: 'ai',
       timestamp: new Date(),
     },
@@ -32,10 +32,10 @@ export default function AIStotleModal({ isOpen, onClose }: AIStotleModalProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickQuestions = [
-    { icon: <Rocket size={16} />, text: 'Why does elephant toothpaste foam?' },
-    { icon: <Beaker size={16} />, text: 'How does dry ice make fog?' },
-    { icon: <Sparkles size={16} />, text: 'Check my booking status' },
-    { icon: <Zap size={16} />, text: 'What is static electricity?' },
+    { icon: <Rocket size={16} />, text: 'What packages do you offer?' },
+    { icon: <Beaker size={16} />, text: 'Who is Carls Newton?' },
+    { icon: <Sparkles size={16} />, text: 'How do I book a show?' },
+    { icon: <Zap size={16} />, text: 'Check my booking status' },
   ];
 
   useEffect(() => {
