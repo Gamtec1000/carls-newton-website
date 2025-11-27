@@ -24,7 +24,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Hi! 👋 I'm here to help with questions about Carls Newton science shows. What would you like to know?",
+      text: "Hi there! 👋 I'm Newton, your science assistant! Ready to make learning FUN? Ask me about our explosive science shows! 🔬✨",
       isUser: false,
       timestamp: new Date(),
     },
@@ -112,29 +112,31 @@ export default function ChatWidget() {
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          width: '56px',
-          height: '56px',
+          width: '65px',
+          height: '65px',
           borderRadius: '50%',
-          backgroundColor: '#06b6d4',
-          border: '2px solid white',
+          background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+          border: 'none',
           color: 'white',
           zIndex: 99999,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.4)',
+          fontSize: '28px',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.boxShadow = '0 6px 25px rgba(6, 182, 212, 0.5)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(6, 182, 212, 0.4)';
         }}
       >
-        {isOpen ? (
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        )}
+        {isOpen ? '✕' : '🧪'}
       </button>
 
       {/* Chat Popup */}
@@ -152,8 +154,8 @@ export default function ChatWidget() {
               zIndex: 99999,
               width: '380px',
               height: '500px',
-              backgroundColor: '#1a1a2e',
-              borderRadius: '16px',
+              backgroundColor: 'white',
+              borderRadius: '20px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               border: '1px solid rgba(6, 182, 212, 0.2)',
               display: 'flex',
@@ -163,45 +165,134 @@ export default function ChatWidget() {
             className="max-sm:w-[calc(100%-3rem)] max-sm:right-3 max-sm:left-3 max-sm:h-[60vh] max-sm:bottom-20"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#2d2440] to-[#1a1a2e] p-4 border-b border-cyan-500/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 flex items-center justify-center">
-                  <span className="text-xl">🔬</span>
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Carls Newton</h3>
-                  <p className="text-cyan-400 text-xs">Ask us anything!</p>
-                </div>
-                <div className="ml-auto flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  <span className="text-green-400 text-xs">Online</span>
+            <div style={{
+              background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+              padding: '16px 20px',
+              borderRadius: '20px 20px 0 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <div style={{
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                background: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+              }}>
+                🔬
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  color: 'white',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  margin: 0,
+                }}>
+                  Carls Newton
+                </h3>
+                <div style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    background: '#4ADE80',
+                    borderRadius: '50%',
+                    display: 'inline-block',
+                    animation: 'pulse 2s infinite',
+                  }}></span>
+                  Online • Ask us anything!
                 </div>
               </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  color: 'white',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                ✕
+              </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '20px',
+              background: 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)',
+            }}>
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: msg.isUser ? 'flex-end' : 'flex-start',
+                    marginBottom: '12px',
+                  }}
                 >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2 ${
-                      msg.isUser
-                        ? "bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white"
-                        : "bg-[#2d2440] text-gray-100 border border-cyan-500/10"
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                  </div>
+                  {msg.isUser ? (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #06B6D4, #0891B2)',
+                      color: 'white',
+                      borderRadius: '18px 18px 4px 18px',
+                      padding: '14px 18px',
+                      maxWidth: '85%',
+                      boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)',
+                      fontSize: '15px',
+                      lineHeight: '1.5',
+                    }}>
+                      {msg.text}
+                    </div>
+                  ) : (
+                    <div style={{
+                      background: 'white',
+                      borderRadius: '18px 18px 18px 4px',
+                      padding: '14px 18px',
+                      maxWidth: '85%',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                      borderLeft: '4px solid #06B6D4',
+                      color: '#1e293b',
+                      fontSize: '15px',
+                      lineHeight: '1.5',
+                    }}>
+                      {msg.text}
+                    </div>
+                  )}
                 </div>
               ))}
 
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-[#2d2440] rounded-2xl px-4 py-3 border border-cyan-500/10">
-                    <div className="flex gap-1">
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  marginBottom: '12px',
+                }}>
+                  <div style={{
+                    background: 'white',
+                    borderRadius: '18px',
+                    padding: '14px 18px',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                    borderLeft: '4px solid #06B6D4',
+                  }}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
                       <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></span>
                       <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></span>
                       <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
@@ -215,13 +306,40 @@ export default function ChatWidget() {
 
             {/* Quick Questions (show only at start) */}
             {messages.length === 1 && (
-              <div className="px-4 pb-2">
-                <div className="flex flex-wrap gap-2">
+              <div style={{
+                padding: '0 20px 12px',
+                background: 'linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 100%)',
+              }}>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                }}>
                   {QUICK_QUESTIONS.map((q) => (
                     <button
                       key={q}
                       onClick={() => handleQuickQuestion(q)}
-                      className="text-xs bg-[#2d2440] text-cyan-300 px-3 py-1.5 rounded-full border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors"
+                      style={{
+                        background: 'white',
+                        border: '2px solid #06B6D4',
+                        borderRadius: '20px',
+                        padding: '8px 16px',
+                        color: '#0891B2',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#06B6D4';
+                        e.currentTarget.style.color = 'white';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.color = '#0891B2';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
                     >
                       {q}
                     </button>
@@ -231,30 +349,69 @@ export default function ChatWidget() {
             )}
 
             {/* Input */}
-            <div className="p-4 border-t border-cyan-500/20">
+            <div style={{
+              background: 'white',
+              padding: '16px 20px',
+              borderRadius: '0 0 20px 20px',
+              borderTop: '1px solid #e2e8f0',
+            }}>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   sendMessage(input);
                 }}
-                className="flex gap-2"
+                style={{
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'center',
+                }}
               >
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your question..."
-                  className="flex-1 bg-[#2d2440] text-white rounded-full px-4 py-2 text-sm border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50 placeholder-gray-400"
                   disabled={isLoading}
+                  style={{
+                    flex: 1,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '25px',
+                    padding: '12px 20px',
+                    fontSize: '15px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#06B6D4'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow"
+                  style={{
+                    width: '45px',
+                    height: '45px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: '18px',
+                    cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'transform 0.2s ease',
+                    opacity: input.trim() && !isLoading ? 1 : 0.5,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (input.trim() && !isLoading) {
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  ➤
                 </button>
               </form>
             </div>
