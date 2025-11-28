@@ -142,6 +142,19 @@ export default function AuthModal({ isOpen, onClose, onRegistrationSuccess }: Au
 
     setLoading(true);
 
+    // Debug logging for form data
+    console.log('📝 ===== REGISTRATION FORM DATA =====');
+    console.log('Full Name:', fullName);
+    console.log('Email:', email);
+    console.log('School/Organization:', school);
+    console.log('Phone:', phone);
+    console.log('Job Position:', jobPosition);
+    console.log('🔬 Science Topics selected:', scienceTopics);
+    console.log('📚 Resources selected:', resources);
+    console.log('🎓 Methodologies selected:', methodologies);
+    console.log('📧 Subscribe to newsletter:', subscribeNewsletter);
+    console.log('=====================================');
+
     try {
       await signUp({
         email,
