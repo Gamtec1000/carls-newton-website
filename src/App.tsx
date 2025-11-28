@@ -2087,15 +2087,37 @@ export default function CarlsNewtonLanding() {
               </svg>
               Chat on WhatsApp
             </a>
-            <button
+            <a
+              href="/brochure/carls-newton-brochure.pdf"
+              download="Carls-Newton-Science-Shows-Brochure.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                ...styles.buttonSecondary,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
                 padding: '16px 32px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '50px',
+                color: 'white',
                 fontSize: '18px',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              Download Brochure
-            </button>
+              📄 Download Brochure
+            </a>
           </div>
         </div>
       </section>
