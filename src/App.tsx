@@ -1973,7 +1973,7 @@ export default function CarlsNewtonLanding() {
       </footer>
 
       {/* Floating Chat Widget */}
-      <ChatWidget />
+      <ChatWidget onAuthRequired={() => setIsAuthModalOpen(true)} />
     </div>
   );
 }

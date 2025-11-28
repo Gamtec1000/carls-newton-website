@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Message {
   id: string;
@@ -18,8 +19,13 @@ const QUICK_QUESTIONS = [
 
 const API_URL = import.meta.env.VITE_AISTOTLE_API_URL || "https://aistotle.carlsnewton.com";
 
-export default function ChatWidget() {
+interface ChatWidgetProps {
+  onAuthRequired?: () => void;
+}
+
+export default function ChatWidget({ onAuthRequired }: ChatWidgetProps) {
   console.log("💬 ChatWidget mounted");
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -70,7 +76,10 @@ export default function ChatWidget() {
       const response = await fetch(`${API_URL}/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: text.trim() }),
+        body: JSON.stringify({
+          question: text.trim(),
+          user_email: user?.email || undefined,
+        }),
       });
 
       const data = await response.json();
@@ -232,14 +241,86 @@ export default function ChatWidget() {
               </button>
             </div>
 
-            {/* Messages */}
-            <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '20px',
-              background: 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)',
-            }}>
-              {messages.map((msg) => (
+            {/* Content: Login Required or Messages */}
+            {!user ? (
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 20px',
+                background: 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)',
+                textAlign: 'center',
+              }}>
+                <div style={{
+                  fontSize: '48px',
+                  marginBottom: '16px',
+                }}>
+                  🔒
+                </div>
+                <h3 style={{
+                  color: '#1e293b',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: '12px',
+                  margin: 0,
+                }}>
+                  Sign In Required
+                </h3>
+                <p style={{
+                  color: '#64748b',
+                  fontSize: '15px',
+                  lineHeight: '1.6',
+                  marginBottom: '24px',
+                  maxWidth: '300px',
+                }}>
+                  To protect your privacy and access booking information, please sign in to use our chatbot.
+                </p>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    onAuthRequired?.();
+                  }}
+                  style={{
+                    background: 'linear-gradient(135deg, #06B6D4, #A855F7)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '25px',
+                    padding: '12px 32px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  Sign In / Register
+                </button>
+                <p style={{
+                  color: '#94a3b8',
+                  fontSize: '13px',
+                  marginTop: '20px',
+                  margin: '20px 0 0 0',
+                }}>
+                  🔐 Your data is safe and secure
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Messages */}
+                <div style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  padding: '20px',
+                  background: 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)',
+                }}>
+                  {messages.map((msg) => (
                 <div
                   key={msg.id}
                   style={{
@@ -415,6 +496,8 @@ export default function ChatWidget() {
                 </button>
               </form>
             </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
