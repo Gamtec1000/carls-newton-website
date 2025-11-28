@@ -30,16 +30,20 @@ import { useAuth } from './contexts/AuthContext';
 // FAQ Accordion Item Component
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         background: 'rgba(255, 255, 255, 0.05)',
         backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        border: isHovered ? '1px solid #A855F7' : '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '16px',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
+        boxShadow: isHovered ? '0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3)' : 'none',
       }}
     >
       <button
@@ -64,8 +68,8 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         <span
           style={{
             fontSize: '24px',
-            color: '#06B6D4',
-            transition: 'transform 0.3s ease',
+            color: isHovered ? '#A855F7' : '#06B6D4',
+            transition: 'all 0.3s ease',
             transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
             flexShrink: 0,
           }}
