@@ -206,6 +206,18 @@ export default function CarlsNewtonLanding() {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        .faq-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+          .faq-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
         .console-grid {
           display: grid;
           grid-template-columns: 160px 1fr 160px;
@@ -1911,7 +1923,7 @@ export default function CarlsNewtonLanding() {
             Everything you need to know about our science shows
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="faq-grid">
             {[
               {
                 question: 'What age groups do you cater to?',
