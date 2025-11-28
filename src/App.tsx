@@ -27,6 +27,71 @@ import WelcomeModal from './components/WelcomeModal';
 import CheckEmailModal from './components/CheckEmailModal';
 import { useAuth } from './contexts/AuthContext';
 
+// FAQ Accordion Item Component
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        background: 'rgba(255, 255, 255, 0.05)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        transition: 'all 0.3s ease',
+      }}
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '24px',
+          background: 'transparent',
+          border: 'none',
+          color: 'white',
+          fontSize: '18px',
+          fontWeight: '600',
+          textAlign: 'left',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '16px',
+        }}
+      >
+        <span>{question}</span>
+        <span
+          style={{
+            fontSize: '24px',
+            color: '#06B6D4',
+            transition: 'transform 0.3s ease',
+            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+            flexShrink: 0,
+          }}
+        >
+          +
+        </span>
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            padding: '0 24px 24px',
+            color: '#C4B5FD',
+            fontSize: '16px',
+            lineHeight: '1.6',
+            borderTop: '1px solid rgba(6, 182, 212, 0.2)',
+            paddingTop: '16px',
+            animation: 'fadeIn 0.3s ease',
+          }}
+        >
+          {answer}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const styles = {
   gradient: {
     background:
@@ -131,6 +196,10 @@ export default function CarlsNewtonLanding() {
         @keyframes ledBlink {
           0%, 49% { opacity: 1; }
           50%, 100% { opacity: 0.3; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .console-grid {
@@ -1810,6 +1879,143 @@ export default function CarlsNewtonLanding() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section style={{ padding: '80px 16px', background: 'rgba(0, 0, 0, 0.2)' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <h2
+            style={{
+              fontSize: '48px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <p
+            style={{
+              textAlign: 'center',
+              color: '#C4B5FD',
+              marginBottom: '48px',
+              fontSize: '18px',
+            }}
+          >
+            Everything you need to know about our science shows
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[
+              {
+                question: 'What age groups do you cater to?',
+                answer: 'We offer tailored programs for all ages from preschool (ages 3-5) through Year 8 (ages 13-14). Our Preschool Special features age-appropriate, sensory-focused experiments, while our Classic Shows and workshops are curriculum-aligned for Y1-Y8 students with more complex scientific concepts.',
+              },
+              {
+                question: 'How long do the shows typically last?',
+                answer: 'Our Preschool Special runs 30-45 minutes, perfect for younger attention spans. The Classic Show is 45-60 minutes of explosive demonstrations. Our Half-Day Experience combines a show and workshop for approximately 4 hours of hands-on learning. Custom projects are flexible based on your event needs.',
+              },
+              {
+                question: 'How many students can participate in each session?',
+                answer: 'Most of our packages accommodate up to 30 students per session to ensure quality interaction and safety. For larger groups or school-wide events (100+ students), we offer our Custom Project package with specialized setups and multiple sessions.',
+              },
+              {
+                question: 'What topics and experiments do you cover?',
+                answer: 'We cover a wide range of curriculum-aligned STEM topics including chemistry reactions, physics principles, air pressure, states of matter, electricity, and more. Each show features spectacular demonstrations like dry ice experiments, liquid nitrogen shows, elephant toothpaste, and interactive challenges that bring textbook concepts to life!',
+              },
+              {
+                question: 'Do you provide all the materials and equipment?',
+                answer: 'Yes! We bring everything needed for the shows and workshops including all experiments, materials, safety equipment, and take-home items where applicable. You just need to provide the space and excited students!',
+              },
+              {
+                question: 'Are the experiments safe for students?',
+                answer: 'Absolutely! Safety is our top priority. All demonstrations are conducted by trained science educators with proper safety protocols. We use age-appropriate experiments and ensure students maintain safe distances during spectacular reactions. All materials meet safety standards.',
+              },
+              {
+                question: 'How far in advance should we book?',
+                answer: 'We recommend booking at least 2-3 weeks in advance to secure your preferred date and time slot. For school-wide events or custom projects, 4-6 weeks advance notice is ideal. However, we do our best to accommodate last-minute requests when possible!',
+              },
+              {
+                question: 'What areas in the UAE do you service?',
+                answer: 'We service schools across all Emirates including Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Travel fees may apply for locations outside Dubai and may be included in your custom quote.',
+              },
+              {
+                question: 'Can the content be customized to our curriculum?',
+                answer: 'Yes! Our shows are designed to align with UAE curriculum standards, and we can customize experiments and topics to complement specific units you\'re teaching. Just let us know your learning objectives when booking, and we\'ll tailor the experience accordingly.',
+              },
+              {
+                question: 'What is your cancellation and rescheduling policy?',
+                answer: 'We understand that school schedules can change. Cancellations or rescheduling requests made 48 hours or more before the scheduled show receive a full refund or free rescheduling. Requests within 48 hours may be subject to a rescheduling fee. Please contact us as soon as possible if changes are needed.',
+              },
+            ].map((faq, idx) => (
+              <FAQItem key={idx} question={faq.question} answer={faq.answer} />
+            ))}
+          </div>
+
+          {/* Still have questions CTA */}
+          <div
+            style={{
+              marginTop: '64px',
+              padding: '40px',
+              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(168, 85, 247, 0.1))',
+              borderRadius: '24px',
+              border: '2px solid rgba(6, 182, 212, 0.3)',
+              textAlign: 'center',
+            }}
+          >
+            <h3
+              style={{
+                fontSize: '28px',
+                fontWeight: 'bold',
+                marginBottom: '16px',
+              }}
+            >
+              Still have questions?
+            </h3>
+            <p
+              style={{
+                color: '#C4B5FD',
+                marginBottom: '24px',
+                fontSize: '16px',
+              }}
+            >
+              We're here to help! Get in touch via WhatsApp for instant answers.
+            </p>
+            <a
+              href="https://wa.me/971524098148?text=Hi%20Carls%20Newton!%20I%20have%20some%20questions%20about%20your%20science%20shows."
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 28px',
+                background: '#25D366',
+                border: 'none',
+                borderRadius: '50px',
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 211, 102, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Chat with us on WhatsApp
+            </a>
           </div>
         </div>
       </section>
