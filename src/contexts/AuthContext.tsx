@@ -365,12 +365,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // 3. Save preferences if user is confirmed (session exists)
       if (authData.session) {
-        console.log('Saving user preferences...');
+        console.log('🎯 ===== SAVING USER PREFERENCES =====');
+        console.log('User ID:', authData.user.id);
+        console.log('Raw interests array:', data.interests);
+        console.log('Raw resources array:', data.resources);
+        console.log('Raw methodologies array:', data.methodologies);
+
         // Delete existing ones first to avoid conflicts
-        await supabase
+        const { error: deleteError } = await supabase
           .from('user_preferences')
           .delete()
           .eq('user_id', authData.user.id);
+
+        if (deleteError) {
+          console.error('❌ Error deleting old preferences:', deleteError);
+        } else {
+          console.log('✅ Old preferences deleted (if any)');
+        }
 
         const preferences = [
           ...data.interests.map(i => ({
@@ -390,15 +401,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })),
         ];
 
+        console.log('📊 Total preferences to save:', preferences.length);
+        console.log('📋 Preferences data:', JSON.stringify(preferences, null, 2));
+
         if (preferences.length > 0) {
-          const { error: prefsError } = await supabase
+          console.log('💾 Inserting preferences into database...');
+          const { data: insertedData, error: prefsError } = await supabase
             .from('user_preferences')
-            .insert(preferences);
+            .insert(preferences)
+            .select();
 
           if (prefsError) {
-            console.error('Preferences save error:', prefsError);
+            console.error('❌ Preferences save error:', prefsError);
+            console.error('Error code:', prefsError.code);
+            console.error('Error message:', prefsError.message);
+            console.error('Error details:', prefsError.details);
             throw prefsError;
           }
+
+          console.log('✅ Preferences saved successfully!');
+          console.log('📥 Inserted data:', insertedData);
+          console.log('🎯 ====================================');
+        } else {
+          console.log('⚠️ No preferences to save (all arrays empty)');
+          console.log('🎯 ====================================');
         }
 
         // Fetch the newly created profile
